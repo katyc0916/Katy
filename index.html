@@ -22,12 +22,18 @@
             font-family: 'Noto Sans TC', sans-serif; 
             font-weight: bold; 
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; overflow: hidden; 
+            min-height: 100vh; 
+            /* 修正：改為 auto 確保長清單可捲動 */
+            overflow-y: auto; 
+            -webkit-font-smoothing: antialiased;
         }
 
         .phone-container { 
             width: 95vw; max-width: 400px; height: 85vh; 
             perspective: 2000px; position: relative; 
+            /* 修正：增加硬體加速穩定性 */
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
         }
 
         .music-wrapper {
@@ -40,6 +46,7 @@
             background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; border: 2px solid var(--theme-blue);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: transparent;
         }
         .music-control.playing { animation: rotate 4s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -52,6 +59,11 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             transform-origin: top center; overflow: hidden; cursor: pointer;
+            /* 修正：防閃爍核心代碼 */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
         }
 
         @keyframes buttonBreathe {
@@ -112,7 +124,7 @@
             cursor: pointer;
         }
         
-        .page-content { padding: 18px; padding-bottom: 95px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+        .page-content { padding: 18px; padding-bottom: 95px; height: 100%; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         .page-title { 
             position: relative;
@@ -272,7 +284,7 @@
             border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 500; 
         }
 
-        .nav-item { font-size: 0.65rem; text-align: center; color: #444; font-weight: normal; cursor: pointer; transition: transform 0.2s; }
+        .nav-item { font-size: 0.65rem; text-align: center; color: #444; font-weight: normal; cursor: pointer; transition: transform 0.2s; -webkit-tap-highlight-color: transparent; }
         .nav-item:active { transform: scale(0.9); }
         .nav-item img { display: block; margin: 0 auto 3px; width: 20px; height: 20px; }
 
