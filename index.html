@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8-Day Osaka Itinerary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #fefae0;
+            --osaka-red: #e63946;
+            --theme-blue: #a2d2ff;
+            --japan-blue: #d1e9f0; 
+            --flight-purple: #6a0dad;
+            --bag-cyan: #4cc9f0;
+        }
+
+        body { 
+            margin: 0; background: #1a1b26; 
+            font-family: 'Noto Sans TC', sans-serif; 
+            font-weight: bold; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden; 
+        }
+
+        .phone-container { 
+            width: 95vw; max-width: 400px; height: 85vh; 
+            perspective: 2000px; position: relative; 
+        }
+
+        .music-wrapper {
+            position: absolute; top: 15px; right: 15px; 
+            display: flex; gap: 10px; z-index: 9999;
+        }
+
+        .music-control {
+            width: 45px; height: 45px;
+            background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid var(--theme-blue);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .music-control.playing { animation: rotate 4s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .single-page {
+            position: absolute; width: 100%; height: 100%; border-radius: 25px;
+            background-color: var(--japan-blue);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40a40 40 0 0 1 40-40 40 40 0 0 1 40 40H70a30 30 0 0 0-30-30 30 30 0 0 0-30 30H0zm40-10a10 10 0 0 1 10-10 10 10 0 0 1 10 10h10a20 20 0 0 0-20-20 20 20 0 0 0-20 20h10z' fill='%23a2d2ff' fill-opacity='0.3'/%3E%3C/svg%3E");
+            background-size: 60px; background-repeat: repeat; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            transform-origin: top center; overflow: hidden; cursor: pointer;
+        }
+
+        @keyframes buttonBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+            50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        }
+
+        @keyframes underlineGrow {
+            0% { width: 0; opacity: 0; }
+            100% { width: 100%; opacity: 1; }
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .hero-cover {
+            height: 100%; border-radius: 25px;
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.7)), 
+                              url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800') !important;
+            background-size: cover !important; background-position: center !important;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 0 !important; 
+        }
+
+        .hero-text-block { padding: 30px 20px 65px 20px; text-align: center; }
+        
+        .main-title { 
+            font-size: clamp(1.3rem, 5.5vw, 1.7rem); 
+            margin: 5px 0; 
+            color: white; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 
+                         0 0 4px rgba(230, 57, 70, 0.7), 
+                         0 0 8px rgba(230, 57, 70, 0.4),
+                         0 0 12px rgba(255, 255, 255, 0.3); 
+            font-weight: bold; 
+        }
+        
+        .happy-trip { 
+            font-size: clamp(0.9rem, 4vw, 1.1rem); 
+            margin: 0 0 20px 0; color: white; font-weight: bold; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 6px rgba(162, 210, 255, 0.5);
+        }
+        
+        .cta-container {
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; color: white; font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 6px rgba(162, 210, 255, 0.5);
+        }
+
+        .cta-button {
+            display: inline-block; padding: 10px 25px;
+            background-color: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(5px); border-radius: 50px; 
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            animation: buttonBreathe 3s ease-in-out infinite;
+            cursor: pointer;
+        }
+        
+        .page-content { padding: 18px; padding-bottom: 95px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+        
+        .page-title { 
+            position: relative;
+            color: var(--osaka-red); 
+            padding-bottom: 8px; margin-bottom: 15px; 
+            font-weight: bold; 
+            text-align: left; 
+            text-shadow: 0 0 5px rgba(230, 57, 70, 0.2); 
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+
+        .page-title span.emoji {
+            display: inline-block;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; 
+            width: 0; height: 2.5px;
+            background: linear-gradient(to right, var(--osaka-red), transparent);
+            animation: underlineGrow 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .japan-time-box {
+            font-size: 0.75rem;
+            color: #555;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 3px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+            border: 1px solid rgba(162, 210, 255, 0.5);
+        }
+        .local-clock { font-weight: bold; color: var(--osaka-red); }
+        
+        .info-box { 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
+            border-radius: 12px; padding: 12px; margin-bottom: 10px; border-bottom: 3px solid var(--theme-blue); 
+        }
+
+        .check-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; margin-bottom: 5px; cursor: default;
+        }
+        .check-item input { width: 14px; height: 14px; accent-color: var(--osaka-red); margin: 0; cursor: pointer; }
+        .check-item:has(input:checked) { color: #aaa; text-decoration: line-through; }
+
+        .crew-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        @keyframes jellyBreathe {
+            0%, 100% { transform: scale(1) rotate(0deg); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { transform: scale(1.03) rotate(1deg); border-radius: 40% 60% 70% 30% / 30% 70% 40% 60%; }
+        }
+
+        .member-card-squishy {
+            padding: 15px 10px; margin-bottom: 10px; border: 3px solid #fff;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            animation: jellyBreathe 4s ease-in-out infinite;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+        .member-card-squishy:active { transform: scale(0.85) rotate(-2deg); }
+        .katy-card { background-color: rgba(243, 209, 255, 0.9); animation-delay: 0s; }
+        .to-card { background-color: rgba(209, 238, 255, 0.9); animation-delay: 0.5s; }
+        .aidan-card { background-color: rgba(209, 255, 248, 0.9); animation-delay: 1s; }
+        .lok-card { background-color: rgba(216, 255, 209, 0.9); animation-delay: 1.5s; }
+        .eva-card { background-color: rgba(255, 232, 209, 0.9); animation-delay: 2s; }
+        .sumi-card { background-color: rgba(255, 209, 231, 0.9); animation-delay: 2.5s; }
+
+        .char-circle { width: 45px; height: 45px; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .member-card-squishy p { margin: 0; text-align: center; font-weight: bold; color: #333; }
+
+        .flight-ticket { color: var(--flight-purple); font-size: 0.85rem; }
+        .flight-row { display: flex; align-items: flex-start; margin-bottom: 4px; }
+        .flight-date-label { font-size: 0.75rem; background: var(--flight-purple); color: white; padding: 2px 8px; border-radius: 4px; margin-bottom: 5px; display: inline-block; font-weight: bold; }
+        .flight-time { font-weight: bold; font-size: 1.05rem; margin-right: 8px; color: #000; }
+        .flight-city { font-weight: bold; color: #000; }
+        .flight-line-container { margin: 2px 0 2px 28px; border-left: 2.5px solid var(--flight-purple); padding-left: 18px; }
+        .flight-duration-info { font-size: 0.8rem; padding: 4px 0; font-weight: bold; }
+
+        .luggage-display { display: flex; justify-content: space-around; text-align: center; margin: 10px 0; }
+        .luggage-svg { width: 50px; height: 50px; margin-bottom: 5px; }
+        .luggage-label { font-size: 0.8rem; font-weight: bold; color: var(--flight-purple); border-bottom: 2px solid; }
+
+        .flight-link { color: #007bff; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 5px; }
+        .vjw-item { display: block; margin-top: 5px; padding: 8px; background: rgba(162, 210, 255, 0.2); border-radius: 8px; font-weight: bold; color: #007bff; text-decoration: none; font-size: 0.85rem; border: 1px solid var(--theme-blue); text-align: center; }
+
+        .day-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--osaka-red); margin-bottom: 3px; font-size: 0.9rem; align-items: center; }
+        
+        .weather-link { 
+            font-size: 0.65rem; color: #007bff; text-decoration: none; 
+            padding: 2px 6px; border: 1.5px solid #a2d2ff; border-radius: 8px; 
+            background: white; transition: 0.2s; white-space: nowrap;
+            font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .weather-link:active { background: #007bff; color: white; border-color: #007bff; }
+
+        .map-icon { 
+            display: inline-block; 
+            text-decoration: none; 
+            padding: 2px 4px; 
+            background: rgba(162, 210, 255, 0.4); 
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+
+        .all-lockers-btn {
+            display: block; width: 100%; background: var(--bag-cyan); color: white;
+            text-align: center; padding: 10px; border-radius: 10px;
+            text-decoration: none; font-weight: bold; font-size: 0.85rem;
+            margin-bottom: 12px; box-shadow: 0 4px 8px rgba(76, 201, 240, 0.3);
+            border: none; cursor: pointer;
+        }
+
+        .stay-input-group {
+            display: flex; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed #ddd; padding-bottom: 4px;
+        }
+        .stay-input-group label {
+            font-size: 0.85rem; color: #444; white-space: nowrap; width: 105px;
+        }
+        .stay-input-group input {
+            flex: 1; border: none; background: transparent; font-size: 0.9rem; font-weight: bold; color: #0056b3; outline: none; width: 100%;
+        }
+        .stay-input-group input::placeholder { color: #aaa; font-weight: normal; }
+        
+        .trip-btn {
+            display: block; background: #007bff; color: white; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1rem; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,123,255,0.3); transition: transform 0.2s;
+        }
+        .trip-btn:active { transform: scale(0.95); }
+
+        .survival-section { margin-bottom: 12px; }
+        .survival-title { font-size: 0.85rem; font-weight: bold; color: #333; margin: 0 0 6px 0; border-left: 4px solid #27ae60; padding-left: 6px; }
+        .survival-list { list-style: none; padding: 0; margin: 0; font-size: 0.8rem; }
+        .survival-list li { margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; line-height: 1.4; color: #444; }
+        .line-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 3px; transform: translateY(1px); border: 1px solid rgba(0,0,0,0.1);}
+        .subway-desc { font-size: 0.75rem; color: #777; width: 100%; padding-left: 12px; margin-top: 2px;}
+
+        .timeline-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-left: 3px solid var(--theme-blue); transition: all 0.3s; user-select: none; }
+        .timeline-row.pressing { background: rgba(230, 57, 70, 0.15); border-radius: 8px; transform: scale(0.98); }
+        .time-input { width: 55px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
+        .loc-input { flex: 1; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; border-bottom: 1.5px dashed #aaa; padding: 2px 0; outline: none; color: #333; transition: font-size 0.2s; }
+        .loc-input::placeholder { color: #bbb; font-weight: normal; }
+        .map-icon-btn { font-size: 1.1rem; cursor: pointer; pointer-events: auto; padding: 2px 4px; background: rgba(162, 210, 255, 0.2); border-radius: 4px; text-decoration: none; display: inline-block; }
+        .add-btn { width: 42px; height: 42px; background: white; border: 3px solid var(--theme-blue); border-radius: 50%; font-size: 1.8rem; color: var(--theme-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 15px auto 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: auto; transition: transform 0.2s; }
+        .add-btn:active { transform: scale(0.9); }
+
+        .bottom-nav { 
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); 
+            width: 95%; max-width: 400px; background: white; 
+            display: flex; justify-content: space-around; padding: 8px 5px; 
+            border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 500; 
+        }
+
+        .nav-item { font-size: 0.65rem; text-align: center; color: #444; font-weight: normal; cursor: pointer; transition: transform 0.2s; }
+        .nav-item:active { transform: scale(0.9); }
+        .nav-item img { display: block; margin: 0 auto 3px; width: 20px; height: 20px; }
+
+        .single-page.flipped { transform: rotateX(110deg) translateY(-40px); opacity: 0; pointer-events: none; }
+
+        .toast-notification {
+            visibility: hidden; min-width: 250px; background-color: rgba(0, 0, 0, 0.8);
+            color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px;
+            position: fixed; z-index: 10000; left: 50%; bottom: 85px; transform: translateX(-50%);
+            font-size: 0.85rem; font-weight: bold; backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: visibility 0s, opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
+            opacity: 0; pointer-events: none;
+        }
+        .toast-notification.show { visibility: visible; opacity: 1; bottom: 100px; }
+
+        .fx-refresh-btn {
+            background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--osaka-red);
+            transition: transform 0.5s ease; padding: 5px;
+        }
+        .fx-refresh-btn.spinning { transform: rotate(360deg); }
+        .update-time { font-size: 0.6rem; color: #888; display: block; margin-top: 4px; }
+
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+    <div class="music-wrapper">
+        <div class="music-control" id="btn-mozart" onclick="toggleMusic('audio-mozart', 'btn-mozart', '🎼', '🌻')">
+            <span>🎼</span>
+            <audio id="audio-mozart" loop preload="auto">
+                <source src="https://archive.org/download/COMPLETE_MOZART_PIANO_SONATAS/Mozart_PS_No.17_in_CM_K.545_SDRodrian.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+        <div class="music-control" id="btn-chopin" onclick="toggleMusic('audio-chopin', 'btn-chopin', '🎹', '🌷')">
+            <span>🎹</span>
+            <audio id="audio-chopin" loop preload="auto">
+                <source src="https://www.mfiles.co.uk/mp3-downloads/chopin-nocturne-op9-no2.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+    </div>
+
+    <div class="book-single" id="book">
+        <div class="single-page p1" onclick="handleFlip(event, this)" style="z-index: 20;">
+            <div class="page-content hero-cover">
+                <div class="hero-text-block">
+                    <p style="color: white; font-size: 0.8rem; margin:0;">JULY 16 - JULY 23, 2026</p>
+                    <h1 class="main-title">8-Day Osaka Itinerary</h1>
+                    <p class="happy-trip">《 Joyful Vacation 》</p>
+                    <div class="cta-container">◀ <div class="cta-button">GoGoGo</div> ▶</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="single-page p2" onclick="handleFlip(event, this)" style="z-index: 19;">
+            <div class="page-content">
+                <h3 class="page-title"><span class="emoji">😆</span> Fun-Filled Crew <span class="emoji">😆</span></h3>
+                <div class="crew-grid">
+                    <div class="member-card-squishy katy-card"><div class="char-circle">🦄</div><p>Katy</p></div>
+                    <div class="member-card-squishy to-card"><div class="char-circle">🐴</div><p>To</p></div>
+                    <div class="member-card-squishy aidan-card"><div class="char-circle">🐰</div><p>Aidan</p></div>
+                    <div class="member-card-squishy lok-card"><div class="char-circle">🐭</div><p>Lok</p></div>
+                    <div class="member-card-squishy eva-card"><div class="char-circle">🐯</div><p>Eva</p></div>
+                    <div class="member-card-squishy sumi-card"><div class="char-circle">🐶</div><p>Sumi</p></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="single-page p3" onclick="handleFlip(event, this)" style="z-index: 18;">
+            <div class="page-content">
+                <h3 class="page-title"><span class="emoji">🧳</span> Ready, Set, Pack! <span class="emoji">🧳</span></h3>
+                <div class="info-box" style="border-bottom-color: var(--osaka-red);">
+                    <h4 style="margin-top:0; color:var(--osaka-red); font-size: 0.9rem;">⚠️ 手提 & 重要證件</h4>
+                    <div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="check-item"><input type="checkbox" id="pack-id"> 證件/錢包</div>
+                        <div class="check-item"><input type="checkbox" id="pack-ticket"> 登機證</div>
+                        <div class="check-item"><input type="checkbox" id="pack-tech"> 手提電話</div>
+                        <div class="check-item"><input type="checkbox" id="pack-power"> 行動電源</div>
+                        <div class="check-item"><input type="checkbox" id="pack-sim"> SIM卡/針</div>
+                        <div class="check-item"><input type="checkbox" id="pack-qr"> QR code</div>
+                    </div>
+                </div>
+                <div class="info-box" style="border-bottom-color: var(--bag-cyan);">
+                    <h4 style="margin-top:0; color:var(--bag-cyan); font-size: 0.9rem;">👕 寄艙衣物</h4>
+                    <div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="check-item"><input type="checkbox" id="cloth-1"> 出街衫褲</div>
+                        <div class="check-item"><input type="checkbox" id="cloth-2"> 睡衣/內衣</div>
+                        <div class="check-item"><input type="checkbox" id="cloth-3"> 襪子/拖鞋</div>
+                        <div class="check-item"><input type="checkbox" id="cloth-4"> 毛巾/浴巾</div>
+                        <div class="check-item"><input type="checkbox" id="cloth-5"> 外套</div>
+                        <div class="check-item"><input type="checkbox" id="cloth-6"> 太陽帽</div>
+                    </div>
+                </div>
+                <div class="info-box" style="border-bottom-color: var(--flight-purple);">
+                    <h4 style="margin-top:0; color:var(--flight-purple); font-size: 0.9rem;">🛠️ 雜物 & 電器</h4>
+                    <div class="crew-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="check-item"><input type="checkbox" id="util-1"> 充電線/充電器</div>
+                        <div class="check-item"><input type="checkbox" id="util-2"> 平安藥/雨衣雨傘</div>
+                        <div class="check-item"><input type="checkbox" id="util-3"> 轉插頭/密碼鎖</div>
+                        <div class="check-item"><input type="checkbox" id="util-4"> 環保袋/備用膠袋</div>
+                    </div>
+                </div>
+                <div class="info-box" style="border-bottom-color: #f9ca24;">
+                    <h4 style="margin-top:0; color:#e67e22; font-size: 0.9rem;">🧴 日用品 & 護理</h4>
+                    <div class="crew-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="check-item"><input type="checkbox" id="care-1"> 牙膏牙刷/梳</div>
+                        <div class="check-item"><input type="checkbox" id="care-2"> 洗面/護膚品</div>
+                        <div class="check-item"><input type="checkbox" id="care-3"> 消毒/隱形眼鏡</div>
+                        <div class="check-item"><input type="checkbox" id="care-4"> 剃鬚/防曬品</div>
+                        <div class="check-item"><input type="checkbox" id="care-5"> 濕巾/乾紙巾</div>
+                        <div class="check-item"><input type="checkbox" id="care-special"> 女性用品</div>
+                        <div class="check-item"><input type="checkbox" id="care-teeth"> 牙線棒/棉花棒</div>
+                        <div class="check-item"><input type="checkbox" id="care-nipper"> 眉鉗/指甲鉗</div>
+                        <div class="check-item"><input type="checkbox" id="care-stone"> 藥膏/止汗石</div>
+                        <div class="check-item"><input type="checkbox" id="care-6"> 口罩/水樽</div>
+                        <div class="check-item"><input type="checkbox" id="care-fan"> 撥扇/電風扇</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="single-page p4" onclick="handleFlip(event, this)" style="z-index: 17;">
+            <div class="page-content">
+                <h3 class="page-title"><span class="emoji">🚀</span> Sky-High Fun <span class="emoji">🚀</span></h3>
+                <div class="info-box">
+                    <h4>香港快運 HK Express</h4>
+                    <a href="https://www.hkexpress.com/" class="flight-link" target="_blank">🌐 官方網站連結</a>
+                    <div class="flight-ticket">
+                        <div class="flight-date-label">去程：2026年7月16日</div>
+                        <div class="flight-row"><span>✈️</span><span class="flight-time">07:05</span><span class="flight-city">HKG 香港國際機場</span></div>
+                        <div class="flight-line-container"><div class="flight-duration-info">✈️ 3h 45m | Flight UO850 (T2)</div></div>
+                        <div class="flight-row"><span>✈️</span><span class="flight-time">11:50</span><span class="flight-city">KIX 關西國際機場</span></div>
+                    </div>
+                    <hr style="border:0; border-top:1px dashed #ccc; margin:12px 0;">
+                    <div class="flight-ticket">
+                        <div class="flight-date-label">回程：2026年7月23日</div>
+                        <div class="flight-row"><span>✈️</span><span class="flight-time">20:40</span><span class="flight-city">KIX 關西國際機場</span></div>
+                        <div class="flight-line-container"><div class="flight-duration-info">✈️ 4h 10m | Flight UO689 (T2)</div></div>
+                        <div class="flight-row"><span>✈️</span><span class="flight-time">23:50</span><span class="flight-city">HKG 香港國際機場</span></div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h4>🧳 行理詳細配額與尺寸</h4>
+                    <div class="luggage-display">
+                        <div class="luggage-item">
+                            <svg class="luggage-svg" viewBox="0 0 100 100">
+                                <rect x="30" y="25" width="40" height="50" rx="5" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/>
+                                <path d="M40 25 V15 H60 V25" fill="none" stroke="var(--bag-cyan)" stroke-width="4"/>
+                                <path d="M42 38 V65 M58 38 V65" fill="none" stroke="var(--flight-purple)" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="35" cy="78" r="3" fill="var(--flight-purple)"/><circle cx="65" cy="78" r="3" fill="var(--flight-purple)"/>
+                            </svg>
+                            <div class="luggage-label">寄艙行李</div>
+                            <div style="font-size:0.65rem; color:#666; margin-top:3px;">158cm / 62吋</div>
+                        </div>
+                        <div class="luggage-item">
+                            <svg class="luggage-svg" viewBox="0 0 100 100">
+                                <path d="M30 70 V45 A20 20 0 0 1 70 45 V70" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/>
+                                <rect x="30" y="70" width="40" height="4" fill="var(--flight-purple)"/>
+                                <rect x="45" y="55" width="10" height="10" rx="2" fill="none" stroke="var(--bag-cyan)" stroke-width="3.5"/>
+                                <path d="M25 70 H30 M70 70 H75" stroke="var(--flight-purple)" stroke-width="4.5"/>
+                            </svg>
+                            <div class="luggage-label">手提行李</div>
+                            <div style="font-size:0.65rem; color:#666; margin-top:3px;">40x25x20cm</div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem;"><strong>去程：</strong>隨身 7kg x6 + 寄艙 20kg x4</p>
+                    <p style="font-size:0.85rem;"><strong>回程：</strong>隨身 7kg x6 + 寄艙 32kg x4</p>
+                </div>
+                <div class="info-box" style="border-bottom: 3px solid #f9ca24;">
+                    <a href="https://vjw-lp.digital.go.jp/zh-hant/" class="vjw-item" target="_blank">🔗 Visit Japan Web 官方申報入口</a>
+                    <p style="font-size: 0.65rem; margin-top: 5px; color: #666; text-align:center;">(過關必備，請務必先完成申報並截圖 QR Code)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="single-page p5" onclick="handleFlip(event, this)" style="z-index: 16;">
+            <div class="page-content">
+                <div class="day-header"><span>16/7 (Thu) - 23/7 (Thu)</span></div>
+                <h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3>
+                
+                <div class="info-box" style="border-bottom-color: var(--osaka-red);">
+                    <h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem;">MA Masters Residence<br>道頓堀 · 島之內 · 心齋橋</h4>
+                    <p style="font-size: 0.85rem; color: #555; line-height: 1.4;">
+                        📍 2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka
+                        <span onclick="openStaticMap('〒542-0082 大阪府大阪市中央区島之内２丁目９−14')" class="map-icon">🌐 導航</span>
+                    </p>
+                    <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
+                    <div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;">
+                        <p style="margin:5px 0;">🔑 Check-in: 16:00</p>
+                        <p style="margin:5px 0;">🚪 Check-out: 11:00</p>
+                    </div>
+                </div>
+
+                <div class="info-box" style="border-bottom-color: var(--theme-blue);">
+                    <div class="stay-input-group">
+                        <label>🔢 分配房號：</label>
+                        <input type="text" id="stay-room" placeholder="點擊輸入..." onchange="saveStayInfo()">
+                    </div>
+                    <div class="stay-input-group">
+                        <label>🔓 門鎖密碼：</label>
+                        <input type="text" id="stay-door" placeholder="點擊輸入..." onchange="saveStayInfo()">
+                    </div>
+                    <div class="stay-input-group">
+                        <label>📶 Wi-Fi 名稱：</label>
+                        <input type="text" id="stay-wifi-name" placeholder="點擊輸入..." onchange="saveStayInfo()">
+                    </div>
+                    <div class="stay-input-group" style="border-bottom: none; margin-bottom: 0;">
+                        <label>🔑 Wi-Fi 密碼：</label>
+                        <input type="text" id="stay-wifi-pass" placeholder="點擊輸入..." onchange="saveStayInfo()">
+                    </div>
+                    
+                    <a href="https://www.trip.com/w/AOyeUfgZ9U2" class="trip-btn" target="_blank">🟦 Trip.com 訂單詳情</a>
+                </div>
+
+                <div class="info-box" style="border-bottom-color: #27ae60;">
+                    <div class="survival-section">
+                        <p class="survival-title">🧳 行李寄存與預約</p>
+                        <a href="https://cloak.ecbo.io/zh-TW/jpn/city/osaka" class="all-lockers-btn" target="_blank">🔍 ecbo cloak 大阪行李預約</a>
+                        
+                        <ul class="survival-list">
+                            <li>
+                                <strong>民宿寄存：</strong>
+                                <div style="width:100%; display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
+                                    <div style="display:flex; align-items:center;">
+                                        <span style="font-size:0.75rem; color:#666; width:65px;">入住前：</span>
+                                        <input type="text" id="luggage-before" placeholder="填寫存放詳情..." onchange="saveStayInfo()" style="flex:1; border:none; border-bottom:1px solid #ddd; background:transparent; font-size:0.8rem; font-weight:bold; outline:none; color:#27ae60;">
+                                    </div>
+                                    <div style="display:flex; align-items:center;">
+                                        <span style="font-size:0.75rem; color:#666; width:65px;">退房後：</span>
+                                        <input type="text" id="luggage-after" placeholder="填寫存放詳情..." onchange="saveStayInfo()" style="flex:1; border:none; border-bottom:1px solid #ddd; background:transparent; font-size:0.8rem; font-weight:bold; outline:none; color:#27ae60;">
+                                    </div>
+                                </div>
+                            </li>
+                            <li style="margin-top:10px;">
+                                <strong>日本橋站置物櫃：</strong>
+                                <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐 導航</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="survival-section">
+                        <p class="survival-title">🏪 便利商店</p>
+                        <ul class="survival-list">
+                            <li>FamilyMart (島之內二丁目店) · 🚶 1 min <span onclick="openStaticMap('FamilyMart 島之内二丁目店')" class="map-icon">🌐</span></li>
+                            <li>7-Eleven (大阪島之內 2 丁目店) · 🚶 2 min <span onclick="openStaticMap('7-Eleven 大阪島之内２丁目店')" class="map-icon">🌐</span></li>
+                            <li>Lawson (島之內店) · 🚶 4 min <span onclick="openStaticMap('Lawson 島之内店')" class="map-icon">🌐</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="survival-section">
+                        <p class="survival-title">🛒 超市與購物</p>
+                        <ul class="survival-list">
+                            <li>玉出超市 (周防町店) · 🚶 4 min <span onclick="openStaticMap('スーパー玉出 周防町店')" class="map-icon">🌐</span></li>
+                            <li>Foodium (心齋橋店) · 🚶 6 min <span onclick="openStaticMap('foodium 心斎橋')" class="map-icon">🌐</span></li>
+                            <li>唐吉訶德 (道頓堀北館) · 🚶 7 min <span onclick="openStaticMap('ドン・キホーテ 道頓堀北館')" class="map-icon">🌐</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="survival-section" style="margin-bottom: 0;">
+                        <p class="survival-title">🚇 鄰近地鐵站</p>
+                        <ul class="survival-list">
+                            <li>
+                                <strong>日本橋站</strong> · 🚶 6 min <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span>
+                                <div class="subway-desc">
+                                    <span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#e44d92;"></span>(千日前線) - <strong>6號出口有電梯</strong>
+                                </div>
+                            </li>
+                            <li>
+                                <strong>長堀橋站</strong> · 🚶 7 min <span onclick="openStaticMap('長堀橋駅')" class="map-icon">🌐</span>
+                                <div class="subway-desc">
+                                    <span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)
+                                </div>
+                            </li>
+                            <li>
+                                <strong>心齋橋站</strong> · 🚶 13 min <span onclick="openStaticMap('心斎橋駅')" class="map-icon">🌐</span>
+                                <div class="subway-desc">
+                                    <span class="line-dot" style="background:#e5171f;"></span>(御堂筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="single-page p6" onclick="handleFlip(event, this)" style="z-index: 15;"><div class="page-content"><div class="day-header"><span>Day 01 - 16/07 (Thu)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day1-list"></div><div class="add-btn" onclick="addNewRow('day1-list')">＋</div></div></div>
+        <div class="single-page p7" onclick="handleFlip(event, this)" style="z-index: 14;"><div class="page-content"><div class="day-header"><span>Day 02 - 17/07 (Fri)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day2-list"></div><div class="add-btn" onclick="addNewRow('day2-list')">＋</div></div></div>
+        <div class="single-page p8" onclick="handleFlip(event, this)" style="z-index: 13;"><div class="page-content"><div class="day-header"><span>Day 03 - 18/07 (Sat)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day3-list"></div><div class="add-btn" onclick="addNewRow('day3-list')">＋</div></div></div>
+        <div class="single-page p9" onclick="handleFlip(event, this)" style="z-index: 12;"><div class="page-content"><div class="day-header"><span>Day 04 - 19/07 (Sun)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day4-list"></div><div class="add-btn" onclick="addNewRow('day4-list')">＋</div></div></div>
+        <div class="single-page p10" onclick="handleFlip(event, this)" style="z-index: 11;"><div class="page-content"><div class="day-header"><span>Day 05 - 20/07 (Mon)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day5-list"></div><div class="add-btn" onclick="addNewRow('day5-list')">＋</div></div></div>
+        <div class="single-page p11" onclick="handleFlip(event, this)" style="z-index: 10;"><div class="page-content"><div class="day-header"><span>Day 06 - 21/07 (Tue)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day6-list"></div><div class="add-btn" onclick="addNewRow('day6-list')">＋</div></div></div>
+        <div class="single-page p12" onclick="handleFlip(event, this)" style="z-index: 9;"><div class="page-content"><div class="day-header"><span>Day 07 - 22/07 (Wed)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day7-list"></div><div class="add-btn" onclick="addNewRow('day7-list')">＋</div></div></div>
+        <div class="single-page p13" onclick="handleFlip(event, this)" style="z-index: 8;"><div class="page-content"><div class="day-header"><span>Day 08 - 23/07 (Thu)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day8-list"></div><div class="add-btn" onclick="addNewRow('day8-list')">＋</div></div></div>
+
+        <div class="single-page p14" onclick="handleFlip(event, this)" style="z-index: 7;">
+            <div class="page-content">
+                <h3 class="page-title"><span class="emoji">💰</span> Budget & FX <span class="emoji">💰</span></h3>
+                <div class="info-box" style="border-bottom-color: #27ae60;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h4 style="margin-top:0; color:#27ae60;">💱 實時匯率計算 (JPY➔HKD)</h4>
+                        <button class="fx-refresh-btn" id="refresh-fx" onclick="fetchLiveExchangeRate()">🔄</button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: #666;">日圓 (JPY ¥)</label>
+                            <input type="number" id="jpy-input" placeholder="輸入日圓..." 
+                                   style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid var(--theme-blue); font-size: 1rem; box-sizing: border-box;"
+                                   oninput="convertCurrency()">
+                        </div>
+                        <div style="text-align: center; font-size: 1.2rem;">⬇️</div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #666;">港幣 (HKD $) - <span id="fx-rate-text">載入匯率中...</span></label>
+                            <input type="number" id="hkd-output" readonly 
+                                   style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #ccc; background: #eee; font-size: 1rem; box-sizing: border-box;">
+                            <span class="update-time" id="fx-update-time">最後更新：尚未載入</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.reload()"><img src="https://img.icons8.com/emoji/48/calendar-emoji.png">Plan</div>
+    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/ticket-emoji.png">Ticket</div>
+    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/shopping-bags.png">Shop</div>
+    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/money-bag-emoji.png">Budget</div>
+    <div class="nav-item" onclick="exportData()"><img src="https://img.icons8.com/emoji/48/outbox-tray.png">Share</div>
+    <div class="nav-item" onclick="importData()"><img src="https://img.icons8.com/emoji/48/inbox-tray.png">Sync</div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+
+<script>
+    // 更新日本時間
+    function updateJapanTime() {
+        const options = { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const formatter = new Intl.DateTimeFormat('en-GB', options);
+        try {
+            const timeString = formatter.format(new Date());
+            document.querySelectorAll('.local-clock').forEach(el => { el.innerText = timeString; });
+        } catch(e) {}
+    }
+    setInterval(updateJapanTime, 1000);
+    updateJapanTime();
+
+    let currentRate = 0.052;
+    let pressTimer;
+
+    // 獲取實時匯率
+    async function fetchLiveExchangeRate() {
+        const refreshBtn = document.getElementById('refresh-fx');
+        const rateText = document.getElementById('fx-rate-text');
+        const updateTimeText = document.getElementById('fx-update-time');
+        refreshBtn.classList.add('spinning');
+        rateText.innerText = "更新中...";
+        try {
+            const response = await fetch('https://open.er-api.com/v6/latest/JPY');
+            const data = await response.json();
+            if (data && data.rates && data.rates.HKD) {
+                currentRate = data.rates.HKD;
+                rateText.innerText = `按實時 ${currentRate.toFixed(4)} 計`;
+                const now = new Date();
+                updateTimeText.innerText = `最後更新：今天 ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                convertCurrency();
+            }
+        } catch (error) {
+            currentRate = 0.052;
+            rateText.innerText = "連線失敗，按預設 0.052 計";
+        } finally {
+            setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+        }
+    }
+
+    function convertCurrency() {
+        const jpy = document.getElementById('jpy-input').value;
+        const out = document.getElementById('hkd-output');
+        if (jpy > 0) out.value = (jpy * currentRate).toFixed(2);
+        else out.value = '';
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.classList.add("show");
+        setTimeout(() => { toast.classList.remove("show"); }, 3000);
+    }
+
+    // 音樂控制邏輯
+    function toggleMusic(audioId, btnId, defaultIcon, playingIcon) {
+        const targetAudio = document.getElementById(audioId);
+        const targetBtn = document.getElementById(btnId);
+        const targetSpan = targetBtn.querySelector('span');
+        
+        if (!targetAudio.paused) {
+            targetAudio.pause();
+            targetBtn.classList.remove('playing');
+            targetSpan.innerText = defaultIcon;
+            return;
+        }
+        
+        // 停止所有其他音樂
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.pause(); 
+            audio.currentTime = 0; 
+            const p = audio.parentElement; 
+            p.classList.remove('playing');
+            p.querySelector('span').innerText = (p.id === 'btn-mozart' ? '🎼' : '🎹');
+        });
+        
+        targetSpan.innerText = playingIcon;
+        targetAudio.play().then(() => targetBtn.classList.add('playing')).catch(e => console.log("Music play blocked"));
+    }
+
+    // 翻頁邏輯
+    function handleFlip(event, page) {
+        if (event.target.tagName === 'A' || event.target.classList.contains('map-icon') || 
+            event.target.tagName === 'INPUT' || event.target.closest('.check-item') ||
+            event.target.classList.contains('add-btn') || event.target.classList.contains('map-icon-btn') ||
+            event.target.classList.contains('fx-refresh-btn') || event.target.closest('.timeline-row')) return;
+        
+        const clickX = event.clientX - page.getBoundingClientRect().left;
+        const pageWidth = page.offsetWidth;
+        const allPages = Array.from(document.querySelectorAll('.single-page'));
+        const currentPageIndex = allPages.indexOf(page);
+        const flippedPages = allPages.filter(p => p.classList.contains('flipped'));
+
+        if (clickX < pageWidth * 0.4) { // 點擊左側往回翻
+            if (currentPageIndex === 0 && flippedPages.length === 0) {
+                allPages.slice(0, allPages.length - 1).forEach((p, i) => {
+                    setTimeout(() => p.classList.add('flipped'), i * 40);
+                });
+            } else {
+                if (flippedPages.length > 0) flippedPages[flippedPages.length - 1].classList.remove('flipped');
+            }
+        } else { // 點擊右側往前翻
+            if (currentPageIndex === allPages.length - 1) {
+                allPages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 50));
+            } else {
+                page.classList.add('flipped');
+            }
+        }
+    }
+
+    function saveStayInfo() {
+        const stayData = {
+            room: document.getElementById('stay-room').value,
+            door: document.getElementById('stay-door').value,
+            wifiName: document.getElementById('stay-wifi-name').value,
+            wifiPass: document.getElementById('stay-wifi-pass').value,
+            luggageBefore: document.getElementById('luggage-before').value,
+            luggageAfter: document.getElementById('luggage-after').value
+        };
+        localStorage.setItem('osaka_stay_info', JSON.stringify(stayData));
+    }
+
+    function addNewRow(cId, time = "12:00", loc = "", shouldSave = true) {
+        const container = document.getElementById(cId);
+        if (!container) return;
+        const div = document.createElement('div');
+        div.className = 'timeline-row';
+        div.innerHTML = `
+            <input type="text" class="time-input" value="${time}" onchange="saveAllRundowns()">
+            <input type="text" class="loc-input" placeholder="輸入行程..." value="${loc}" onchange="saveAllRundowns()">
+            <span class="map-icon-btn" onclick="openDynamicMap(this)">🌐</span>
+        `;
+        
+        const startPress = () => { 
+            div.classList.add('pressing'); 
+            pressTimer = setTimeout(() => { if(confirm("🗑️ 刪除此項行程？")) { div.remove(); saveAllRundowns(); } }, 800); 
+        };
+        const cancelPress = () => { clearTimeout(pressTimer); div.classList.remove('pressing'); };
+        
+        div.addEventListener('touchstart', startPress); div.addEventListener('touchend', cancelPress);
+        div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', cancelPress);
+        
+        container.appendChild(div);
+        if (shouldSave) saveAllRundowns();
+    }
+
+    // 修正地圖開啟邏輯
+    function openDynamicMap(btn) {
+        const loc = btn.parentElement.querySelector('.loc-input').value;
+        if (loc) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`, '_blank');
+        } else {
+            showToast('⚠️ 請先輸入地點');
+        }
+    }
+
+    function openStaticMap(address) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+    }
+
+    function saveAllRundowns() {
+        for (let i = 1; i <= 8; i++) {
+            const data = [];
+            const list = document.getElementById(`day${i}-list`);
+            if (list) {
+                list.querySelectorAll('.timeline-row').forEach(row => {
+                    data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value });
+                });
+                localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data));
+            }
+        }
+    }
+
+    function exportData() {
+        saveAllRundowns();
+        saveStayInfo();
+        const all = {};
+        for (let i = 1; i <= 8; i++) {
+            all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`);
+        }
+        all['stay_info'] = localStorage.getItem('osaka_stay_info');
+        const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+        all['pack_info'] = {};
+        checkboxes.forEach(box => { all['pack_info'][box.id] = box.checked; });
+        
+        const code = btoa(encodeURIComponent(JSON.stringify(all)));
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(() => { showToast("✅ 行程數據已複製到剪貼板！"); });
+        } else {
+            alert("請手動複製代碼：\n\n" + code);
+        }
+    }
+
+    function importData() {
+        const code = prompt("請貼上行程分享代碼：");
+        if (code) {
+            try {
+                const decoded = JSON.parse(decodeURIComponent(atob(code)));
+                for (let i = 1; i <= 8; i++) {
+                    if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]);
+                }
+                if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']);
+                if (decoded['pack_info']) {
+                    for (const [id, checked] of Object.entries(decoded['pack_info'])) {
+                        localStorage.setItem(`osaka_pack_${id}`, checked);
+                    }
+                }
+                showToast("🔄 導入成功，正在刷新頁面...");
+                setTimeout(() => location.reload(), 1500);
+            } catch (e) { showToast("❌ 代碼錯誤，無法導入"); }
+        }
+    }
+
+    window.addEventListener('load', () => {
+        fetchLiveExchangeRate();
+        // 載入行程
+        for (let i = 1; i <= 8; i++) {
+            const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]");
+            saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false));
+        }
+        // 載入住宿資訊
+        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
+        if(savedStay.room) document.getElementById('stay-room').value = savedStay.room;
+        if(savedStay.door) document.getElementById('stay-door').value = savedStay.door;
+        if(savedStay.wifiName) document.getElementById('stay-wifi-name').value = savedStay.wifiName;
+        if(savedStay.wifiPass) document.getElementById('stay-wifi-pass').value = savedStay.wifiPass;
+        if(savedStay.luggageBefore) document.getElementById('luggage-before').value = savedStay.luggageBefore;
+        if(savedStay.luggageAfter) document.getElementById('luggage-after').value = savedStay.luggageAfter;
+        
+        // 載入勾選清單
+        document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => {
+            const savedState = localStorage.getItem(`osaka_pack_${box.id}`);
+            if (savedState === 'true') box.checked = true;
+            box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); });
+        });
+    });
+</script>
+
+</body>
+</html>
