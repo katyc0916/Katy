@@ -23,7 +23,6 @@
             font-weight: bold; 
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; 
-            /* 修正：改為 auto 確保長清單可捲動 */
             overflow-y: auto; 
             -webkit-font-smoothing: antialiased;
         }
@@ -31,7 +30,6 @@
         .phone-container { 
             width: 95vw; max-width: 400px; height: 85vh; 
             perspective: 2000px; position: relative; 
-            /* 修正：增加硬體加速穩定性 */
             -webkit-transform-style: preserve-3d;
             transform-style: preserve-3d;
         }
@@ -59,7 +57,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.4);
             transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             transform-origin: top center; overflow: hidden; cursor: pointer;
-            /* 修正：防閃爍核心代碼 */
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
             -webkit-transform: translate3d(0,0,0);
@@ -202,7 +199,7 @@
         .member-card-squishy p { margin: 0; text-align: center; font-weight: bold; color: #333; }
 
         .flight-ticket { color: var(--flight-purple); font-size: 0.85rem; }
-        .flight-row { display: flex; align-items: flex-start; margin-bottom: 4px; }
+        .flight-row { display: flex; align-items: flex-start; margin-bottom: 4px; width: 100%;}
         .flight-date-label { font-size: 0.75rem; background: var(--flight-purple); color: white; padding: 2px 8px; border-radius: 4px; margin-bottom: 5px; display: inline-block; font-weight: bold; }
         .flight-time { font-weight: bold; font-size: 1.05rem; margin-right: 8px; color: #000; }
         .flight-city { font-weight: bold; color: #000; }
@@ -218,6 +215,19 @@
 
         .day-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--osaka-red); margin-bottom: 3px; font-size: 0.9rem; align-items: center; }
         
+        .day-label-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed rgba(230, 57, 70, 0.3);
+            color: var(--osaka-red);
+            font-weight: bold;
+            font-size: 0.9rem;
+            width: 100%;
+            font-family: inherit;
+            outline: none;
+            padding: 2px 0;
+        }
+
         .weather-link { 
             font-size: 0.65rem; color: #007bff; text-decoration: none; 
             padding: 2px 6px; border: 1.5px solid #a2d2ff; border-radius: 8px; 
@@ -268,12 +278,21 @@
         .line-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 3px; transform: translateY(1px); border: 1px solid rgba(0,0,0,0.1);}
         .subway-desc { font-size: 0.75rem; color: #777; width: 100%; padding-left: 12px; margin-top: 2px;}
 
-        .timeline-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-left: 3px solid var(--theme-blue); transition: all 0.3s; user-select: none; }
+        .timeline-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-left: 3px solid var(--theme-blue); transition: all 0.3s; user-select: none; }
         .timeline-row.pressing { background: rgba(230, 57, 70, 0.15); border-radius: 8px; transform: scale(0.98); }
-        .time-input { width: 55px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
-        .loc-input { flex: 1; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; border-bottom: 1.5px dashed #aaa; padding: 2px 0; outline: none; color: #333; transition: font-size 0.2s; }
+        .time-input { width: 55px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; margin-top: 2px; }
+        
+        .loc-input { 
+            flex: 1; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; 
+            border-bottom: 1.5px dashed #aaa; padding: 2px 0; outline: none; color: #333; 
+            transition: font-size 0.2s; resize: none; overflow: hidden; font-family: inherit;
+            line-height: 1.4; 
+            height: 1.4em; 
+            min-height: 1.4em;
+        }
         .loc-input::placeholder { color: #bbb; font-weight: normal; }
-        .map-icon-btn { font-size: 1.1rem; cursor: pointer; pointer-events: auto; padding: 2px 4px; background: rgba(162, 210, 255, 0.2); border-radius: 4px; text-decoration: none; display: inline-block; }
+
+        .map-icon-btn { font-size: 1.1rem; cursor: pointer; pointer-events: auto; padding: 2px 4px; background: rgba(162, 210, 255, 0.2); border-radius: 4px; text-decoration: none; display: inline-block; margin-top: 2px; }
         .add-btn { width: 42px; height: 42px; background: white; border: 3px solid var(--theme-blue); border-radius: 50%; font-size: 1.8rem; color: var(--theme-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 15px auto 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: auto; transition: transform 0.2s; }
         .add-btn:active { transform: scale(0.9); }
 
@@ -411,20 +430,40 @@
             <div class="page-content">
                 <h3 class="page-title"><span class="emoji">🚀</span> Sky-High Fun <span class="emoji">🚀</span></h3>
                 <div class="info-box">
-                    <h4>香港快運 HK Express</h4>
+                    <h4><input type="text" id="flight-airline" value="香港快運 HK Express" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:1rem; font-weight:bold; font-family:inherit; outline:none; width:100%;"></h4>
                     <a href="https://www.hkexpress.com/" class="flight-link" target="_blank">🌐 官方網站連結</a>
                     <div class="flight-ticket">
-                        <div class="flight-date-label">去程：2026年7月16日</div>
-                        <div class="flight-row"><span>✈️</span><span class="flight-time">07:05</span><span class="flight-city">HKG 香港國際機場</span></div>
-                        <div class="flight-line-container"><div class="flight-duration-info">✈️ 3h 45m | Flight UO850 (T2)</div></div>
-                        <div class="flight-row"><span>✈️</span><span class="flight-time">11:50</span><span class="flight-city">KIX 關西國際機場</span></div>
+                        <div class="flight-date-label">去程：<input type="text" id="flight-out-date" value="2026年7月16日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div>
+                        <div class="flight-row">
+                            <span>✈️</span>
+                            <input type="text" id="flight-out-t1" class="flight-time" value="07:05" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;">
+                            <input type="text" id="flight-out-loc1" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;">
+                        </div>
+                        <div class="flight-line-container">
+                            <div class="flight-duration-info">✈️ <input type="text" id="flight-out-dur" value="3h 45m | Flight UO850 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div>
+                        </div>
+                        <div class="flight-row">
+                            <span>✈️</span>
+                            <input type="text" id="flight-out-t2" class="flight-time" value="11:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;">
+                            <input type="text" id="flight-out-loc2" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;">
+                        </div>
                     </div>
                     <hr style="border:0; border-top:1px dashed #ccc; margin:12px 0;">
                     <div class="flight-ticket">
-                        <div class="flight-date-label">回程：2026年7月23日</div>
-                        <div class="flight-row"><span>✈️</span><span class="flight-time">20:40</span><span class="flight-city">KIX 關西國際機場</span></div>
-                        <div class="flight-line-container"><div class="flight-duration-info">✈️ 4h 10m | Flight UO689 (T2)</div></div>
-                        <div class="flight-row"><span>✈️</span><span class="flight-time">23:50</span><span class="flight-city">HKG 香港國際機場</span></div>
+                        <div class="flight-date-label">回程：<input type="text" id="flight-in-date" value="2026年7月23日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div>
+                        <div class="flight-row">
+                            <span>✈️</span>
+                            <input type="text" id="flight-in-t1" class="flight-time" value="20:40" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;">
+                            <input type="text" id="flight-in-loc1" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;">
+                        </div>
+                        <div class="flight-line-container">
+                            <div class="flight-duration-info">✈️ <input type="text" id="flight-in-dur" value="4h 10m | Flight UO689 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div>
+                        </div>
+                        <div class="flight-row">
+                            <span>✈️</span>
+                            <input type="text" id="flight-in-t2" class="flight-time" value="23:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;">
+                            <input type="text" id="flight-in-loc2" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;">
+                        </div>
                     </div>
                 </div>
                 <div class="info-box">
@@ -463,19 +502,22 @@
 
         <div class="single-page p5" onclick="handleFlip(event, this)" style="z-index: 16;">
             <div class="page-content">
-                <div class="day-header"><span>16/7 (Thu) - 23/7 (Thu)</span></div>
+                <div class="day-header"><input type="text" id="stay-period-label" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" onchange="saveStayInfo()"></div>
                 <h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3>
                 
                 <div class="info-box" style="border-bottom-color: var(--osaka-red);">
-                    <h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem;">MA Masters Residence<br>道頓堀 · 島之內 · 心齋橋</h4>
-                    <p style="font-size: 0.85rem; color: #555; line-height: 1.4;">
-                        📍 2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka
-                        <span onclick="openStaticMap('〒542-0082 大阪府大阪市中央区島之内２丁目９−14')" class="map-icon">🌐 導航</span>
+                    <h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem; display:flex; flex-direction:column; gap:4px;">
+                        <input type="text" id="stay-name" value="MA Masters Residence" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;">
+                        <input type="text" id="stay-subname" value="道頓堀 · 島之內 · 心齋橋" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;">
+                    </h4>
+                    <p style="font-size: 0.85rem; color: #555; line-height: 1.4; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+                        📍 <textarea id="stay-addr" onchange="saveStayInfo()" rows="2" style="flex:1; border:none; border-bottom:none; background:transparent; font-size:0.85rem; color:inherit; outline:none; font-family:inherit; min-width:180px; resize:none; padding:0; margin:0; overflow:hidden; word-break:break-word; line-height:1.4;">2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka</textarea>
+                        <span onclick="openStaticMap(document.getElementById('stay-addr').value)" class="map-icon">🌐 導航</span>
                     </p>
                     <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
                     <div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;">
-                        <p style="margin:5px 0;">🔑 Check-in: 16:00</p>
-                        <p style="margin:5px 0;">🚪 Check-out: 11:00</p>
+                        <p style="margin:5px 0; display:flex; align-items:center;">🔑 Check-in: <input type="text" id="stay-checkin" value="16:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p>
+                        <p style="margin:5px 0; display:flex; align-items:center;">🚪 Check-out: <input type="text" id="stay-checkout" value="11:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p>
                     </div>
                 </div>
 
@@ -571,14 +613,14 @@
             </div>
         </div>
         
-        <div class="single-page p6" onclick="handleFlip(event, this)" style="z-index: 15;"><div class="page-content"><div class="day-header"><span>Day 01 - 16/07 (Thu)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day1-list"></div><div class="add-btn" onclick="addNewRow('day1-list')">＋</div></div></div>
-        <div class="single-page p7" onclick="handleFlip(event, this)" style="z-index: 14;"><div class="page-content"><div class="day-header"><span>Day 02 - 17/07 (Fri)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day2-list"></div><div class="add-btn" onclick="addNewRow('day2-list')">＋</div></div></div>
-        <div class="single-page p8" onclick="handleFlip(event, this)" style="z-index: 13;"><div class="page-content"><div class="day-header"><span>Day 03 - 18/07 (Sat)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day3-list"></div><div class="add-btn" onclick="addNewRow('day3-list')">＋</div></div></div>
-        <div class="single-page p9" onclick="handleFlip(event, this)" style="z-index: 12;"><div class="page-content"><div class="day-header"><span>Day 04 - 19/07 (Sun)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day4-list"></div><div class="add-btn" onclick="addNewRow('day4-list')">＋</div></div></div>
-        <div class="single-page p10" onclick="handleFlip(event, this)" style="z-index: 11;"><div class="page-content"><div class="day-header"><span>Day 05 - 20/07 (Mon)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day5-list"></div><div class="add-btn" onclick="addNewRow('day5-list')">＋</div></div></div>
-        <div class="single-page p11" onclick="handleFlip(event, this)" style="z-index: 10;"><div class="page-content"><div class="day-header"><span>Day 06 - 21/07 (Tue)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day6-list"></div><div class="add-btn" onclick="addNewRow('day6-list')">＋</div></div></div>
-        <div class="single-page p12" onclick="handleFlip(event, this)" style="z-index: 9;"><div class="page-content"><div class="day-header"><span>Day 07 - 22/07 (Wed)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day7-list"></div><div class="add-btn" onclick="addNewRow('day7-list')">＋</div></div></div>
-        <div class="single-page p13" onclick="handleFlip(event, this)" style="z-index: 8;"><div class="page-content"><div class="day-header"><span>Day 08 - 23/07 (Thu)</span></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day8-list"></div><div class="add-btn" onclick="addNewRow('day8-list')">＋</div></div></div>
+        <div class="single-page p6" onclick="handleFlip(event, this)" style="z-index: 15;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-1" class="day-label-input" value="Day 01 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day1-list"></div><div class="add-btn" onclick="addNewRow('day1-list')">＋</div></div></div>
+        <div class="single-page p7" onclick="handleFlip(event, this)" style="z-index: 14;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-2" class="day-label-input" value="Day 02 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day2-list"></div><div class="add-btn" onclick="addNewRow('day2-list')">＋</div></div></div>
+        <div class="single-page p8" onclick="handleFlip(event, this)" style="z-index: 13;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-3" class="day-label-input" value="Day 03 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day3-list"></div><div class="add-btn" onclick="addNewRow('day3-list')">＋</div></div></div>
+        <div class="single-page p9" onclick="handleFlip(event, this)" style="z-index: 12;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-4" class="day-label-input" value="Day 04 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day4-list"></div><div class="add-btn" onclick="addNewRow('day4-list')">＋</div></div></div>
+        <div class="single-page p10" onclick="handleFlip(event, this)" style="z-index: 11;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-5" class="day-label-input" value="Day 05 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day5-list"></div><div class="add-btn" onclick="addNewRow('day5-list')">＋</div></div></div>
+        <div class="single-page p11" onclick="handleFlip(event, this)" style="z-index: 10;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-6" class="day-label-input" value="Day 06 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day6-list"></div><div class="add-btn" onclick="addNewRow('day6-list')">＋</div></div></div>
+        <div class="single-page p12" onclick="handleFlip(event, this)" style="z-index: 9;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-7" class="day-label-input" value="Day 07 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day7-list"></div><div class="add-btn" onclick="addNewRow('day7-list')">＋</div></div></div>
+        <div class="single-page p13" onclick="handleFlip(event, this)" style="z-index: 8;"><div class="page-content"><div class="day-header"><input type="text" id="day-label-8" class="day-label-input" value="Day 08 - 加載中..." onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🌟</span> Crazy Rundown <span class="emoji">🌟</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3><div id="day8-list"></div><div class="add-btn" onclick="addNewRow('day8-list')">＋</div></div></div>
 
         <div class="single-page p14" onclick="handleFlip(event, this)" style="z-index: 7;">
             <div class="page-content">
@@ -621,7 +663,6 @@
 <div id="toast" class="toast-notification"></div>
 
 <script>
-    // 更新日本時間
     function updateJapanTime() {
         const options = { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         const formatter = new Intl.DateTimeFormat('en-GB', options);
@@ -633,14 +674,36 @@
     setInterval(updateJapanTime, 1000);
     updateJapanTime();
 
+    function generateDayLabels() {
+        const startDate = new Date(2026, 6, 16); 
+        const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
+        
+        for (let i = 1; i <= 8; i++) {
+            const labelEl = document.getElementById(`day-label-${i}`);
+            if (labelEl) {
+                if (savedStay[`dayLabel${i}`]) {
+                    labelEl.value = savedStay[`dayLabel${i}`];
+                } else {
+                    const currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.getDate() + (i - 1));
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                    const weekDay = weekDays[currentDate.getDay()];
+                    labelEl.value = `Day 0${i} - ${day}/${month} (${weekDay})`;
+                }
+            }
+        }
+    }
+
     let currentRate = 0.052;
     let pressTimer;
 
-    // 獲取實時匯率
     async function fetchLiveExchangeRate() {
         const refreshBtn = document.getElementById('refresh-fx');
         const rateText = document.getElementById('fx-rate-text');
         const updateTimeText = document.getElementById('fx-update-time');
+        if(!refreshBtn) return;
         refreshBtn.classList.add('spinning');
         rateText.innerText = "更新中...";
         try {
@@ -675,20 +738,16 @@
         setTimeout(() => { toast.classList.remove("show"); }, 3000);
     }
 
-    // 音樂控制邏輯
     function toggleMusic(audioId, btnId, defaultIcon, playingIcon) {
         const targetAudio = document.getElementById(audioId);
         const targetBtn = document.getElementById(btnId);
         const targetSpan = targetBtn.querySelector('span');
-        
         if (!targetAudio.paused) {
             targetAudio.pause();
             targetBtn.classList.remove('playing');
             targetSpan.innerText = defaultIcon;
             return;
         }
-        
-        // 停止所有其他音樂
         document.querySelectorAll('audio').forEach(audio => {
             audio.pause(); 
             audio.currentTime = 0; 
@@ -696,15 +755,13 @@
             p.classList.remove('playing');
             p.querySelector('span').innerText = (p.id === 'btn-mozart' ? '🎼' : '🎹');
         });
-        
         targetSpan.innerText = playingIcon;
         targetAudio.play().then(() => targetBtn.classList.add('playing')).catch(e => console.log("Music play blocked"));
     }
 
-    // 翻頁邏輯
     function handleFlip(event, page) {
         if (event.target.tagName === 'A' || event.target.classList.contains('map-icon') || 
-            event.target.tagName === 'INPUT' || event.target.closest('.check-item') ||
+            event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.closest('.check-item') ||
             event.target.classList.contains('add-btn') || event.target.classList.contains('map-icon-btn') ||
             event.target.classList.contains('fx-refresh-btn') || event.target.closest('.timeline-row')) return;
         
@@ -714,7 +771,7 @@
         const currentPageIndex = allPages.indexOf(page);
         const flippedPages = allPages.filter(p => p.classList.contains('flipped'));
 
-        if (clickX < pageWidth * 0.4) { // 點擊左側往回翻
+        if (clickX < pageWidth * 0.4) {
             if (currentPageIndex === 0 && flippedPages.length === 0) {
                 allPages.slice(0, allPages.length - 1).forEach((p, i) => {
                     setTimeout(() => p.classList.add('flipped'), i * 40);
@@ -722,7 +779,7 @@
             } else {
                 if (flippedPages.length > 0) flippedPages[flippedPages.length - 1].classList.remove('flipped');
             }
-        } else { // 點擊右側往前翻
+        } else {
             if (currentPageIndex === allPages.length - 1) {
                 allPages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 50));
             } else {
@@ -738,9 +795,39 @@
             wifiName: document.getElementById('stay-wifi-name').value,
             wifiPass: document.getElementById('stay-wifi-pass').value,
             luggageBefore: document.getElementById('luggage-before').value,
-            luggageAfter: document.getElementById('luggage-after').value
+            luggageAfter: document.getElementById('luggage-after').value,
+            stayName: document.getElementById('stay-name').value,
+            staySubname: document.getElementById('stay-subname').value,
+            stayAddr: document.getElementById('stay-addr').value,
+            stayCheckin: document.getElementById('stay-checkin').value,
+            stayCheckout: document.getElementById('stay-checkout').value,
+            stayPeriod: document.getElementById('stay-period-label').value,
+            flightAirline: document.getElementById('flight-airline').value,
+            flightOutDate: document.getElementById('flight-out-date').value,
+            flightOutT1: document.getElementById('flight-out-t1').value,
+            flightOutLoc1: document.getElementById('flight-out-loc1').value,
+            flightOutDur: document.getElementById('flight-out-dur').value,
+            flightOutT2: document.getElementById('flight-out-t2').value,
+            flightOutLoc2: document.getElementById('flight-out-loc2').value,
+            flightInDate: document.getElementById('flight-in-date').value,
+            flightInT1: document.getElementById('flight-in-t1').value,
+            flightInLoc1: document.getElementById('flight-in-loc1').value,
+            flightInDur: document.getElementById('flight-in-dur').value,
+            flightInT2: document.getElementById('flight-in-t2').value,
+            flightInLoc2: document.getElementById('flight-in-loc2').value
         };
+        for (let i = 1; i <= 8; i++) {
+            const labelEl = document.getElementById(`day-label-${i}`);
+            if (labelEl) stayData[`dayLabel${i}`] = labelEl.value;
+        }
         localStorage.setItem('osaka_stay_info', JSON.stringify(stayData));
+    }
+
+    function autoResizeTextarea(el) {
+        el.style.height = '1.4em'; 
+        if (el.scrollHeight > el.offsetHeight) {
+            el.style.height = el.scrollHeight + 'px';
+        }
     }
 
     function addNewRow(cId, time = "12:00", loc = "", shouldSave = true) {
@@ -750,7 +837,7 @@
         div.className = 'timeline-row';
         div.innerHTML = `
             <input type="text" class="time-input" value="${time}" onchange="saveAllRundowns()">
-            <input type="text" class="loc-input" placeholder="輸入行程..." value="${loc}" onchange="saveAllRundowns()">
+            <textarea class="loc-input" placeholder="輸入行程..." rows="1" onchange="saveAllRundowns()" oninput="autoResizeTextarea(this)">${loc}</textarea>
             <span class="map-icon-btn" onclick="openDynamicMap(this)">🌐</span>
         `;
         
@@ -764,21 +851,24 @@
         div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', cancelPress);
         
         container.appendChild(div);
+        
+        const txt = div.querySelector('.loc-input');
+        setTimeout(() => autoResizeTextarea(txt), 0);
+
         if (shouldSave) saveAllRundowns();
     }
 
-    // 修正地圖開啟邏輯
     function openDynamicMap(btn) {
         const loc = btn.parentElement.querySelector('.loc-input').value;
         if (loc) {
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc)}`, '_blank');
+            window.open(`https://www.google.com/maps/search/${encodeURIComponent(loc)}`, '_blank');
         } else {
             showToast('⚠️ 請先輸入地點');
         }
     }
 
     function openStaticMap(address) {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(address)}`, '_blank');
     }
 
     function saveAllRundowns() {
@@ -835,22 +925,43 @@
     }
 
     window.addEventListener('load', () => {
+        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
+        generateDayLabels();
         fetchLiveExchangeRate();
-        // 載入行程
+        
         for (let i = 1; i <= 8; i++) {
             const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]");
             saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false));
         }
-        // 載入住宿資訊
-        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
+        
         if(savedStay.room) document.getElementById('stay-room').value = savedStay.room;
         if(savedStay.door) document.getElementById('stay-door').value = savedStay.door;
         if(savedStay.wifiName) document.getElementById('stay-wifi-name').value = savedStay.wifiName;
         if(savedStay.wifiPass) document.getElementById('stay-wifi-pass').value = savedStay.wifiPass;
         if(savedStay.luggageBefore) document.getElementById('luggage-before').value = savedStay.luggageBefore;
         if(savedStay.luggageAfter) document.getElementById('luggage-after').value = savedStay.luggageAfter;
+        if(savedStay.stayPeriod) document.getElementById('stay-period-label').value = savedStay.stayPeriod;
         
-        // 載入勾選清單
+        if(savedStay.stayName) document.getElementById('stay-name').value = savedStay.stayName;
+        if(savedStay.staySubname) document.getElementById('stay-subname').value = savedStay.staySubname;
+        if(savedStay.stayAddr) document.getElementById('stay-addr').value = savedStay.stayAddr;
+        if(savedStay.stayCheckin) document.getElementById('stay-checkin').value = savedStay.stayCheckin;
+        if(savedStay.stayCheckout) document.getElementById('stay-checkout').value = savedStay.stayCheckout;
+        
+        if(savedStay.flightAirline) document.getElementById('flight-airline').value = savedStay.flightAirline;
+        if(savedStay.flightOutDate) document.getElementById('flight-out-date').value = savedStay.flightOutDate;
+        if(savedStay.flightOutT1) document.getElementById('flight-out-t1').value = savedStay.flightOutT1;
+        if(savedStay.flightOutLoc1) document.getElementById('flight-out-loc1').value = savedStay.flightOutLoc1;
+        if(savedStay.flightOutDur) document.getElementById('flight-out-dur').value = savedStay.flightOutDur;
+        if(savedStay.flightOutT2) document.getElementById('flight-out-t2').value = savedStay.flightOutT2;
+        if(savedStay.flightOutLoc2) document.getElementById('flight-out-loc2').value = savedStay.flightOutLoc2;
+        if(savedStay.flightInDate) document.getElementById('flight-in-date').value = savedStay.flightInDate;
+        if(savedStay.flightInT1) document.getElementById('flight-in-t1').value = savedStay.flightInT1;
+        if(savedStay.flightInLoc1) document.getElementById('flight-in-loc1').value = savedStay.flightInLoc1;
+        if(savedStay.flightInDur) document.getElementById('flight-in-dur').value = savedStay.flightInDur;
+        if(savedStay.flightInT2) document.getElementById('flight-in-t2').value = savedStay.flightInT2;
+        if(savedStay.flightInLoc2) document.getElementById('flight-in-loc2').value = savedStay.flightInLoc2;
+        
         document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => {
             const savedState = localStorage.getItem(`osaka_pack_${box.id}`);
             if (savedState === 'true') box.checked = true;
