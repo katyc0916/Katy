@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>8-Day Osaka Itinerary</title>
@@ -21,17 +21,20 @@
             margin: 0; background: #1a1b26; 
             font-family: 'Noto Sans TC', sans-serif; 
             font-weight: bold; 
-            display: flex; justify-content: center; align-items: flex-start; /* 改為靠上，由 container 決定高度 */
-            min-height: 100dvh; 
-            overflow: hidden; /* 防止主體滾動，讓頁面內部滾動 */
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; 
+            overflow-y: auto; 
             -webkit-font-smoothing: antialiased;
         }
 
         .phone-container { 
-            width: 100vw; max-width: 400px; height: 100dvh; /* 改為 100dvh 適配全屏 */
+            width: 95vw; max-width: 400px; height: 85vh; 
             perspective: 2000px; position: relative; 
             -webkit-transform-style: preserve-3d;
             transform-style: preserve-3d;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         /* --- 左右揭頁導航按鈕 --- */
@@ -71,7 +74,7 @@
         .next-btn .nav-arrow-icon { transform: rotate(-135deg); margin-right: 4px; }
 
         .music-wrapper {
-            position: absolute; top: calc(15px + env(safe-area-inset-top)); right: 20px;
+            position: absolute; top: 15px; right: 20px;
             display: flex; gap: 10px; z-index: 9999;
         }
 
@@ -106,7 +109,7 @@
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .single-page {
-            position: absolute; width: 100%; height: 100%; border-radius: 0; /* App版建議取消圓角以達成全屏感 */
+            position: absolute; width: 100%; height: 100%; border-radius: 0;
             background-color: var(--japan-blue);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40a40 40 0 0 1 40-40 40 40 0 0 1 40 40H70a30 30 0 0 0-30-30 30 30 0 0 0-30 30H0zm40-10a10 10 0 0 1 10-10 10 10 0 0 1 10 10h10a20 20 0 0 0-20-20 20 20 0 0 0-20 20h10z' fill='%23a2d2ff' fill-opacity='0.3'/%3E%3C/svg%3E");
             background-size: 60px; background-repeat: repeat; 
@@ -139,7 +142,7 @@
             background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.7)), 
                               url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800') !important;
             background-size: cover !important; background-position: center !important;
-            display: flex; flex-direction: column; justify-content: flex-start; /* 改為向上排列 */
+            display: flex; flex-direction: column; justify-content: flex-end;
             padding: 0 !important; 
         }
 
@@ -151,12 +154,11 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            /* 調整位置：將日期推到與側邊箭頭水平的高度 */
-            margin-top: 48vh; 
+            transform: translateY(-16vh); 
         }
         
         .main-title { 
-            font-size: clamp(1.56rem, 6.6vw, 2.04rem); 
+            font-size: clamp(1.56rem, 6.6vw, 2.04rem);
             margin: 10px 0; 
             color: white; 
             text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 
@@ -167,7 +169,7 @@
         }
         
         .happy-trip { 
-            font-size: clamp(1.35rem, 6vw, 1.65rem); 
+            font-size: clamp(1.35rem, 6vw, 1.65rem);
             margin: 0 0 20px 0; color: white; font-weight: bold; 
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 6px rgba(162, 210, 255, 0.5);
         }
@@ -188,12 +190,7 @@
             cursor: pointer;
         }
         
-        .page-content { 
-            padding: 18px; 
-            padding-top: calc(18px + env(safe-area-inset-top)); /* 增加頂部內距防止遮擋 */
-            padding-bottom: calc(95px + env(safe-area-inset-bottom)); /* 增加底部內距防止被 nav 擋住 */
-            height: 100%; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; align-items: flex-start; 
-        }
+        .page-content { padding: 18px; padding-top: calc(18px + env(safe-area-inset-top)); padding-bottom: calc(95px + env(safe-area-inset-bottom)); height: 100%; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; align-items: flex-start; }
         
         .page-title { position: relative; color: var(--osaka-red); padding-bottom: 8px; margin-bottom: 15px; margin-top: 5px; font-weight: bold; text-align: left; text-shadow: 0 0 5px rgba(230, 57, 70, 0.2); display: inline-flex; align-items: center; gap: 10px; animation: emojiFloat 3s ease-in-out infinite; width: fit-content; clear: both; }
         .page-title span.emoji { display: inline-block; }
@@ -276,7 +273,7 @@
         .add-btn { width: 42px; height: 42px; background: white; border: 3px solid var(--theme-blue); border-radius: 50%; font-size: 1.8rem; color: var(--theme-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 15px auto 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: auto; transition: transform 0.2s; }
         .add-btn:active { transform: scale(0.9); }
         
-        /* --- 修正後的下方選單 (動態高度與內距) --- */
+        /* --- 修改後的下方選單 (下移並懸浮) --- */
         .bottom-nav { 
             position: fixed; 
             bottom: 20px; 
@@ -284,17 +281,17 @@
             transform: translateX(-50%); 
             width: 90%; 
             max-width: 380px; 
-            background: rgba(255, 255, 255, 0.75); /* 改為半透明白色 */
-            backdrop-filter: blur(10px); /* 加入毛玻璃效果 */
-            -webkit-backdrop-filter: blur(10px); /* 支援 Safari */
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex; 
             justify-content: space-around; 
             padding: 10px 5px; 
-            /* 關鍵：增加底部安全區域內距 */
             padding-bottom: calc(10px + env(safe-area-inset-bottom));
             border-radius: 30px; 
             box-shadow: 0 8px 30px rgba(0,0,0,0.25); 
             z-index: 10010; 
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .nav-item { font-size: 0.65rem; text-align: center; color: #444; font-weight: normal; cursor: pointer; transition: transform 0.2s; -webkit-tap-highlight-color: transparent; }
@@ -401,8 +398,7 @@
         <div class="single-page p1" style="z-index: 20;">
             <div class="page-content hero-cover">
                 <div class="hero-text-block">
-                    <p style="color: white; font-size: 1.1rem; margin:0; opacity: 0.9;">JULY 16 - JULY 23, 2026</p> 
-                    <h1 class="main-title">8-Day Osaka Itinerary</h1>
+                    <p style="color: white; font-size: 1.2rem; margin:0;">JULY 16 - JULY 23, 2026</p> <h1 class="main-title">8-Day Osaka Itinerary</h1>
                     <p class="happy-trip">《 Joyful Vacation 》</p>
                     <div class="cta-container">
                         <div class="cta-button" onclick="goNext()">GoGoGo</div>
@@ -577,6 +573,7 @@
         if(savedStay.customDayName) document.getElementById('custom-day-name').value = savedStay.customDayName;
         document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => { const savedState = localStorage.getItem(`osaka_pack_${box.id}`); if (savedState === 'true') box.checked = true; box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); }); });
         
+        // 同步日期標籤到 Flight 頁面
         if(savedStay.stayPeriod) document.getElementById('stay-period-flight').value = savedStay.stayPeriod;
 
         updateNavTriggerVisibility(0);
