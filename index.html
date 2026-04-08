@@ -387,7 +387,7 @@
             <div class="cat-item" onclick="addSpent('🛍️ 購物')"><span class="cat-icon">🛍️</span><span class="cat-label">購物</span></div>
             <div class="cat-item" onclick="addSpent('🧸 玩具')"><span class="cat-icon">🧸</span><span class="cat-label">玩具</span></div>
             <div class="cat-item" onclick="addSpent('💄 藥妝')"><span class="cat-icon">💄</span><span class="cat-label">藥妝</span></div>
-            <div class="cat-item" onclick="addSpent('🎟️ 門票')"><span class="cat-icon">🎟️</span><span class="cat-label">門票</span></div>
+            <div class="cat-item" onclick="addSpent('🛍️ 門票')"><span class="cat-icon">🎟️</span><span class="cat-label">門票</span></div>
             <div class="cat-item" onclick="addSpent('🎁 手信')"><span class="cat-icon">🎁</span><span class="cat-label">手信</span></div>
             <div class="cat-item" onclick="addSpent('🏮 紀念品')"><span class="cat-icon">🏮</span><span class="cat-label">紀念品</span></div>
             <div class="cat-item" onclick="addCustomSpent()"><span class="cat-icon">➕</span><span class="cat-label">自訂</span></div>
@@ -475,11 +475,11 @@
     function escapeHTML(str) {
         return String(str).replace(/[&<>"']/g, function(match) {
             return {
-                '&': '&',
-                '<': '<',
-                '>': '>',
-                '"': '"',
-                "'": '\''
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
             }[match];
         });
     }
@@ -653,9 +653,7 @@
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${encodeURIComponent(query)}&language=zh-Hant`;
-        // 注意：若無 API Key，建議改用下面這種通用連結（但可能無法在 iframe 內嵌）
-        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-Hant&z=15&output=embed`;
+        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
         modal.style.display = 'flex';
     }
 
@@ -719,7 +717,7 @@
 
     // --- PWA 離線支援 (Service Worker & Manifest) ---
     const swCode = `
-        const CACHE_NAME = 'osaka-v2';
+        const CACHE_NAME = 'osaka-v3';
         self.addEventListener('install', (e) => {
             e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./', 'index.html'])));
         });
@@ -741,7 +739,18 @@
         display: "standalone",
         background_color: "#1a1b26",
         theme_color: "#1a1b26",
-        icons: [{ src: "https://img.icons8.com/emoji/192/sun-with-face.png", sizes: "192x192", type: "image/png" }]
+        icons: [
+            { 
+                src: "https://img.icons8.com/emoji/192/maneki-neko-emoji.png", 
+                sizes: "192x192", 
+                type: "image/png" 
+            },
+            { 
+                src: "https://img.icons8.com/emoji/512/maneki-neko-emoji.png", 
+                sizes: "512x512", 
+                type: "image/png" 
+            }
+        ]
     };
     const manifestStr = JSON.stringify(manifest);
     const blobMf = new Blob([manifestStr], { type: 'application/json' });
