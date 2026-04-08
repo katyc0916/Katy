@@ -333,6 +333,22 @@
         .num-btn:active { background: #ddd; }
         .num-btn.op { background: #ffeaa7; }
 
+        /* --- 方案 B: Modal 彈窗地圖樣式 --- */
+        .map-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9); z-index: 20000;
+            display: none; flex-direction: column;
+        }
+        .map-modal-header {
+            padding: 15px; background: #1a1b26; color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .map-modal-title { font-weight: bold; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 10px; }
+        .map-modal-close { background: var(--osaka-red); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .map-modal-body { flex: 1; width: 100%; height: 100%; }
+        .map-modal-body iframe { width: 100%; height: 100%; border: none; }
+
     </style>
 </head>
 <body>
@@ -450,6 +466,16 @@
     <div class="nav-item" onclick="importData()"><img src="https://img.icons8.com/emoji/48/inbox-tray.png">Sync</div>
 </div>
 
+<div id="map-modal" class="map-modal-overlay">
+    <div class="map-modal-header">
+        <span id="map-modal-title" class="map-modal-title">地圖預覽</span>
+        <button onclick="closeMapModal()" class="map-modal-close">關閉 X</button>
+    </div>
+    <div class="map-modal-body">
+        <iframe id="map-iframe" src=""></iframe>
+    </div>
+</div>
+
 <div id="toast" class="toast-notification"></div>
 
 <script>
@@ -550,8 +576,40 @@
     function saveStayInfo() { const stayData = { room: document.getElementById('stay-room').value, door: document.getElementById('stay-door').value, wifiName: document.getElementById('stay-wifi-name').value, wifiPass: document.getElementById('stay-wifi-pass').value, luggageBefore: document.getElementById('luggage-before').value, luggageAfter: document.getElementById('luggage-after').value, stayName: document.getElementById('stay-name').value, staySubname: document.getElementById('stay-subname').value, stayAddr: document.getElementById('stay-addr').value, stayCheckin: document.getElementById('stay-checkin').value, stayCheckout: document.getElementById('stay-checkout').value, stayPeriod: document.getElementById('stay-period-label').value, customDayName: document.getElementById('custom-day-name').value, flightAirline: document.getElementById('flight-airline-input').value, flightOutDate: document.getElementById('flight-out-date').value, flightOutT1: document.getElementById('flight-out-t1').value, flightOutLoc1: document.getElementById('flight-out-loc1').value, flightOutDur: document.getElementById('flight-out-dur').value, flightOutT2: document.getElementById('flight-out-t2').value, flightOutLoc2: document.getElementById('flight-out-loc2').value, flightInDate: document.getElementById('flight-in-date').value, flightInT1: document.getElementById('flight-in-t1').value, flightInLoc1: document.getElementById('flight-in-loc1').value, flightInDur: document.getElementById('flight-in-dur').value, flightInT2: document.getElementById('flight-in-t2').value, flightInLoc2: document.getElementById('flight-in-loc2').value }; for (let i = 1; i <= 8; i++) { const labelEl = document.getElementById(`day-label-${i}`); if (labelEl) stayData[`dayLabel${i}`] = labelEl.value; } localStorage.setItem('osaka_stay_info', JSON.stringify(stayData)); }
     function autoResizeTextarea(el) { el.style.height = '1.4em'; if (el.scrollHeight > el.offsetHeight) el.style.height = el.scrollHeight + 'px'; }
     function addNewRow(cId, time = "12:00", loc = "", shouldSave = true) { const container = document.getElementById(cId); if (!container) return; const div = document.createElement('div'); div.className = 'timeline-row'; div.innerHTML = `<input type="text" class="time-input" value="${time}" onchange="saveAllRundowns()"><textarea class="loc-input" placeholder="行程..." rows="1" onchange="saveAllRundowns()" oninput="autoResizeTextarea(this)">${loc}</textarea><span class="map-icon-btn" onclick="openDynamicMap(this)">🌐</span>`; let pressTimer; const startPress = () => { div.classList.add('pressing'); pressTimer = setTimeout(() => { if(confirm("🗑️ 刪除？")) { div.remove(); saveAllRundowns(); } }, 800); }; const cancelPress = () => { clearTimeout(pressTimer); div.classList.remove('pressing'); }; div.addEventListener('touchstart', startPress); div.addEventListener('touchend', cancelPress); div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', cancelPress); container.appendChild(div); const txt = div.querySelector('.loc-input'); setTimeout(() => autoResizeTextarea(txt), 0); if (shouldSave) saveAllRundowns(); }
-    function openDynamicMap(btn) { const loc = btn.parentElement.querySelector('.loc-input').value; if (loc) window.open(`https://www.google.com/maps/search/${encodeURIComponent(loc)}`, '_blank'); else showToast('⚠️ 填寫地點'); }
-    function openStaticMap(address) { window.open(`https://www.google.com/maps/search/${encodeURIComponent(address)}`, '_blank'); }
+    
+    // --- 修改地圖打開函數 (改用方案 B Modal) ---
+    function openDynamicMap(btn) { 
+        const loc = btn.parentElement.querySelector('.loc-input').value; 
+        if (loc) {
+            openMapModal(loc);
+        } else {
+            showToast('⚠️ 填寫地點'); 
+        }
+    }
+    
+    function openStaticMap(address) { 
+        if (address) {
+            openMapModal(address);
+        }
+    }
+
+    function openMapModal(query) {
+        const modal = document.getElementById('map-modal');
+        const iframe = document.getElementById('map-iframe');
+        const title = document.getElementById('map-modal-title');
+        title.innerText = "地圖: " + query;
+        // 使用 Google Maps Embed API
+        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        modal.style.display = 'flex';
+    }
+
+    function closeMapModal() {
+        const modal = document.getElementById('map-modal');
+        const iframe = document.getElementById('map-iframe');
+        iframe.src = ''; // 停止加載
+        modal.style.display = 'none';
+    }
+
     function saveAllRundowns() { for (let i = 1; i <= 8; i++) { const data = []; const list = document.getElementById(`day${i}-list`); if (list) { list.querySelectorAll('.timeline-row').forEach(row => { data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value }); }); localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); } } }
     function exportData() { saveAllRundowns(); saveStayInfo(); const all = {}; for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); all['stay_info'] = localStorage.getItem('osaka_stay_info'); all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); all['pack_info'] = {}; checkboxes.forEach(box => { all['pack_info'][box.id] = box.checked; }); const code = btoa(encodeURIComponent(JSON.stringify(all))); navigator.clipboard.writeText(code).then(() => { showToast("✅ 已複製代碼"); }); }
     function importData() { const code = prompt("貼上分享代碼："); if (code) { try { const decoded = JSON.parse(decodeURIComponent(atob(code))); for (let i = 1; i <= 8; i++) if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); if (decoded['pack_info']) for (const [id, checked] of Object.entries(decoded['pack_info'])) localStorage.setItem(`osaka_pack_${id}`, checked); showToast("🔄 導入中..."); setTimeout(() => location.reload(), 1000); } catch (e) { showToast("❌ 代碼錯誤"); } } }
