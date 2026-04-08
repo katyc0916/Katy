@@ -284,7 +284,9 @@
             transform: translateX(-50%); 
             width: 90%; 
             max-width: 380px; 
-            background: white; 
+            background: rgba(255, 255, 255, 0.75); /* 改為半透明白色 */
+            backdrop-filter: blur(10px); /* 加入毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px); /* 支援 Safari */
             display: flex; 
             justify-content: space-around; 
             padding: 10px 5px; 
