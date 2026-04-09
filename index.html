@@ -140,14 +140,12 @@
 
         .hero-cover {
             height: 100%; border-radius: 0;
-            /* 修改處：調整光線為明亮日光，移除深灰色陰影 (linear-gradient 修改) */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.05)), 
+            background-image: linear-gradient(rgba(255,255,255,0.1), rgba(0,0,0,0.45)), 
                               url('https://raw.githubusercontent.com/katyc0916/Katy/refs/heads/main/IMG_7130.png') !important;
             background-size: cover !important; background-position: center !important;
-            /* 修改處：提升色彩飽和度(saturate)、亮度(brightness)與對比度(contrast)使針織細節更銳利 */
-            filter: saturate(1.8) brightness(1.15) contrast(1.2);
             display: flex; flex-direction: column; justify-content: flex-end;
             padding: 0 !important; 
+            filter: saturate(1.4) brightness(1.15) contrast(1.15); /* 提升飽和度、光線亮度與細節對比 */
         }
 
         .hero-text-block { 
@@ -158,7 +156,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center;
-            transform: translateY(-2vh); 
+            transform: translateY(-2vh); /* 修改處：將原本的 -16vh 改為 -2vh，讓文字向下移動 */
         }
         
         .main-title { 
@@ -478,11 +476,11 @@
     function escapeHTML(str) {
         return String(str).replace(/[&<>"']/g, function(match) {
             return {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
+                '&': '&',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '\''
             }[match];
         });
     }
@@ -656,8 +654,6 @@
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(query)}&language=zh-Hant`;
-        // 注意：為確保能直接運作且不需 API KEY，改用導向式 URL (雖然部分瀏覽器可能限制 iframe)
         iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-Hant&z=15&output=embed`;
         modal.style.display = 'flex';
     }
