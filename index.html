@@ -140,11 +140,12 @@
 
         .hero-cover {
             height: 100%; border-radius: 0;
-            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.7)), 
+            background-image: linear-gradient(rgba(255,255,255,0.1), rgba(0,0,0,0.45)), 
                               url('https://raw.githubusercontent.com/katyc0916/Katy/refs/heads/main/IMG_7130.png') !important;
             background-size: cover !important; background-position: center !important;
             display: flex; flex-direction: column; justify-content: flex-end;
             padding: 0 !important; 
+            filter: saturate(1.4) brightness(1.15) contrast(1.15); /* 提升飽和度、光線亮度與細節對比 */
         }
 
         .hero-text-block { 
@@ -653,8 +654,6 @@
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${encodeURIComponent(query)}&language=zh-Hant`;
-        // 注意：若無 API Key，建議改用下面這種通用連結（但可能無法在 iframe 內嵌）
         iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-Hant&z=15&output=embed`;
         modal.style.display = 'flex';
     }
