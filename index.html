@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,6 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1b26">
     <title>8-Day Osaka Itinerary</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -766,7 +769,7 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
+        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
         modal.style.display = 'flex';
     }
 
@@ -775,19 +778,95 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
 
     function saveAllRundowns() { for (let i = 1; i <= 8; i++) { const data = []; const list = document.getElementById(`day${i}-list`); if (list) { list.querySelectorAll('.timeline-row').forEach(row => { data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value }); }); localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); } } }
     
+    // --- 加密匯出核心邏輯 ---
     function exportData() { 
-        saveAllRundowns(); saveStayInfo(); const all = {}; for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); 
-        all['stay_info'] = localStorage.getItem('osaka_stay_info'); all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); 
-        const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); all['pack_info'] = {}; 
+        saveAllRundowns(); 
+        saveStayInfo(); 
+        
+        const all = {}; 
+        for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); 
+        all['stay_info'] = localStorage.getItem('osaka_stay_info'); 
+        all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); 
+        
+        const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); 
+        all['pack_info'] = {}; 
         checkboxes.forEach(box => { all['pack_info'][box.id] = box.checked; }); 
-        const jsonData = JSON.stringify(all, null, 2); const code = btoa(encodeURIComponent(jsonData)); 
-        navigator.clipboard.writeText(code).then(() => { showToast("✅ 已複製代碼並下載備份"); }); 
-        const blob = new Blob([jsonData], { type: 'application/json' }); const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `osaka_itinerary_backup.json`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        
+        const jsonData = JSON.stringify(all, null, 2); 
+        
+        // 要求使用者設定加密密碼
+        const password = prompt("🔐 為了保護敏感個資（護照/保單），請設定加密密碼：\n(匯入時必須輸入此密碼，請務必牢記)");
+        
+        if (password === null) return; // 使用者取消
+        if (password.trim() === "") {
+            showToast("⚠️ 密碼不能為空！匯出取消。");
+            return;
+        }
+
+        try {
+            // 使用 CryptoJS 進行 AES 加密
+            const encrypted = CryptoJS.AES.encrypt(jsonData, password).toString();
+            
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(encrypted).then(() => { 
+                showToast("✅ 加密代碼已複製並下載備份"); 
+            }); 
+            
+            // 下載備份檔案
+            const blob = new Blob([encrypted], { type: 'text/plain' }); 
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); 
+            a.href = url; 
+            a.download = `osaka_encrypted_backup.txt`;
+            document.body.appendChild(a); 
+            a.click(); 
+            document.body.removeChild(a); 
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            showToast("❌ 加密過程出錯");
+            console.error(e);
+        }
     }
 
-    function importData() { const code = prompt("貼上分享代碼："); if (code) { try { const decoded = JSON.parse(decodeURIComponent(atob(code))); for (let i = 1; i <= 8; i++) if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); if (decoded['pack_info']) for (const [id, checked] of Object.entries(decoded['pack_info'])) localStorage.setItem(`osaka_pack_${id}`, checked); showToast("🔄 導入中..."); setTimeout(() => location.reload(), 1000); } catch (e) { showToast("❌ 代碼錯誤"); } } }
+    // --- 解密匯入核心邏輯 ---
+    function importData() { 
+        const code = prompt("📥 貼上加密分享代碼："); 
+        if (!code) return;
+
+        const password = prompt("🔑 此資料受加密保護，請輸入解密密碼：");
+        if (password === null) return;
+
+        try {
+            // 使用 CryptoJS 進行 AES 解密
+            const bytes = CryptoJS.AES.decrypt(code, password);
+            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+            
+            if (!decryptedData) {
+                showToast("❌ 密碼錯誤或代碼無效！");
+                return;
+            }
+
+            const decoded = JSON.parse(decryptedData); 
+            
+            // 寫入 LocalStorage
+            for (let i = 1; i <= 8; i++) {
+                if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); 
+            }
+            if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); 
+            if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); 
+            if (decoded['pack_info']) {
+                for (const [id, checked] of Object.entries(decoded['pack_info'])) {
+                    localStorage.setItem(`osaka_pack_${id}`, checked); 
+                }
+            }
+            
+            showToast("🔄 解密成功，導入中..."); 
+            setTimeout(() => location.reload(), 1000); 
+        } catch (e) { 
+            showToast("❌ 解密失敗：密碼不正確"); 
+            console.error(e);
+        } 
+    }
 
     window.addEventListener('load', () => {
         const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
@@ -812,3 +891,5 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
 </script>
 </body>
 </html>
+
+```
