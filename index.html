@@ -540,7 +540,7 @@
                 </div>
 
                 <div class="info-box" style="border-bottom-color: #27ae60;">
-                    <h4 style="margin-top:0; color:#27ae60; font-size: 0.95rem;">🏃 附近指定避難所 (大地震/海嘯)</h4>
+                    <h4 style="margin-top:0; color:#27ae60; font-size: 0.95rem;">跑 附近指定避難所 (大地震/海嘯)</h4>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:8px; border-radius:8px;">
                             <span style="font-size:0.85rem;">🏫 <strong>南小學校</strong> (最近)</span>
@@ -607,11 +607,21 @@
     function renderDayPages() {
         const p14 = document.querySelector('.p14');
         let daysHtml = '';
+        const startDate = new Date(2026, 6, 16); // 2026-07-16
+        const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
         for (let i = 1; i <= 8; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + (i - 1));
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const weekDayStr = weekDays[currentDate.getDay()];
+            const formattedDate = `${day}/${month} (${weekDayStr})`;
+
             daysHtml += `
             <div class="single-page p${i + 5}" style="z-index: ${16 - i};">
                 <div class="page-content">
-                    <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="Day 0${i} - 加載中..." onchange="saveStayInfo()"></div>
+                    <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="Day 0${i} - ${formattedDate}" onchange="saveStayInfo()"></div>
                     <div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div>
                     <h3 class="page-title"><span class="emoji">💥</span> Crazy Rundown <span class="emoji">💥</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3>
                     <div id="day${i}-list" style="width:100%;"></div>
@@ -767,7 +777,7 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
+        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
         modal.style.display = 'flex';
     }
 
@@ -800,7 +810,11 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         if(savedCustom) { customRate = parseFloat(savedCustom); document.getElementById('custom-rate-input').value = customRate; }
         if(savedLedgerDays) ledgerByDay = JSON.parse(savedLedgerDays);
         if(savedCalc) { document.getElementById('jpy-input').value = savedCalc; handleCalcInput(); }
-        generateDayLabels(); fetchLiveExchangeRate(); updateJapanTime(); renderLedger();
+        // generateDayLabels() 會根據 localStorage 或 預設重新寫入 input.value
+        generateDayLabels(); 
+        fetchLiveExchangeRate(); 
+        updateJapanTime(); 
+        renderLedger();
         for (let i = 1; i <= 8; i++) { const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false)); }
         const fields = ['room','door','wifiName','wifiPass','luggageBefore','luggageAfter','stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2', 'insHkProvider', 'insHkPolicy', 'insHkPhone', 'insJpProvider', 'insJpPolicy', 'insJpPhone', 'customDayName'];
         fields.forEach(f => { if(savedStay[f]) { let el = document.getElementById('stay-'+f.replace(/([A-Z])/g, '-$1').toLowerCase()) || document.getElementById(f.replace(/([A-Z])/g, '-$1').toLowerCase()); if(el) el.value = savedStay[f]; } });
