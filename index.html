@@ -212,7 +212,7 @@
         .katy-card { background-color: rgba(243, 209, 255, 0.9); animation-delay: 0s; }
         .to-card { background-color: rgba(209, 238, 255, 0.9); animation-delay: 0.5s; }
         .aidan-card { background-color: rgba(209, 255, 248, 0.9); animation-delay: 1s; }
-        .lok-card { background-color: rgba(216, 255, 209, 0.9); animation-delay: 1.5s; }
+        .loka-card { background-color: rgba(216, 255, 209, 0.9); animation-delay: 1.5s; }
         .eva-card { background-color: rgba(255, 232, 209, 0.9); animation-delay: 2s; }
         .sumi-card { background-color: rgba(255, 209, 231, 0.9); animation-delay: 2.5s; }
         .char-circle { width: 45px; height: 45px; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -433,7 +433,7 @@
         
         <div class="single-page p4" style="z-index: 17;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-flight" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🚀</span> Sky-High Fun <span class="emoji">🚀</span></h3><div class="info-box"><h4><input type="text" id="flight-airline-input" value="香港快運 HK Express" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:1rem; font-weight:bold; font-family:inherit; outline:none; width:100%;"></h4><a href="https://www.hkexpress.com/" class="flight-link" target="_blank">🌐 官方網站連結</a><div class="flight-ticket"><div class="flight-date-label">去程：<input type="text" id="flight-out-date" value="2026年7月16日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t1" class="flight-time" value="07:05" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-out-loc1" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-out-dur" value="3h 45m | Flight UO850 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t2" class="flight-time" value="11:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-out-loc2" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div></div><div class="flight-ticket" style="margin-top: 15px;"><div class="flight-date-label">回程：<input type="text" id="flight-in-date" value="2026年7月23日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t1" class="flight-time" value="20:40" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-in-loc1" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-in-dur" value="4h 10m | Flight UO689 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t2" class="flight-time" value="23:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-in-loc2" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div></div></div><div class="info-box"><h4>🧳 行理詳細配額與尺寸</h4><div class="luggage-display"><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><rect x="30" y="25" width="40" height="50" rx="5" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><path d="M40 25 V15 H60 V25" fill="none" stroke="var(--bag-cyan)" stroke-width="4"/><path d="M42 38 V65 M58 38 V65" fill="none" stroke="var(--flight-purple)" stroke-width="3" stroke-linecap="round"/><circle cx="35" cy="78" r="3" fill="var(--flight-purple)"/><circle cx="65" cy="78" r="3" fill="var(--flight-purple)"/></svg><div class="luggage-label">寄艙行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">158cm / 62吋</div></div><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><path d="M30 70 V45 A20 20 0 0 1 70 45 V70" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><rect x="30" y="70" width="40" height="4" fill="var(--flight-purple)"/><rect x="45" y="55" width="10" height="10" rx="2" fill="none" stroke="var(--bag-cyan)" stroke-width="3.5"/><path d="M25 70 H30 M70 70 H75" stroke="var(--flight-purple)" stroke-width="4.5"/></svg><div class="luggage-label">手提行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">40x25x20cm</div></div></div><p style="font-size:0.85rem;"><strong>去程：</strong>隨身 7kg x6 + 寄艙 20kg x4</p><p style="font-size:0.85rem;"><strong>回程：</strong>隨身 7kg x6 + 寄艙 32kg x4</p></div><div class="info-box" style="border-bottom: 3px solid #f9ca24;"><a href="https://vjw-lp.digital.go.jp/zh-hant/" class="vjw-item" target="_blank">🔗 Visit Japan Web 官方申報入口</a><p style="font-size: 0.65rem; margin-top: 5px; color: #666; text-align:center;">(過關必備，請務必先完成申報並截圖 QR Code)</p></div></div></div>
         
-        <div class="single-page p5" style="z-index: 16;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-label" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem; display:flex; flex-direction:column; gap:4px;"><input type="text" id="stay-name" value="MA Masters Residence" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;"><input type="text" id="stay-subname" value="道頓堀 · 島之內 · 心齋橋" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;"></h4><p style="font-size: 0.85rem; color: #555; line-height: 1.4; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">📍 <textarea id="stay-addr" onchange="saveStayInfo()" rows="2" style="flex:1; border:none; border-bottom:none; background:transparent; font-size:0.85rem; color:inherit; outline:none; font-family:inherit; min-width:180px; resize:none; padding:0; margin:0; overflow:hidden; word-break:break-word; line-height:1.4;">2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka</textarea><span onclick="openStaticMap(document.getElementById('stay-addr').value)" class="map-icon">🌐 導航</span></p><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;"><div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;"><p style="margin:5px 0; display:flex; align-items:center;">🔑 Check-in: <input type="text" id="stay-checkin" value="16:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p><p style="margin:5px 0; display:flex; align-items:center;">🚪 Check-out: <input type="text" id="stay-checkout" value="11:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p></div></div><div class="info-box" style="border-bottom-color: var(--theme-blue);"><div class="stay-input-group"><label>🔢 分配房號：</label><input type="text" id="stay-room" placeholder="點擊輸入..." onchange="saveStayInfo()"></div><div class="stay-input-group"><label>🔓 門鎖密碼：</label><input type="text" id="stay-door" placeholder="點擊輸入..." onchange="saveStayInfo()"></div><div class="stay-input-group"><label>📶 Wi-Fi 名稱：</label><input type="text" id="stay-wifi-name" placeholder="點擊輸入..." onchange="saveStayInfo()"></div><div class="stay-input-group" style="border-bottom: none; margin-bottom: 0;"><label>🔑 Wi-Fi 密碼：</label><input type="text" id="stay-wifi-pass" placeholder="點擊輸入..." onchange="saveStayInfo()"></div><a href="https://www.trip.com/w/AOyeUfgZ9U2" class="trip-btn" target="_blank">🟦 Trip.com 訂單詳情</a></div><div class="info-box" style="border-bottom-color: #27ae60;"><div class="survival-section" style="margin-bottom: 0;"><p style="font-size: 0.95rem; font-weight: bold; color: #27ae60; margin: 0 0 10px 0;">🧳 行李寄存與預約</p><div class="survival-section"><p class="survival-title">🏠 民宿寄存</p><ul class="survival-list"><li><div style="width:100%; display: flex; flex-direction: column; gap: 5px; margin-top: 5px;"><div style="display:flex; align-items:center;"><span style="font-size:0.75rem; color:#666; width:65px;">入住前：</span><input type="text" id="luggage-before" placeholder="填寫存放詳情..." onchange="saveStayInfo()" style="flex:1; border:none; border-bottom:1px solid #ddd; background:transparent; font-size:0.8rem; font-weight:bold; outline:none; color:#27ae60;"></div><div style="display:flex; align-items:center;"><span style="font-size:0.75rem; color:#666; width:65px;">退房後：</span><input type="text" id="luggage-after" placeholder="填寫存放詳情..." onchange="saveStayInfo()" style="flex:1; border:none; border-bottom:1px solid #ddd; background:transparent; font-size:0.8rem; font-weight:bold; outline:none; color:#27ae60;"></div></div></li></ul></div><div class="survival-section"><p class="survival-title">🚇 日本橋站置物櫃 <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span></p></div><a href="https://cloak.ecbo.io/zh-TW/jpn/city/osaka" class="all-lockers-btn" target="_blank">🔍 ecbo cloak 大阪行李預約</a></div></div><div class="info-box" style="border-bottom-color: #e67e22;"><h4 style="margin-top:0; margin-bottom:12px; color:#e67e22; font-size: 0.95rem;">📍 附近商店與車站</h4><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🏪 便利商店</p><ul class="survival-list"><li>FamilyMart (島之內二丁目店) · 🚶 1 min <span onclick="openStaticMap('FamilyMart 島之内二丁目店')" class="map-icon">🌐</span></li><li>7-Eleven (大阪島之內 2 丁目店) · 🚶 2 min <span onclick="openStaticMap('7-Eleven 大阪島之内２丁目店')" class="map-icon">🌐</span></li><li>Lawson (島之內店) · 🚶 4 min <span onclick="openStaticMap('Lawson 島之内店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🛒 超市與購物</p><ul class="survival-list"><li>玉出超市 (周防町店) · 🚶 4 min <span onclick="openStaticMap('スーパー玉出 周防町店')" class="map-icon">🌐</span></li><li>Foodium (心齋橋店) · 🚶 6 min <span onclick="openStaticMap('foodium 心斎橋')" class="map-icon">🌐</span></li><li>唐吉訶德 (道頓堀北館) · 🚶 7 min <span onclick="openStaticMap('ドン・キホーテ 道頓堀北館')" class="map-icon">🌐</span></li></ul></div><div class="survival-section" style="margin-bottom: 0;"><p class="survival-title" style="border-left-color: #e67e22;">🚇 鄰近地鐵站</p><ul class="survival-list"><li><strong>日本橋站</strong> · 🚶 6 min <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#e44d92;"></span>(千日前線) - <strong>6號出口有電梯</strong></div></li><li><strong>長堀橋站</strong> · 🚶 7 min <span onclick="openStaticMap('長堀橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li><li><strong>心齋橋站</strong> · 🚶 13 min <span onclick="openStaticMap('心斎橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#e5171f;"></span>(御堂筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li></ul></div></div></div></div>
+        <div class="single-page p5" style="z-index: 16;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-label" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem; display:flex; flex-direction:column; gap:4px;"><input type="text" id="stay-name" value="MA Masters Residence" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;"><input type="text" id="stay-subname" value="道頓堀 · 島之內 · 心齋橋" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:inherit; font-weight:bold; color:inherit; outline:none; font-family:inherit; width:100%; padding:0;"></h4><p style="font-size: 0.85rem; color: #555; line-height: 1.4; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">📍 <textarea id="stay-addr" onchange="saveStayInfo()" rows="2" style="flex:1; border:none; border-bottom:none; background:transparent; font-size:0.85rem; color:inherit; outline:none; font-family:inherit; min-width:180px; resize:none; padding:0; margin:0; overflow:hidden; word-break:break-word; line-height:1.4;">2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka</textarea><span onclick="openStaticMap(document.getElementById('stay-addr').value)" class="map-icon">🌐 導航</span></p><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;"><div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;"><p style="margin:5px 0; display:flex; align-items:center;">🔑 Check-in: <input type="text" id="stay-checkin" value="16:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p><p style="margin:5px 0; display:flex; align-items:center;">🚪 Check-out: <input type="text" id="stay-checkout" value="11:00" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:50px; font-size:inherit; font-weight:bold; font-family:inherit; outline:none; padding:0; text-align:center;"></p></div></div><div class="info-box" style="border-bottom-color: var(--theme-blue); padding-bottom: 20px;"><a href="https://www.trip.com/w/AOyeUfgZ9U2" class="trip-btn" target="_blank" style="margin-top:0;">🟦 Trip.com 訂單詳情</a></div><div class="info-box" style="border-bottom-color: #27ae60;"><div class="survival-section" style="margin-bottom: 0;"><p style="font-size: 0.95rem; font-weight: bold; color: #27ae60; margin: 0 0 10px 0;">🧳 行李寄存與預約</p><div class="survival-section"><p class="survival-title">🚇 日本橋站置物櫃 <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span></p></div><a href="https://cloak.ecbo.io/zh-TW/jpn/city/osaka" class="all-lockers-btn" target="_blank">🔍 ecbo cloak 大阪行李預約</a></div></div><div class="info-box" style="border-bottom-color: #e67e22;"><h4 style="margin-top:0; margin-bottom:12px; color:#e67e22; font-size: 0.95rem;">📍 附近商店與車站</h4><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🏪 便利商店</p><ul class="survival-list"><li>FamilyMart (島之內二丁目店) · 🚶 1 min <span onclick="openStaticMap('FamilyMart 島之内二丁目店')" class="map-icon">🌐</span></li><li>7-Eleven (大阪島之內 2 丁目店) · 🚶 2 min <span onclick="openStaticMap('7-Eleven 大阪島之内２丁目店')" class="map-icon">🌐</span></li><li>Lawson (島之內店) · 🚶 4 min <span onclick="openStaticMap('Lawson 島之内店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🛒 超市與購物</p><ul class="survival-list"><li>玉出超市 (周防町店) · 🚶 4 min <span onclick="openStaticMap('スーパー玉出 周防町店')" class="map-icon">🌐</span></li><li>Foodium (心齋橋店) · 🚶 6 min <span onclick="openStaticMap('foodium 心斎橋')" class="map-icon">🌐</span></li><li>唐吉訶德 (道頓堀北館) · 🚶 7 min <span onclick="openStaticMap('ドン・キホーテ 道頓堀北館')" class="map-icon">🌐</span></li></ul></div><div class="survival-section" style="margin-bottom: 0;"><p class="survival-title" style="border-left-color: #e67e22;">🚇 鄰近地鐵站</p><ul class="survival-list"><li><strong>日本橋站</strong> · 🚶 6 min <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#e44d92;"></span>(千日前線) - <strong>6號出口有電梯</strong></div></li><li><strong>長堀橋站</strong> · 🚶 7 min <span onclick="openStaticMap('長堀橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li><li><strong>心齋橋站</strong> · 🚶 13 min <span onclick="openStaticMap('心斎橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#e5171f;"></span>(御堂筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li></ul></div></div></div></div>
 
         <div class="single-page p14" style="z-index: 7;">
             <div class="page-content">
@@ -459,27 +459,15 @@
                 <div class="info-box" style="border-bottom-color: #007bff;">
                     <h4 style="margin-top:0; color:#007bff; font-size: 0.95rem;">🏥 香港旅遊保險</h4>
                     <div class="stay-input-group"><label>保險公司：</label><input type="text" id="ins-hk-provider" placeholder="例: Blue Cross / AXA" onchange="saveStayInfo()"></div>
-                    <div class="stay-input-group"><label>保單編號：</label><input type="text" id="ins-hk-policy" placeholder="點擊輸入..." onchange="saveStayInfo()"></div>
                     <div class="stay-input-group" style="border-bottom:none;"><label>緊急熱線：</label><input type="text" id="ins-hk-phone" placeholder="點擊輸入..." onchange="saveStayInfo()"></div>
                 </div>
 
                 <div class="info-box" style="border-bottom-color: #27ae60;">
                     <h4 style="margin-top:0; color:#27ae60; font-size: 0.95rem;">🏥 日本當地保險</h4>
                     <div class="stay-input-group"><label>保險名稱：</label><input type="text" id="ins-jp-provider" placeholder="例: Tokio Marine" onchange="saveStayInfo()"></div>
-                    <div class="stay-input-group"><label>保單編號：</label><input type="text" id="ins-jp-policy" placeholder="點擊輸入..." onchange="saveStayInfo()"></div>
                     <div class="stay-input-group" style="border-bottom:none;"><label>聯絡電話：</label><input type="text" id="ins-jp-phone" placeholder="點擊輸入..." onchange="saveStayInfo()"></div>
                 </div>
                 
-                <div class="info-box" style="border: 2px solid var(--osaka-red); background: rgba(255,255,255,0.95);">
-                    <h4 style="margin-top:0; color:var(--osaka-red); text-align:center; font-size:0.9rem; border-bottom:1px dashed var(--osaka-red); padding-bottom:8px;">🏠 民宿地址備份</h4>
-                    <div style="padding: 10px 0; font-size: 0.95rem; line-height: 1.5; color: #333;">
-                        <strong>日本語：</strong><br>
-                        〒542-0082 大阪府大阪市中央区島之内2-9-14<br><br>
-                        <strong>English：</strong><br>
-                        2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka
-                    </div>
-                </div>
-
                 <div class="info-box" style="border-bottom-color: var(--osaka-red);">
                     <h4 style="margin-top:0; color:var(--osaka-red); font-size: 0.95rem;">📞 日本緊急求助電話</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
@@ -742,7 +730,7 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
     }
 
     function saveStayInfo() { 
-        const stayData = { room: document.getElementById('stay-room').value, door: document.getElementById('stay-door').value, wifiName: document.getElementById('stay-wifi-name').value, wifiPass: document.getElementById('stay-wifi-pass').value, luggageBefore: document.getElementById('luggage-before').value, luggageAfter: document.getElementById('luggage-after').value, stayName: document.getElementById('stay-name').value, staySubname: document.getElementById('stay-subname').value, stayAddr: document.getElementById('stay-addr').value, stayCheckin: document.getElementById('stay-checkin').value, stayCheckout: document.getElementById('stay-checkout').value, stayPeriod: document.getElementById('stay-period-label').value, customDayName: document.getElementById('custom-day-name').value, flightAirline: document.getElementById('flight-airline-input').value, flightOutDate: document.getElementById('flight-out-date').value, flightOutT1: document.getElementById('flight-out-t1').value, flightOutLoc1: document.getElementById('flight-out-loc1').value, flightOutDur: document.getElementById('flight-out-dur').value, flightOutT2: document.getElementById('flight-out-t2').value, flightOutLoc2: document.getElementById('flight-out-loc2').value, flightInDate: document.getElementById('flight-in-date').value, flightInT1: document.getElementById('flight-in-t1').value, flightInLoc1: document.getElementById('flight-in-loc1').value, flightInDur: document.getElementById('flight-in-dur').value, flightInT2: document.getElementById('flight-in-t2').value, flightInLoc2: document.getElementById('flight-in-loc2').value, insHkProvider: document.getElementById('ins-hk-provider').value, insHkPolicy: document.getElementById('ins-hk-policy').value, insHkPhone: document.getElementById('ins-hk-phone').value, insJpProvider: document.getElementById('ins-jp-provider').value, insJpPolicy: document.getElementById('ins-jp-policy').value, insJpPhone: document.getElementById('ins-jp-phone').value }; 
+        const stayData = { stayPeriod: document.getElementById('stay-period-label').value, stayName: document.getElementById('stay-name').value, staySubname: document.getElementById('stay-subname').value, stayAddr: document.getElementById('stay-addr').value, stayCheckin: document.getElementById('stay-checkin').value, stayCheckout: document.getElementById('stay-checkout').value, customDayName: document.getElementById('custom-day-name').value, flightAirline: document.getElementById('flight-airline-input').value, flightOutDate: document.getElementById('flight-out-date').value, flightOutT1: document.getElementById('flight-out-t1').value, flightOutLoc1: document.getElementById('flight-out-loc1').value, flightOutDur: document.getElementById('flight-out-dur').value, flightOutT2: document.getElementById('flight-out-t2').value, flightOutLoc2: document.getElementById('flight-out-loc2').value, flightInDate: document.getElementById('flight-in-date').value, flightInT1: document.getElementById('flight-in-t1').value, flightInLoc1: document.getElementById('flight-in-loc1').value, flightInDur: document.getElementById('flight-in-dur').value, flightInT2: document.getElementById('flight-in-t2').value, flightInLoc2: document.getElementById('flight-in-loc2').value, insHkProvider: document.getElementById('ins-hk-provider').value, insHkPhone: document.getElementById('ins-hk-phone').value, insJpProvider: document.getElementById('ins-jp-provider').value, insJpPhone: document.getElementById('ins-jp-phone').value }; 
         for (let i = 1; i <= 8; i++) { const labelEl = document.getElementById(`day-label-${i}`); if (labelEl) stayData[`dayLabel${i}`] = labelEl.value; } 
         localStorage.setItem('osaka_stay_info', JSON.stringify(stayData)); 
     }
@@ -767,103 +755,57 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
+        iframe.src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${encodeURIComponent(query)}`;
+        // 注意：若無 API Key，建議使用通用導航連結
+        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
         modal.style.display = 'flex';
     }
 
     function closeMapModal() { const modal = document.getElementById('map-modal'); const iframe = document.getElementById('map-iframe'); iframe.src = ''; modal.style.display = 'none'; }
-    function copySOSAddress() { const text = "〒542-0082 大阪府大阪市中央区島之内2-9-14\n(2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka)"; navigator.clipboard.writeText(text).then(() => showToast("✅ 已複製雙語地址")); }
 
     function saveAllRundowns() { for (let i = 1; i <= 8; i++) { const data = []; const list = document.getElementById(`day${i}-list`); if (list) { list.querySelectorAll('.timeline-row').forEach(row => { data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value }); }); localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); } } }
     
-    // --- 加密匯出核心邏輯 ---
     function exportData() { 
         saveAllRundowns(); 
         saveStayInfo(); 
-        
         const all = {}; 
         for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); 
         all['stay_info'] = localStorage.getItem('osaka_stay_info'); 
         all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); 
-        
         const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); 
         all['pack_info'] = {}; 
         checkboxes.forEach(box => { all['pack_info'][box.id] = box.checked; }); 
-        
         const jsonData = JSON.stringify(all, null, 2); 
-        
-        // 要求使用者設定加密密碼
-        const password = prompt("🔐 為了保護敏感個資（護照/保單），請設定加密密碼：\n(匯入時必須輸入此密碼，請務必牢記)");
-        
-        if (password === null) return; // 使用者取消
-        if (password.trim() === "") {
-            showToast("⚠️ 密碼不能為空！匯出取消。");
-            return;
-        }
-
+        const password = prompt("🔐 為了保護資料，請設定加密密碼：\n(匯入時必須輸入此密碼)");
+        if (password === null) return;
+        if (password.trim() === "") { showToast("⚠️ 密碼不能為空"); return; }
         try {
-            // 使用 CryptoJS 進行 AES 加密
             const encrypted = CryptoJS.AES.encrypt(jsonData, password).toString();
-            
-            // 複製到剪貼簿
-            navigator.clipboard.writeText(encrypted).then(() => { 
-                showToast("✅ 加密代碼已複製並下載備份"); 
-            }); 
-            
-            // 下載備份檔案
+            navigator.clipboard.writeText(encrypted).then(() => { showToast("✅ 加密代碼已複製"); }); 
             const blob = new Blob([encrypted], { type: 'text/plain' }); 
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); 
-            a.href = url; 
-            a.download = `osaka_encrypted_backup.txt`;
-            document.body.appendChild(a); 
-            a.click(); 
-            document.body.removeChild(a); 
-            URL.revokeObjectURL(url);
-        } catch (e) {
-            showToast("❌ 加密過程出錯");
-            console.error(e);
-        }
+            const a = document.createElement('a'); a.href = url; a.download = `osaka_encrypted_backup.txt`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        } catch (e) { showToast("❌ 加密出錯"); }
     }
 
-    // --- 解密匯入核心邏輯 ---
     function importData() { 
         const code = prompt("📥 貼上加密分享代碼："); 
         if (!code) return;
-
-        const password = prompt("🔑 此資料受加密保護，請輸入解密密碼：");
+        const password = prompt("🔑 請輸入解密密碼：");
         if (password === null) return;
-
         try {
-            // 使用 CryptoJS 進行 AES 解密
             const bytes = CryptoJS.AES.decrypt(code, password);
             const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-            
-            if (!decryptedData) {
-                showToast("❌ 密碼錯誤或代碼無效！");
-                return;
-            }
-
+            if (!decryptedData) { showToast("❌ 密碼錯誤！"); return; }
             const decoded = JSON.parse(decryptedData); 
-            
-            // 寫入 LocalStorage
-            for (let i = 1; i <= 8; i++) {
-                if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); 
-            }
+            for (let i = 1; i <= 8; i++) { if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); }
             if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); 
             if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); 
-            if (decoded['pack_info']) {
-                for (const [id, checked] of Object.entries(decoded['pack_info'])) {
-                    localStorage.setItem(`osaka_pack_${id}`, checked); 
-                }
-            }
-            
+            if (decoded['pack_info']) { for (const [id, checked] of Object.entries(decoded['pack_info'])) { localStorage.setItem(`osaka_pack_${id}`, checked); } }
             showToast("🔄 解密成功，導入中..."); 
             setTimeout(() => location.reload(), 1000); 
-        } catch (e) { 
-            showToast("❌ 解密失敗：密碼不正確"); 
-            console.error(e);
-        } 
+        } catch (e) { showToast("❌ 解密失敗"); } 
     }
 
     window.addEventListener('load', () => {
@@ -876,7 +818,7 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         if(savedCalc) { document.getElementById('jpy-input').value = savedCalc; handleCalcInput(); }
         generateDayLabels(); fetchLiveExchangeRate(); updateJapanTime(); renderLedger();
         for (let i = 1; i <= 8; i++) { const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false)); }
-        const fields = ['room','door','wifiName','wifiPass','luggageBefore','luggageAfter','stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2', 'insHkProvider', 'insHkPolicy', 'insHkPhone', 'insJpProvider', 'insJpPolicy', 'insJpPhone', 'customDayName'];
+        const fields = ['stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2', 'insHkProvider', 'insHkPhone', 'insJpProvider', 'insJpPhone', 'customDayName'];
         fields.forEach(f => { if(savedStay[f]) { let el = document.getElementById('stay-'+f.replace(/([A-Z])/g, '-$1').toLowerCase()) || document.getElementById(f.replace(/([A-Z])/g, '-$1').toLowerCase()); if(el) el.value = savedStay[f]; } });
         document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => { const savedState = localStorage.getItem(`osaka_pack_${box.id}`); if (savedState === 'true') box.checked = true; box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); }); });
         updateNavTriggerVisibility(0);
