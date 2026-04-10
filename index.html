@@ -757,9 +757,8 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        iframe.src = `https://www.google.com/maps/embed/v1/place?key=REPLACE_WITH_YOUR_KEY&q=${encodeURIComponent(query)}`;
-        // 注意：若無 API Key，建議使用通用導航連結
-        iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
+        // 已修正為使用 https 協議
+        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
         modal.style.display = 'flex';
     }
 
