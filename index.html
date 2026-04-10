@@ -681,8 +681,7 @@
     function updateRateDisplay() { const rateText = document.getElementById('fx-rate-text'); const updateTimeText = document.getElementById('fx-update-time'); const lastTime = localStorage.getItem('osaka_last_rate_time'); currentRate = (useMode === 'live') ? liveRate : customRate; rateText.innerText = `按 ${useMode === 'live' ? '實時' : '自訂'} ${currentRate.toFixed(4)} 計`; if(lastTime) { const d = new Date(parseInt(lastTime)); updateTimeText.innerText = `最後更新：${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; } convertCurrency('jpy'); }
     function switchFX(mode) { useMode = mode; document.getElementById('opt-live').classList.toggle('active', mode === 'live'); document.getElementById('opt-custom').classList.toggle('active', mode === 'custom'); document.getElementById('custom-rate-box').style.display = (mode === 'custom') ? 'block' : 'none'; updateRateDisplay(); }
     function saveCustomRate() { const val = parseFloat(document.getElementById('custom-rate-input').value); if(val) { customRate = val; localStorage.setItem('osaka_custom_rate', customRate); if(useMode === 'custom') updateRateDisplay(); } }
-    function convertCurrency(source) { const jpyIn = document.getElementById('jpy-input'); const hkdIn = document.getElementById('hkd-input'); if(source === 'jpy') { const val = parseFloat(jpyIn.value); hkdIn.value = !isNaN(val) ? (val * currentRate).toFixed(2) : ''; } else if (source === 'hkd') { const val = parseFloat(hkdIn.value); jpyIn.value = !isNaN(val) ? (val / 
-currentRate).toFixed(0) : ''; handleCalcInput(); } }
+    function convertCurrency(source) { const jpyIn = document.getElementById('jpy-input'); const hkdIn = document.getElementById('hkd-input'); if(source === 'jpy') { const val = parseFloat(jpyIn.value); hkdIn.value = !isNaN(val) ? (val * currentRate).toFixed(2) : ''; } else if (source === 'hkd') { const val = parseFloat(hkdIn.value); jpyIn.value = !isNaN(val) ? (val / currentRate).toFixed(0) : ''; handleCalcInput(); } }
     function openCategory() { finalCalc(); const jpy = document.getElementById('jpy-input').value; if(!jpy || jpy <= 0) return showToast("⚠️ 請先輸入金額"); document.getElementById('category-overlay').style.display = 'flex'; }
     function closeCategory() { document.getElementById('category-overlay').style.display = 'none'; }
     function addCustomSpent() { const customName = prompt("請輸入項目名稱：", ""); if (customName && customName.trim() !== "") { addSpent("🧩 " + customName.trim()); } }
@@ -757,8 +756,8 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        // 已修正為使用 https 協議
-        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
+        // 修正後的 Google Maps 嵌入網址
+        iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed&hl=zh-TW`;
         modal.style.display = 'flex';
     }
 
