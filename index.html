@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1b26">
     <title>8-Day Osaka Itinerary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --cream: #fefae0;
@@ -604,34 +604,14 @@
         });
     }
 
-    // 將渲染邏輯封裝，確保在資料準備好後再執行
     function renderDayPages() {
         const p14 = document.querySelector('.p14');
-        if (!p14) return;
-        
         let daysHtml = '';
-        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
-        const startDate = new Date(2026, 6, 16);
-        const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
         for (let i = 1; i <= 8; i++) {
-            // 預先計算預設日期標籤
-            let defaultLabel = "";
-            if (savedStay[`dayLabel${i}`]) {
-                defaultLabel = savedStay[`dayLabel${i}`];
-            } else {
-                const currentDate = new Date(startDate);
-                currentDate.setDate(startDate.getDate() + (i - 1));
-                const day = String(currentDate.getDate()).padStart(2, '0');
-                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                const weekDay = weekDays[currentDate.getDay()];
-                defaultLabel = `Day 0${i} - ${day}/${month} (${weekDay})`;
-            }
-
             daysHtml += `
             <div class="single-page p${i + 5}" style="z-index: ${16 - i};">
                 <div class="page-content">
-                    <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="${escapeHTML(defaultLabel)}" onchange="saveStayInfo()"></div>
+                    <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="Day 0${i} - 加載中..." onchange="saveStayInfo()"></div>
                     <div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div>
                     <h3 class="page-title"><span class="emoji">💥</span> Crazy Rundown <span class="emoji">💥</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3>
                     <div id="day${i}-list" style="width:100%;"></div>
@@ -641,6 +621,7 @@
         }
         p14.insertAdjacentHTML('beforebegin', daysHtml);
     }
+    renderDayPages();
 
     let currentRate = 0.052;
     let liveRate = 0.052;
@@ -705,18 +686,7 @@
     function getAutoDay() { const startDate = new Date(2026, 6, 16); const today = new Date(); const diffTime = today - startDate; const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; if (diffDays < 1) return 1; if (diffDays > 8) return 8; return diffDays; }
     function updateJapanTime() { const options = { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }; const formatter = new Intl.DateTimeFormat('en-GB', options); try { const timeString = formatter.format(new Date()); document.querySelectorAll('.local-clock').forEach(el => { el.innerText = timeString; }); } catch(e) {} }
     setInterval(updateJapanTime, 1000);
-    
-    // 修正日期生成函數，增加判斷
-    function generateDayLabels() { 
-        const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
-        for (let i = 1; i <= 8; i++) { 
-            const labelEl = document.getElementById(`day-label-${i}`); 
-            if (labelEl && savedStay[`dayLabel${i}`]) { 
-                labelEl.value = savedStay[`dayLabel${i}`]; 
-            }
-        } 
-    }
-
+    function generateDayLabels() { const startDate = new Date(2026, 6, 16); const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}"); for (let i = 1; i <= 8; i++) { const labelEl = document.getElementById(`day-label-${i}`); if (labelEl) { if (savedStay[`dayLabel${i}`]) { labelEl.value = savedStay[`dayLabel${i}`]; } else { const currentDate = new Date(startDate); currentDate.setDate(startDate.getDate() + (i - 1)); const day = String(currentDate.getDate()).padStart(2, '0'); const month = String(currentDate.getMonth() + 1).padStart(2, ' 0'); const weekDay = weekDays[currentDate.getDay()]; labelEl.value = `Day 0${i} - ${day}/${month} (${weekDay})`; } } } }
     async function fetchLiveExchangeRate() { const refreshBtn = document.getElementById('refresh-fx'); const rateText = document.getElementById('fx-rate-text'); if(!refreshBtn) return; refreshBtn.classList.add('spinning'); rateText.innerText = "更新中..."; try { const response = await fetch('https://open.er-api.com/v6/latest/JPY'); const data = await response.json(); if (data && data.rates && data.rates.HKD) { liveRate = data.rates.HKD; localStorage.setItem('osaka_last_rate', liveRate); localStorage.setItem('osaka_last_rate_time', new Date().getTime()); updateRateDisplay(); } } catch (error) { const cachedRate = localStorage.getItem('osaka_last_rate'); if(cachedRate) { liveRate = parseFloat(cachedRate); showToast("⚠️ 使用快取匯率"); updateRateDisplay(); } } finally { setTimeout(() => refreshBtn.classList.remove('spinning'), 500); } }
     function updateRateDisplay() { const rateText = document.getElementById('fx-rate-text'); const updateTimeText = document.getElementById('fx-update-time'); const lastTime = localStorage.getItem('osaka_last_rate_time'); currentRate = (useMode === 'live') ? liveRate : customRate; rateText.innerText = `按 ${useMode === 'live' ? '實時' : '自訂'} ${currentRate.toFixed(4)} 計`; if(lastTime) { const d = new Date(parseInt(lastTime)); updateTimeText.innerText = `最後更新：${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`; } convertCurrency('jpy'); }
     function switchFX(mode) { useMode = mode; document.getElementById('opt-live').classList.toggle('active', mode === 'live'); document.getElementById('opt-custom').classList.toggle('active', mode === 'custom'); document.getElementById('custom-rate-box').style.display = (mode === 'custom') ? 'block' : 'none'; updateRateDisplay(); }
@@ -732,7 +702,6 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
     function renderLedger() { 
         const list = document.getElementById('ledger-list'); 
         const totalEl = document.getElementById('ledger-total'); 
-        if(!list) return;
         list.innerHTML = ''; 
         let totalHKD = 0; 
         let totalJPY = 0; 
@@ -798,7 +767,6 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
         const iframe = document.getElementById('map-iframe');
         const title = document.getElementById('map-modal-title');
         title.innerText = "地圖: " + query;
-        // 修正編碼拼接錯誤
         iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=zh-TW&z=16&output=embed`;
         modal.style.display = 'flex';
     }
@@ -808,57 +776,109 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
 
     function saveAllRundowns() { for (let i = 1; i <= 8; i++) { const data = []; const list = document.getElementById(`day${i}-list`); if (list) { list.querySelectorAll('.timeline-row').forEach(row => { data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value }); }); localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); } } }
     
+    // --- 加密匯出核心邏輯 ---
     function exportData() { 
-        saveAllRundowns(); saveStayInfo(); const all = {}; for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); 
-        all['stay_info'] = localStorage.getItem('osaka_stay_info'); all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); 
-        const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); all['pack_info'] = {}; 
+        saveAllRundowns(); 
+        saveStayInfo(); 
+        
+        const all = {}; 
+        for (let i = 1; i <= 8; i++) all[`day${i}`] = localStorage.getItem(`osaka_rundown_day${i}`); 
+        all['stay_info'] = localStorage.getItem('osaka_stay_info'); 
+        all['ledger_v2'] = localStorage.getItem('osaka_ledger_days'); 
+        
+        const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]'); 
+        all['pack_info'] = {}; 
         checkboxes.forEach(box => { all['pack_info'][box.id] = box.checked; }); 
+        
         const jsonData = JSON.stringify(all, null, 2); 
-        const pwd = prompt("請設定匯出加密密碼："); if (pwd === null || pwd.trim() === "") { showToast("⚠️ 取消匯出 (未設定密碼)"); return; }
-        const code = CryptoJS.AES.encrypt(jsonData, pwd).toString(); 
-        navigator.clipboard.writeText(code).then(() => { showToast("✅ 已複製加密代碼並下載備份"); }); 
-        const blob = new Blob([code], { type: 'text/plain' }); const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `osaka_itinerary_backup_encrypted.txt`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        
+        // 要求使用者設定加密密碼
+        const password = prompt("🔐 為了保護敏感個資（護照/保單），請設定加密密碼：\n(匯入時必須輸入此密碼，請務必牢記)");
+        
+        if (password === null) return; // 使用者取消
+        if (password.trim() === "") {
+            showToast("⚠️ 密碼不能為空！匯出取消。");
+            return;
+        }
+
+        try {
+            // 使用 CryptoJS 進行 AES 加密
+            const encrypted = CryptoJS.AES.encrypt(jsonData, password).toString();
+            
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(encrypted).then(() => { 
+                showToast("✅ 加密代碼已複製並下載備份"); 
+            }); 
+            
+            // 下載備份檔案
+            const blob = new Blob([encrypted], { type: 'text/plain' }); 
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); 
+            a.href = url; 
+            a.download = `osaka_encrypted_backup.txt`;
+            document.body.appendChild(a); 
+            a.click(); 
+            document.body.removeChild(a); 
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            showToast("❌ 加密過程出錯");
+            console.error(e);
+        }
     }
 
-    function importData() { const code = prompt("貼上加密分享代碼："); if (code) { const pwd = prompt("請輸入解密密碼："); if (pwd === null) return; try { const bytes = CryptoJS.AES.decrypt(code, pwd); const decrypted = bytes.toString(CryptoJS.enc.Utf8); if (!decrypted) throw new Error("解密失敗"); const decoded = JSON.parse(decrypted); for (let i = 1; i <= 8; i++) if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); if (decoded['pack_info']) for (const [id, checked] of Object.entries(decoded['pack_info'])) localStorage.setItem(`osaka_pack_${id}`, checked); showToast("🔄 導入中..."); setTimeout(() => location.reload(), 1000); } catch (e) { showToast("❌ 密碼錯誤或代碼無效"); } } }
+    // --- 解密匯入核心邏輯 ---
+    function importData() { 
+        const code = prompt("📥 貼上加密分享代碼："); 
+        if (!code) return;
 
-    // 主啟動邏輯
+        const password = prompt("🔑 此資料受加密保護，請輸入解密密碼：");
+        if (password === null) return;
+
+        try {
+            // 使用 CryptoJS 進行 AES 解密
+            const bytes = CryptoJS.AES.decrypt(code, password);
+            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+            
+            if (!decryptedData) {
+                showToast("❌ 密碼錯誤或代碼無效！");
+                return;
+            }
+
+            const decoded = JSON.parse(decryptedData); 
+            
+            // 寫入 LocalStorage
+            for (let i = 1; i <= 8; i++) {
+                if (decoded[`day${i}`]) localStorage.setItem(`osaka_rundown_day${i}`, decoded[`day${i}`]); 
+            }
+            if (decoded['stay_info']) localStorage.setItem('osaka_stay_info', decoded['stay_info']); 
+            if (decoded['ledger_v2']) localStorage.setItem('osaka_ledger_days', decoded['ledger_v2']); 
+            if (decoded['pack_info']) {
+                for (const [id, checked] of Object.entries(decoded['pack_info'])) {
+                    localStorage.setItem(`osaka_pack_${id}`, checked); 
+                }
+            }
+            
+            showToast("🔄 解密成功，導入中..."); 
+            setTimeout(() => location.reload(), 1000); 
+        } catch (e) { 
+            showToast("❌ 解密失敗：密碼不正確"); 
+            console.error(e);
+        } 
+    }
+
     window.addEventListener('load', () => {
-        // 1. 先讀取所有資料
         const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
         const savedCustom = localStorage.getItem('osaka_custom_rate');
         const savedLedgerDays = localStorage.getItem('osaka_ledger_days');
         const savedCalc = localStorage.getItem('osaka_calc_temp');
-        
-        // 2. 渲染動態頁面 (帶入 savedStay)
-        renderDayPages();
-        
-        // 3. 恢復資料狀態
         if(savedCustom) { customRate = parseFloat(savedCustom); document.getElementById('custom-rate-input').value = customRate; }
         if(savedLedgerDays) ledgerByDay = JSON.parse(savedLedgerDays);
         if(savedCalc) { document.getElementById('jpy-input').value = savedCalc; handleCalcInput(); }
-        
-        generateDayLabels(); 
-        fetchLiveExchangeRate(); 
-        updateJapanTime(); 
-        renderLedger();
-
-        for (let i = 1; i <= 8; i++) { 
-            const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); 
-            saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false)); 
-        }
-
+        generateDayLabels(); fetchLiveExchangeRate(); updateJapanTime(); renderLedger();
+        for (let i = 1; i <= 8; i++) { const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false)); }
         const fields = ['room','door','wifiName','wifiPass','luggageBefore','luggageAfter','stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2', 'insHkProvider', 'insHkPolicy', 'insHkPhone', 'insJpProvider', 'insJpPolicy', 'insJpPhone', 'customDayName'];
         fields.forEach(f => { if(savedStay[f]) { let el = document.getElementById('stay-'+f.replace(/([A-Z])/g, '-$1').toLowerCase()) || document.getElementById(f.replace(/([A-Z])/g, '-$1').toLowerCase()); if(el) el.value = savedStay[f]; } });
-        
-        document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => { 
-            const savedState = localStorage.getItem(`osaka_pack_${box.id}`); 
-            if (savedState === 'true') box.checked = true; 
-            box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); }); 
-        });
-        
+        document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => { const savedState = localStorage.getItem(`osaka_pack_${box.id}`); if (savedState === 'true') box.checked = true; box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); }); });
         updateNavTriggerVisibility(0);
     });
 
@@ -869,4 +889,3 @@ currentRate).toFixed(0) : ''; handleCalcInput(); } }
 </script>
 </body>
 </html>
-
