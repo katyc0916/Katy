@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#1a1b26">
     <title>8-Day Osaka Itinerary</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -269,7 +270,7 @@
         .survival-list li { margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; line-height: 1.4; color: #444; }
         .line-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 3px; transform: translateY(1px); border: 1px solid rgba(0,0,0,0.1);}
         .subway-desc { font-size: 0.75rem; color: #777; width: 100%; padding-left: 12px; margin-top: 2px;}
-        .timeline-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-left: 3px solid var(--theme-blue); transition: all 0.3s; user-select: none; width: 100%; box-sizing: border-box; }
+        .timeline-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; padding: 8px 10px; border-left: 3px solid var(--theme-blue); transition: all 0.3s; user-select: none; width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.4); border-radius: 8px; }
         .timeline-row.pressing { background: rgba(230, 57, 70, 0.15); border-radius: 8px; transform: scale(0.98); }
         .time-input { width: 55px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; margin-top: 2px; }
         .loc-input { flex: 1; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; border-bottom: 1.5px dashed #aaa; padding: 2px 0; outline: none; color: #333; transition: font-size 0.2s; resize: none; overflow: hidden; font-family: inherit; line-height: 1.4; height: 1.4em; min-height: 1.4em; }
@@ -385,6 +386,28 @@
             word-break: break-all;
         }
 
+        /* --- 新增：行程進度條 --- */
+        .day-progress-container { width: 100%; height: 6px; background: rgba(162, 210, 255, 0.4); border-radius: 3px; margin-bottom: 12px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .day-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--bag-cyan), var(--theme-blue), var(--osaka-red)); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 3px; }
+
+        /* --- 新增：行程 Checkbox 與完成狀態 --- */
+        .task-check-wrapper { display: flex; align-items: flex-start; padding-top: 2px; padding-right: 6px; }
+        .task-check { appearance: none; width: 22px; height: 22px; border: 2px solid var(--theme-blue); border-radius: 6px; outline: none; cursor: pointer; transition: 0.2s; position: relative; background: white; margin: 0; flex-shrink: 0; }
+        .task-check:checked { background: var(--bag-cyan); border-color: var(--bag-cyan); }
+        .task-check:checked::after { content: '✔'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; font-weight: bold; }
+        .timeline-row.completed { opacity: 0.65; background: rgba(200, 200, 200, 0.3); border-left-color: #aaa; }
+        .timeline-row.completed .loc-input { text-decoration: line-through; color: #777; }
+
+        /* --- 新增：行程點擴充欄位 (圖標、交通、圖片) --- */
+        .row-main-content { flex: 1; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+        .loc-header { display: flex; align-items: flex-start; gap: 5px; }
+        .type-icon-btn { cursor: pointer; font-size: 1.2rem; padding: 2px; background: rgba(255,255,255,0.6); border-radius: 6px; user-select: none; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .type-icon-btn:active { transform: scale(0.8); }
+        .transport-input { width: 100%; background: rgba(255,255,255,0.7); border: 1px dashed var(--theme-blue); font-size: 0.75rem; font-weight: bold; padding: 4px 6px; border-radius: 6px; color: #444; outline: none; box-sizing: border-box; }
+        .transport-input::placeholder { color: #999; font-weight: normal; }
+        .img-preview-box { width: 100%; max-height: 100px; border-radius: 8px; object-fit: cover; border: 2px solid white; display: none; cursor: pointer; margin-top: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .img-url-input { width: 100%; background: transparent; border: 1px dashed #ccc; font-size: 0.7rem; padding: 4px; border-radius: 6px; color: #777; outline: none; box-sizing: border-box; }
+        .img-url-input::placeholder { color: #bbb; }
     </style>
 </head>
 <body>
@@ -635,6 +658,52 @@
         });
     }
 
+    const iconList = ['📍', '🚇', '🚌', '✈️', '🏨', '🍜', '🍣', '☕', '🎢', '🏯', '⛩️', '🛍️', '🛒', '🦌', '🐋', '🎡'];
+
+    const defaultOsakaItinerary = {
+        1: [
+            { t: "12:50", i: "✈️", l: "抵達關西機場 (KIX) & 領取行李", tr: "南海電鐵特急ラピート (約40分)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Nankai_50000_series_Rapiit_01.jpg/640px-Nankai_50000_series_Rapiit_01.jpg", d: false },
+            { t: "14:30", i: "🏨", l: "MA Masters Residence Check-in", tr: "地鐵堺筋線/千日前線 日本橋站 (6號出口有電梯)", img: "", d: false },
+            { t: "16:00", i: "🛍️", l: "心齋橋筋商店街", tr: "步行 或 御堂筋線 心齋橋站 (5號/6號出口)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Shinsaibashi-suji_Shopping_Street_201605.jpg/640px-Shinsaibashi-suji_Shopping_Street_201605.jpg", d: false },
+            { t: "19:00", i: "🍜", l: "道頓堀 固力果跑跑人 & 晚餐", tr: "步行", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Dotonbori_Glico_sign_201705.jpg/640px-Dotonbori_Glico_sign_201705.jpg", d: false }
+        ],
+        2: [
+            { t: "08:00", i: "🎢", l: "日本環球影城 USJ (提早排隊)", tr: "JR夢咲線 環球城站 (Universal City)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Universal_Studios_Japan_Entrance.jpg/640px-Universal_Studios_Japan_Entrance.jpg", d: false },
+            { t: "10:00", i: "🎢", l: "超級任天堂世界 (需整理券)", tr: "園區內", img: "", d: false },
+            { t: "20:00", i: "🍜", l: "環球影城外 CityWalk 晚餐", tr: "步行", img: "", d: false }
+        ],
+        3: [
+            { t: "09:30", i: "🏯", l: "大阪城天守閣", tr: "地鐵谷町線 谷町四丁目站 (1-B出口或9號出口)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Osaka_Castle_02bs3200.jpg/640px-Osaka_Castle_02bs3200.jpg", d: false },
+            { t: "12:30", i: "🍣", l: "黑門市場 吃海鮮", tr: "地鐵堺筋線 日本橋站 (10號出口)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kuromon_Market_20140413.jpg/640px-Kuromon_Market_20140413.jpg", d: false },
+            { t: "16:00", i: "🎡", l: "梅田藍天大廈 空中庭園展望台", tr: "地鐵御堂筋線 梅田站 (5號出口步行10分)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Umeda_Sky_Building_201505.jpg/640px-Umeda_Sky_Building_201505.jpg", d: false }
+        ],
+        4: [
+            { t: "08:30", i: "⛩️", l: "京都 - 伏見稻荷大社 (千本鳥居)", tr: "京阪本線 伏見稻荷站", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Fushimi_Inari-taisha_Senbon_Torii_201504.jpg/640px-Fushimi_Inari-taisha_Senbon_Torii_201504.jpg", d: false },
+            { t: "13:00", i: "⛩️", l: "清水寺 & 二年坂三年坂", tr: "京阪本線 清水五條站 (步行約20分)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Kiyomizu-dera_201605.jpg/640px-Kiyomizu-dera_201605.jpg", d: false },
+            { t: "18:00", i: "📍", l: "祇園 花見小路", tr: "步行 或 京阪本線 祇園四條站", img: "", d: false }
+        ],
+        5: [
+            { t: "09:00", i: "🦌", l: "奈良公園 餵鹿", tr: "近鐵奈良線 近鐵奈良站 (3號出口)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Nara_Park_deer_201405.jpg/640px-Nara_Park_deer_201405.jpg", d: false },
+            { t: "11:30", i: "⛩️", l: "東大寺 大佛殿", tr: "步行 (從奈良公園內)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Todai-ji_Daibutsuden_201505.jpg/640px-Todai-ji_Daibutsuden_201505.jpg", d: false },
+            { t: "17:00", i: "🛍️", l: "阿倍野 Harukas 300 展望台", tr: "近鐵南大阪線 大阪阿部野橋站", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Abeno_Harukas_201405.jpg/640px-Abeno_Harukas_201405.jpg", d: false }
+        ],
+        6: [
+            { t: "10:00", i: "🐋", l: "海遊館 (世界最大級水族館)", tr: "地鐵中央線 大阪港站 (1號出口步行5分)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Osaka_Aquarium_Kaiyukan_201505.jpg/640px-Osaka_Aquarium_Kaiyukan_201505.jpg", d: false },
+            { t: "13:00", i: "🎡", l: "天保山大摩天輪", tr: "步行 (海遊館旁)", img: "", d: false },
+            { t: "18:00", i: "♨️", l: "空庭溫泉 (可選)", tr: "JR大阪環狀線 弁天町站", img: "", d: false }
+        ],
+        7: [
+            { t: "10:00", i: "🛍️", l: "難波 Parks & 難波 City 逛街", tr: "地鐵御堂筋線 難波站 (南南檢票口)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Namba_Parks_201505.jpg/640px-Namba_Parks_201505.jpg", d: false },
+            { t: "15:00", i: "☕", l: "美國村 (潮流服飾/咖啡店)", tr: "地鐵四橋線 四橋站 或 步行", img: "", d: false },
+            { t: "19:00", i: "🛒", l: "唐吉訶德 (最後掃貨)", tr: "步行至 道頓堀", img: "", d: false }
+        ],
+        8: [
+            { t: "10:00", i: "🧳", l: "Check-out & 寄放行李", tr: "日本橋站 置物櫃", img: "", d: false },
+            { t: "13:00", i: "🛍️", l: "臨空城 Outlet (Rinku Premium Outlets)", tr: "南海電鐵 臨空城站 (Rinku Town)", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Rinku_Premium_Outlets_201305.jpg/640px-Rinku_Premium_Outlets_201305.jpg", d: false },
+            { t: "18:00", i: "✈️", l: "抵達關西機場 準備回程 (HK Express)", tr: "南海電鐵 關西機場站", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Kansai_International_Airport_Terminal_1_201505.jpg/640px-Kansai_International_Airport_Terminal_1_201505.jpg", d: false }
+        ]
+    };
+
     function renderDayPages() {
         const p14 = document.querySelector('.p14');
         let daysHtml = '';
@@ -659,6 +728,7 @@
             <div class="single-page p${i + 5}" style="z-index: ${16 - i};">
                 <div class="page-content">
                     <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="${labelValue}" onchange="saveStayInfo()"></div>
+                    <div class="day-progress-container"><div class="day-progress-bar" id="progress-day${i}"></div></div>
                     <div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div>
                     <h3 class="page-title"><span class="emoji">💥</span> Crazy Rundown <span class="emoji">💥</span> <a href="https://www.jma.go.jp/bosai/wdist/#lat:34.6863&lon:135.52&zoom:11" target="_blank" class="weather-link">🌦️ JMA 天氣</a></h3>
                     <div id="day${i}-list" style="width:100%;"></div>
@@ -788,17 +858,123 @@
         for (let i = 1; i <= 8; i++) { const labelEl = document.getElementById(`day-label-${i}`); if (labelEl) stayData[`dayLabel${i}`] = labelEl.value; } 
         localStorage.setItem('osaka_stay_info', JSON.stringify(stayData)); 
     }
+    
     function autoResizeTextarea(el) { el.style.height = '1.4em'; if (el.scrollHeight > el.offsetHeight) el.style.height = el.scrollHeight + 'px'; }
-    function addNewRow(cId, time = "12:00", loc = "", shouldSave = true) { 
+    
+    function cycleIcon(btn) {
+        let currentIndex = iconList.indexOf(btn.innerText);
+        if(currentIndex === -1) currentIndex = 0;
+        let nextIndex = (currentIndex + 1) % iconList.length;
+        btn.innerText = iconList[nextIndex];
+        saveAllRundowns();
+    }
+
+    function updatePreview(input) {
+        const url = input.value.trim();
+        const box = input.previousElementSibling;
+        if (url) {
+            box.src = url;
+            box.style.display = 'block';
+            input.style.display = 'none';
+        } else {
+            box.style.display = 'none';
+            box.src = '';
+        }
+    }
+
+    function promptImage(img) {
+        const input = img.nextElementSibling;
+        const newUrl = prompt("更換圖片網址:", input.value);
+        if (newUrl !== null) {
+            input.value = newUrl;
+            updatePreview(input);
+            saveAllRundowns();
+        }
+    }
+
+    function toggleTask(checkbox, dayNum) {
+        const row = checkbox.closest('.timeline-row');
+        if (checkbox.checked) {
+            row.classList.add('completed');
+            if (typeof confetti === 'function') {
+                const rect = checkbox.getBoundingClientRect();
+                confetti({
+                    particleCount: 40,
+                    spread: 60,
+                    origin: {
+                        x: (rect.left + rect.width / 2) / window.innerWidth,
+                        y: (rect.top + rect.height / 2) / window.innerHeight
+                    },
+                    colors: ['#a2d2ff', '#e63946', '#f9ca24', '#4cc9f0'],
+                    disableForReducedMotion: true
+                });
+            }
+        } else {
+            row.classList.remove('completed');
+        }
+        updateProgress(dayNum);
+    }
+
+    function updateProgress(dayNum) {
+        const list = document.getElementById(`day${dayNum}-list`);
+        if (!list) return;
+        const total = list.querySelectorAll('.task-check').length;
+        const checked = list.querySelectorAll('.task-check:checked').length;
+        const bar = document.getElementById(`progress-day${dayNum}`);
+        if (bar) {
+            bar.style.width = total === 0 ? '0%' : (checked / total * 100) + '%';
+        }
+    }
+
+    function addNewRow(cId, dataParam = null, legacyLoc = null, shouldSave = true) { 
         const container = document.getElementById(cId); if (!container) return; 
-        const div = document.createElement('div'); div.className = 'timeline-row'; 
-        div.innerHTML = `<input type="text" class="time-input" value="${escapeHTML(time)}" onchange="saveAllRundowns()"><textarea class="loc-input" placeholder="行程..." rows="1" onchange="saveAllRundowns()" oninput="autoResizeTextarea(this)">${escapeHTML(loc)}</textarea><span class="map-icon-btn" onclick="openDynamicMap(this)">🌐</span>`; 
-        let pressTimer; const startPress = () => { div.classList.add('pressing'); pressTimer = setTimeout(() => { if(confirm("🗑️ 刪除？")) { div.remove(); saveAllRundowns(); } }, 800); }; 
+        const dayMatch = cId.match(/day(\d+)/);
+        const dayNum = dayMatch ? dayMatch[1] : 1;
+
+        if (dataParam instanceof Event) dataParam = null;
+
+        let data = { t: "12:00", i: "📍", l: "", tr: "", img: "", d: false };
+
+        if (typeof dataParam === 'string') {
+            data.t = dataParam;
+            data.l = legacyLoc || "";
+        } else if (dataParam && typeof dataParam === 'object') {
+            data = { ...data, ...dataParam };
+        }
+
+        const div = document.createElement('div'); 
+        div.className = 'timeline-row' + (data.d ? ' completed' : ''); 
+        div.innerHTML = `
+            <div class="task-check-wrapper">
+                <input type="checkbox" class="task-check" ${data.d ? 'checked' : ''} onchange="toggleTask(this, ${dayNum}); saveAllRundowns()">
+            </div>
+            <input type="text" class="time-input" value="${escapeHTML(data.t)}" onchange="saveAllRundowns()">
+            <div class="row-main-content">
+                <div class="loc-header">
+                    <span class="type-icon-btn" onclick="cycleIcon(this)">${escapeHTML(data.i || '📍')}</span>
+                    <textarea class="loc-input" placeholder="行程..." rows="1" onchange="saveAllRundowns()" oninput="autoResizeTextarea(this)">${escapeHTML(data.l)}</textarea>
+                </div>
+                <input type="text" class="transport-input" placeholder="🚇 交通 / 出口..." value="${escapeHTML(data.tr || '')}" onchange="saveAllRundowns()">
+                <img src="${escapeHTML(data.img || '')}" class="img-preview-box" ${data.img ? 'style="display:block;"' : ''} onclick="promptImage(this)">
+                <input type="text" class="img-url-input" placeholder="🖼️ 貼上圖片網址預覽..." value="${escapeHTML(data.img || '')}" onchange="updatePreview(this); saveAllRundowns()" ${data.img ? 'style="display:none;"' : ''}>
+            </div>
+            <span class="map-icon-btn" onclick="openDynamicMap(this)">🌐</span>
+        `; 
+
+        let pressTimer; 
+        const startPress = (e) => { 
+            if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='IMG') return;
+            div.classList.add('pressing'); 
+            pressTimer = setTimeout(() => { if(confirm("🗑️ 刪除？")) { div.remove(); saveAllRundowns(); updateProgress(dayNum); } }, 800); 
+        }; 
         const cancelPress = () => { clearTimeout(pressTimer); div.classList.remove('pressing'); }; 
         div.addEventListener('touchstart', startPress); div.addEventListener('touchend', cancelPress); 
         div.addEventListener('mousedown', startPress); div.addEventListener('mouseup', cancelPress); 
-        container.appendChild(div); const txt = div.querySelector('.loc-input'); setTimeout(() => autoResizeTextarea(txt), 0); 
-        if (shouldSave) saveAllRundowns(); 
+        
+        container.appendChild(div); 
+        const txt = div.querySelector('.loc-input'); 
+        setTimeout(() => autoResizeTextarea(txt), 0); 
+        if (shouldSave) { saveAllRundowns(); updateProgress(dayNum); }
     }
     
     function openDynamicMap(btn) { const loc = btn.parentElement.querySelector('.loc-input').value; if (loc) openMapModal(loc); else showToast('⚠️ 填寫地點'); }
@@ -815,7 +991,25 @@
 
     function closeMapModal() { const modal = document.getElementById('map-modal'); const iframe = document.getElementById('map-iframe'); iframe.src = ''; modal.style.display = 'none'; }
 
-    function saveAllRundowns() { for (let i = 1; i <= 8; i++) { const data = []; const list = document.getElementById(`day${i}-list`); if (list) { list.querySelectorAll('.timeline-row').forEach(row => { data.push({ t: row.querySelector('.time-input').value, l: row.querySelector('.loc-input').value }); }); localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); } } }
+    function saveAllRundowns() { 
+        for (let i = 1; i <= 8; i++) { 
+            const data = []; 
+            const list = document.getElementById(`day${i}-list`); 
+            if (list) { 
+                list.querySelectorAll('.timeline-row').forEach(row => { 
+                    data.push({ 
+                        t: row.querySelector('.time-input').value, 
+                        i: row.querySelector('.type-icon-btn').innerText,
+                        l: row.querySelector('.loc-input').value,
+                        tr: row.querySelector('.transport-input').value,
+                        img: row.querySelector('.img-preview-box').style.display !== 'none' ? row.querySelector('.img-url-input').value : '',
+                        d: row.querySelector('.task-check').checked
+                    }); 
+                }); 
+                localStorage.setItem(`osaka_rundown_day${i}`, JSON.stringify(data)); 
+            } 
+        } 
+    }
     
     function exportData() { 
         saveAllRundowns(); 
@@ -869,7 +1063,27 @@
         if(savedLedgerDays) ledgerByDay = JSON.parse(savedLedgerDays);
         if(savedCalc) { document.getElementById('jpy-input').value = savedCalc; handleCalcInput(); }
         generateDayLabels(); fetchLiveExchangeRate(); updateJapanTime(); renderLedger();
-        for (let i = 1; i <= 8; i++) { const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); saved.forEach(r => addNewRow(`day${i}-list`, r.t, r.l, false)); }
+        
+        for (let i = 1; i <= 8; i++) { 
+            const savedDataStr = localStorage.getItem(`osaka_rundown_day${i}`);
+            let parsedData = [];
+            if (savedDataStr) {
+                parsedData = JSON.parse(savedDataStr);
+            } else if (defaultOsakaItinerary[i]) {
+                parsedData = defaultOsakaItinerary[i];
+            }
+
+            parsedData.forEach(r => {
+                // Support legacy format or new format smoothly
+                if (r.t !== undefined && r.l !== undefined) {
+                    addNewRow(`day${i}-list`, r, null, false);
+                } else {
+                    addNewRow(`day${i}-list`, r, null, false);
+                }
+            });
+            updateProgress(i);
+        }
+
         const fields = ['stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2', 'insHkProvider', 'insHkPhone', 'insJpProvider', 'insJpPhone', 'customDayName'];
         fields.forEach(f => { if(savedStay[f]) { let el = document.getElementById('stay-'+f.replace(/([A-Z])/g, '-$1').toLowerCase()) || document.getElementById(f.replace(/([A-Z])/g, '-$1').toLowerCase()); if(el) el.value = savedStay[f]; } });
         document.querySelectorAll('.check-item input[type="checkbox"]').forEach(box => { const savedState = localStorage.getItem(`osaka_pack_${box.id}`); if (savedState === 'true') box.checked = true; box.addEventListener('change', () => { localStorage.setItem(`osaka_pack_${box.id}`, box.checked); }); });
@@ -884,6 +1098,7 @@
             'https://raw.githubusercontent.com/katyc0916/Katy/refs/heads/main/IMG_7310.png',
             'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap',
             'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js',
+            'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
             'https://archive.org/download/COMPLETE_MOZART_PIANO_SONATAS/Mozart_PS_No.17_in_CM_K.545_SDRodrian.mp3',
             'https://www.mfiles.co.uk/mp3-downloads/chopin-nocturne-op9-no2.mp3'
         ];
