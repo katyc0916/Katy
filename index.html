@@ -18,7 +18,7 @@
             --japan-blue: #d1e9f0; 
             --flight-purple: #6a0dad;
             --bag-cyan: #4cc9f0;
-            --transport-blue: #0056b3; /* 定義交通文字藍色 */
+            --transport-blue: #0056b3; 
         }
 
         body { 
@@ -41,7 +41,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        /* --- 左右揭頁導航按鈕 --- */
         .nav-side-btn {
             position: absolute;
             top: 50%;
@@ -59,10 +58,7 @@
             pointer-events: auto;
         }
 
-        .nav-side-btn:hover, .nav-side-btn:active {
-            opacity: 0.9; 
-        }
-
+        .nav-side-btn:hover, .nav-side-btn:active { opacity: 0.9; }
         .nav-side-btn.prev-btn { left: 8px; } 
         .nav-side-btn.next-btn { right: 8px; }
 
@@ -272,7 +268,6 @@
         .line-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 3px; transform: translateY(1px); border: 1px solid rgba(0,0,0,0.1);}
         .subway-desc { font-size: 0.75rem; color: #777; width: 100%; padding-left: 12px; margin-top: 2px;}
         
-        /* --- 改良後的行程列表樣式 (垂直布局) --- */
         .timeline-row { 
             display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; padding: 12px; 
             border-left: 4px solid var(--theme-blue); background: rgba(255,255,255,0.6); border-radius: 0 12px 12px 0;
@@ -284,9 +279,7 @@
         .row-body { display: flex; flex-direction: column; gap: 6px; }
 
         .arrival-check { width: 20px; height: 20px; accent-color: var(--osaka-red); cursor: pointer; flex-shrink: 0; }
-        .emoji-btn { font-size: 1.1rem; cursor: pointer; background: none; border: none; padding: 0; min-width: 25px; }
         
-        /* 新增：手動輸入圖案/類別樣式 (移動到第二行) */
         .loc-input-group {
             display: flex;
             align-items: center;
@@ -311,9 +304,8 @@
         .loc-input { flex: 1; background: transparent; border: none; font-weight: bold; font-size: 1rem; outline: none; color: #1a1b26; font-family: inherit; line-height: 1.4; resize: none; overflow: hidden; min-height: 1.4em; }
         
         .transport-box { 
-            display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box; padding-left: 43px; /* 對齊 emoji 後的文字 */
+            display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box; padding-left: 43px; 
         }
-        /* --- 修正處：將文字顏色設為藍色並加粗以便識別 --- */
         .transport-input { 
             flex: 1; background: #f0f7ff; border: none; border-radius: 6px; padding: 6px 10px; 
             font-size: 0.8rem; color: var(--transport-blue); font-weight: bold; outline: none; font-family: inherit; resize: none; overflow: hidden; min-height: 1.2em;
@@ -330,7 +322,6 @@
         .add-btn { width: 42px; height: 42px; background: white; border: 3px solid var(--theme-blue); border-radius: 50%; font-size: 1.8rem; color: var(--theme-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 15px auto 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: auto; transition: transform 0.2s; }
         .add-btn:active { transform: scale(0.9); }
         
-        /* --- 下方選單 --- */
         .bottom-nav { 
             position: fixed; 
             bottom: 20px; 
@@ -390,7 +381,6 @@
         .num-btn:active { background: #ddd; }
         .num-btn.op { background: #ffeaa7; }
 
-        /* --- Modal 彈窗地圖樣式 --- */
         .map-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0.9); z-index: 20000;
@@ -414,28 +404,9 @@
             margin-bottom: 10px;
             box-shadow: 0 4px 12px rgba(230, 57, 70, 0.1);
         }
-        .japan-stay-label {
-            font-size: 0.7rem;
-            color: #999;
-            margin-bottom: 3px;
-            display: block;
-        }
-        .japan-stay-name-jp {
-            font-size: 1.25rem;
-            color: #1a1b26;
-            display: block;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            line-height: 1.3;
-        }
-        .japan-stay-addr-jp {
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.5;
-            word-break: break-all;
-        }
-
+        .japan-stay-label { font-size: 0.7rem; color: #999; margin-bottom: 3px; display: block; }
+        .japan-stay-name-jp { font-size: 1.25rem; color: #1a1b26; display: block; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px; line-height: 1.3; }
+        .japan-stay-addr-jp { font-size: 1rem; color: #333; line-height: 1.5; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -513,7 +484,7 @@
         
         <div class="single-page p2" style="z-index: 19;"><div class="page-content"><div class="day-header"><input type="text" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" readonly></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">😆</span> Fun-Filled Crew <span class="emoji">😆</span></h3><div class="crew-grid"><div class="member-card-squishy katy-card"><div class="char-circle">🦄</div><p>Katy</p></div><div class="member-card-squishy to-card"><div class="char-circle">🐴</div><p>To</p></div><div class="member-card-squishy aidan-card"><div class="char-circle">🐰</div><p>Aidan</p></div><div class="member-card-squishy loka-card"><div class="char-circle">🐭</div><p>Lok</p></div><div class="member-card-squishy eva-card"><div class="char-circle">🐯</div><p>Eva</p></div><div class="member-card-squishy sumi-card"><div class="char-circle">🐶</div><p>Sumi</p></div></div></div></div>
         
-        <div class="single-page p3" style="z-index: 18;"><div class="page-content"><div class="day-header"><input type="text" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" readonly></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🧳</span> Ready, Set, Pack! <span class="emoji">🧳</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="margin-top:0; color:var(--osaka-red); font-size: 0.9rem;">⚠️ 手提 & 重要證件</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;"><div class="check-item"><input type="checkbox" id="pack-id"> 證件/銀包</div><div class="check-item"><input type="checkbox" id="pack-ticket"> 登機證</div><div class="check-item"><input type="checkbox" id="pack-tech"> 手提電話</div><div class="check-item"><input type="checkbox" id="pack-power"> 憑證副本</div><div class="check-item"><input type="checkbox" id="pack-sim"> SIM卡/針</div><div class="check-item"><input type="checkbox" id="pack-qr"> QR code</div></div></div><div class="info-box" style="border-bottom-color: var(--bag-cyan);"><h4 style="margin-top:0; color:var(--bag-cyan); font-size: 0.9rem;">👕 寄艙衣物</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;"><div class="check-item"><input type="checkbox" id="cloth-1"> 出街衫褲</div><div class="check-item"><input type="checkbox" id="cloth-2"> 睡衣/內衣</div><div class="check-item"><input type="checkbox" id="cloth-3"> 襪子/拖鞋</div><div class="check-item"><input type="checkbox" id="cloth-4"> 毛巾/浴巾</div><div class="check-item"><input type="checkbox" id="cloth-5"> 外套</div><div class="check-item"><input type="checkbox" id="cloth-6"> 太陽帽</div></div></div><div class="info-box" style="border-bottom-color: var(--flight-purple);"><h4 style="margin-top:0; color:var(--flight-purple); font-size: 0.9rem;">🛠️ 雜物 & 電器</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr;"><div class="check-item"><input type="checkbox" id="util-1"> 充電線/充電器</div><div class="check-item"><input type="checkbox" id="util-2"> 平安藥/雨衣雨傘</div><div class="check-item"><input type="checkbox" id="util-3"> 轉插頭/密碼鎖</div><div class="check-item"><input type="checkbox" id="util-4"> 環保袋/備用膠袋</div></div></div><div class="info-box" style="border-bottom-color: #f9ca24;"><h4 style="margin-top:0; color:#e67e22; font-size: 0.9rem;">🧴 日用品 & 護理</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr;"><div class="check-item"><input type="checkbox" id="care-1"> 牙膏牙刷/梳</div><div class="check-item"><input type="checkbox" id="care-2"> 洗面/護膚品</div><div class="check-item"><input type="checkbox" id="care-3"> 眼鏡/OK鏡</div><div class="check-item"><input type="checkbox" id="care-4"> 剃鬚/防曬品</div><div class="check-item"><input type="checkbox" id="care-5"> 濕巾/乾紙巾</div><div class="check-item"><input type="checkbox" id="care-special"> 女性用品</div><div class="check-item"><input type="checkbox" id="care-teeth"> 牙線棒/棉花棒</div><div class="check-item"><input type="checkbox" id="care-nipper"> 眉鉗/指甲鉗</div><div class="check-item"><input type="checkbox" id="care-stone"> 藥膏/止汗石</div><div class="check-item"><input type="checkbox" id="care-6"> 口罩/水樽</div><div class="check-item"><input type="checkbox" id="care-fan"> 撥扇/電風扇</div><div class="check-item"><input type="checkbox" id="care-clean"> 消毒用品</div></div></div></div></div>
+        <div class="single-page p3" style="z-index: 18;"><div class="page-content"><div class="day-header"><input type="text" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" readonly></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🧳</span> Ready, Set, Pack! <span class="emoji">🧳</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="margin-top:0; color:var(--osaka-red); font-size: 0.9rem;">⚠️ 手提 & 重要證件</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;"><div class="check-item"><input type="checkbox" id="pack-id" onchange="savePackingStatus()"> 證件/銀包</div><div class="check-item"><input type="checkbox" id="pack-ticket" onchange="savePackingStatus()"> 登機證</div><div class="check-item"><input type="checkbox" id="pack-tech" onchange="savePackingStatus()"> 手提電話</div><div class="check-item"><input type="checkbox" id="pack-power" onchange="savePackingStatus()"> 憑證副本</div><div class="check-item"><input type="checkbox" id="pack-sim" onchange="savePackingStatus()"> SIM卡/針</div><div class="check-item"><input type="checkbox" id="pack-qr" onchange="savePackingStatus()"> QR code</div></div></div><div class="info-box" style="border-bottom-color: var(--bag-cyan);"><h4 style="margin-top:0; color:var(--bag-cyan); font-size: 0.9rem;">👕 寄艙衣物</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr 1fr;"><div class="check-item"><input type="checkbox" id="cloth-1" onchange="savePackingStatus()"> 出街衫褲</div><div class="check-item"><input type="checkbox" id="cloth-2" onchange="savePackingStatus()"> 睡衣/內衣</div><div class="check-item"><input type="checkbox" id="cloth-3" onchange="savePackingStatus()"> 襪子/拖鞋</div><div class="check-item"><input type="checkbox" id="cloth-4" onchange="savePackingStatus()"> 毛巾/浴巾</div><div class="check-item"><input type="checkbox" id="cloth-5" onchange="savePackingStatus()"> 外套</div><div class="check-item"><input type="checkbox" id="cloth-6" onchange="savePackingStatus()"> 太陽帽</div></div></div><div class="info-box" style="border-bottom-color: var(--flight-purple);"><h4 style="margin-top:0; color:var(--flight-purple); font-size: 0.9rem;">🛠️ 雜物 & 電器</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr;"><div class="check-item"><input type="checkbox" id="util-1" onchange="savePackingStatus()"> 充電線/充電器</div><div class="check-item"><input type="checkbox" id="util-2" onchange="savePackingStatus()"> 平安藥/雨衣雨傘</div><div class="check-item"><input type="checkbox" id="util-3" onchange="savePackingStatus()"> 轉插頭/密碼鎖</div><div class="check-item"><input type="checkbox" id="util-4" onchange="savePackingStatus()"> 環保袋/備用膠袋</div></div></div><div class="info-box" style="border-bottom-color: #f9ca24;"><h4 style="margin-top:0; color:#e67e22; font-size: 0.9rem;">🧴 日用品 & 護理</h4><div class="crew-grid" style="grid-template-columns: 1fr 1fr;"><div class="check-item"><input type="checkbox" id="care-1" onchange="savePackingStatus()"> 牙膏牙刷/梳</div><div class="check-item"><input type="checkbox" id="care-2" onchange="savePackingStatus()"> 洗面/護膚品</div><div class="check-item"><input type="checkbox" id="care-3" onchange="savePackingStatus()"> 眼鏡/OK鏡</div><div class="check-item"><input type="checkbox" id="care-4" onchange="savePackingStatus()"> 剃鬚/防曬品</div><div class="check-item"><input type="checkbox" id="care-5" onchange="savePackingStatus()"> 濕巾/乾紙巾</div><div class="check-item"><input type="checkbox" id="care-special" onchange="savePackingStatus()"> 女性用品</div><div class="check-item"><input type="checkbox" id="care-teeth" onchange="savePackingStatus()"> 牙線棒/棉花棒</div><div class="check-item"><input type="checkbox" id="care-nipper" onchange="savePackingStatus()"> 眉鉗/指甲鉗</div><div class="check-item"><input type="checkbox" id="care-stone" onchange="savePackingStatus()"> 藥膏/止汗石</div><div class="check-item"><input type="checkbox" id="care-6" onchange="savePackingStatus()"> 口罩/水樽</div><div class="check-item"><input type="checkbox" id="care-fan" onchange="savePackingStatus()"> 撥扇/電風扇</div><div class="check-item"><input type="checkbox" id="care-clean" onchange="savePackingStatus()"> 消毒用品</div></div></div></div></div>
         
         <div class="single-page p4" style="z-index: 17;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-flight" class="day-label-input" value="16/7 (Thu) - 23/7 (Thu)" onchange="saveStayInfo()"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🚀</span> Sky-High Fun <span class="emoji">🚀</span></h3><div class="info-box"><h4><input type="text" id="flight-airline-input" value="香港快運 HK Express" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; font-size:1rem; font-weight:bold; font-family:inherit; outline:none; width:100%;"></h4><div class="flight-link-wrapper"><span class="official-tag">官方網站</span><a href="https://www.hkexpress.com/zh-HK" class="flight-link" target="_blank">🌐</a></div><div class="flight-ticket"><div class="flight-date-label">去程：<input type="text" id="flight-out-date" value="2026年7月16日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t1" class="flight-time" value="07:05" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-out-loc1" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-out-dur" value="3h 45m | Flight UO850 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t2" class="flight-time" value="11:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-out-loc2" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div></div><div class="flight-ticket" style="margin-top: 15px;"><div class="flight-date-label">回程：<input type="text" id="flight-in-date" value="2026年7月23日" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed rgba(255,255,255,0.5); background:transparent; color:white; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none; width:90px; padding:0;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t1" class="flight-time" value="20:40" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-in-loc1" class="flight-city" value="KIX 關西國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-in-dur" value="4h 10m | Flight UO689 (T2)" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:200px; font-size:inherit; font-weight:inherit; font-family:inherit; outline:none;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t2" class="flight-time" value="23:50" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; width:45px; padding:0; outline:none; font-family:inherit;"><input type="text" id="flight-in-loc2" class="flight-city" value="HKG 香港國際機場" onchange="saveStayInfo()" style="border:none; border-bottom:1px dashed #ccc; background:transparent; flex:1; padding:0; outline:none; font-family:inherit;"></div></div></div><div class="info-box"><h4>🧳 行理詳細配額與尺寸</h4><div class="luggage-display"><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><rect x="30" y="25" width="40" height="50" rx="5" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><path d="M40 25 V15 H60 V25" fill="none" stroke="var(--bag-cyan)" stroke-width="4"/><path d="M42 38 V65 M58 38 V65" fill="none" stroke="var(--flight-purple)" stroke-width="3" stroke-linecap="round"/><circle cx="35" cy="78" r="3" fill="var(--flight-purple)"/><circle cx="65" cy="78" r="3" fill="var(--flight-purple)"/></svg><div class="luggage-label">寄艙行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">158cm / 62吋</div></div><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><path d="M30 70 V45 A20 20 0 0 1 70 45 V70" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><rect x="30" y="70" width="40" height="4" fill="var(--flight-purple)"/><rect x="45" y="55" width="10" height="10" rx="2" fill="none" stroke="var(--bag-cyan)" stroke-width="3.5"/><path d="M25 70 H30 M70 70 H75" stroke="var(--flight-purple)" stroke-width="4.5"/></svg><div class="luggage-label">手提行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">40x25x20cm</div></div></div><p style="font-size:0.85rem;"><strong>去程：</strong>隨身 7kg x6 + 寄艙 20kg x4</p><p style="font-size:0.85rem;"><strong>回程：</strong>隨身 7kg x6 + 寄艙 32kg x4</p></div><div class="info-box" style="border-bottom: 3px solid #f9ca24;"><a href="https://vjw-lp.digital.go.jp/zh-hant/" class="vjw-item" target="_blank">🔗 Visit Japan Web 官方申報入口</a><p style="font-size: 0.65rem; margin-top: 5px; color: #666; text-align:center;">(過關必備，請務必先完成申報並截圖 QR Code)</p></div></div></div>
         
@@ -547,9 +518,9 @@
 
 <div class="bottom-nav">
     <div class="nav-item" onclick="location.reload()"><img src="https://img.icons8.com/emoji/48/calendar-emoji.png">Plan</div>
-    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/ticket-emoji.png">Ticket</div>
-    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/shopping-bags.png">Shop</div>
-    <div class="nav-item"><img src="https://img.icons8.com/emoji/48/money-bag-emoji.png">Budget</div>
+    <div class="nav-item" onclick="jumpToPage(3)"><img src="https://img.icons8.com/emoji/48/ticket-emoji.png">Ticket</div>
+    <div class="nav-item" onclick="jumpToPage(2)"><img src="https://img.icons8.com/emoji/48/shopping-bags.png">Shop</div>
+    <div class="nav-item" onclick="jumpToPage(13)"><img src="https://img.icons8.com/emoji/48/money-bag-emoji.png">Budget</div>
     <div class="nav-item" onclick="exportData()"><img src="https://img.icons8.com/emoji/48/outbox-tray.png">Share</div>
     <div class="nav-item" onclick="importData()"><img src="https://img.icons8.com/emoji/48/inbox-tray.png">Sync</div>
     <div class="nav-item" onclick="jumpToPage(14)"><img src="https://img.icons8.com/emoji/48/sos-button-emoji.png" style="width:24px; height:24px; margin-bottom:1px;"><span style="color:var(--osaka-red); font-weight:bold; display:block; margin-top:1px;">SOS</span></div>
@@ -567,7 +538,6 @@
 
     function renderDayPages() {
         const p14 = document.querySelector('.p14');
-        let daysHtml = '';
         const startDate = new Date(2026, 6, 16); 
         const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
@@ -580,7 +550,7 @@
                 labelValue = `Day 0${i} - ${currentDate.getDate()}/${currentDate.getMonth() + 1} (${weekDays[currentDate.getDay()]})`;
             }
 
-            daysHtml += `
+            const html = `
             <div class="single-page p${i + 5}" style="z-index: ${16 - i};">
                 <div class="page-content">
                     <div class="day-header"><input type="text" id="day-label-${i}" class="day-label-input" value="${labelValue}" onchange="saveStayInfo()"></div>
@@ -590,8 +560,8 @@
                     <div class="add-btn" onclick="addNewRow('day${i}-list')">＋</div>
                 </div>
             </div>`;
+            p14.insertAdjacentHTML('beforebegin', html);
         }
-        p14.insertAdjacentHTML('beforebegin', daysHtml);
     }
     renderDayPages();
 
@@ -644,7 +614,7 @@
             </div>
         `;
         
-        let pt; div.addEventListener('touchstart', (e) => { if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT'||e.target.classList.contains('emoji-btn')) return; div.classList.add('pressing'); pt = setTimeout(() => { if(confirm("🗑️ 刪除？")) { div.remove(); saveAllRundowns(); } }, 800); });
+        let pt; div.addEventListener('touchstart', (e) => { if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return; div.classList.add('pressing'); pt = setTimeout(() => { if(confirm("🗑️ 刪除此行程？")) { div.remove(); saveAllRundowns(); } }, 800); });
         div.addEventListener('touchend', () => { clearTimeout(pt); div.classList.remove('pressing'); });
         container.appendChild(div);
         div.querySelectorAll('textarea').forEach(autoResizeTextarea);
@@ -672,38 +642,63 @@
         }
     }
 
+    function savePackingStatus() {
+        const packing = {};
+        document.querySelectorAll('.p3 input[type="checkbox"]').forEach(cb => { packing[cb.id] = cb.checked; });
+        localStorage.setItem('osaka_packing_status', JSON.stringify(packing));
+    }
+
     async function fetchLiveExchangeRate() { const refreshBtn = document.getElementById('refresh-fx'), rateText = document.getElementById('fx-rate-text'); if(!refreshBtn) return; refreshBtn.classList.add('spinning'); rateText.innerText = "更新中..."; try { const response = await fetch('https://open.er-api.com/v6/latest/JPY'); const data = await response.json(); if (data?.rates?.HKD) { liveRate = data.rates.HKD; localStorage.setItem('osaka_last_rate', liveRate); localStorage.setItem('osaka_last_rate_time', new Date().getTime()); updateRateDisplay(); } } catch (e) { const cached = localStorage.getItem('osaka_last_rate'); if(cached) { liveRate = parseFloat(cached); updateRateDisplay(); } } finally { setTimeout(() => refreshBtn.classList.remove('spinning'), 500); } }
-    function updateRateDisplay() { currentRate = (useMode === 'live') ? liveRate : customRate; document.getElementById('fx-rate-text').innerText = `按 ${useMode === 'live' ? '實時' : '自訂'} ${currentRate.toFixed(4)} 計`; convertCurrency('jpy'); }
-    function convertCurrency(source) { const jpyIn = document.getElementById('jpy-input'), hkdIn = document.getElementById('hkd-input'); if(source === 'jpy') { const val = parseFloat(jpyIn.value); hkdIn.value = !isNaN(val) ? (val * currentRate).toFixed(2) : ''; } else { const val = parseFloat(hkdIn.value); jpyIn.value = !isNaN(val) ? (val / currentRate).toFixed(0) : ''; } }
+    function switchFX(mode) { useMode = mode; localStorage.setItem('osaka_fx_mode', mode); document.getElementById('opt-live').classList.toggle('active', mode==='live'); document.getElementById('opt-custom').classList.toggle('active', mode==='custom'); document.getElementById('custom-rate-box').style.display = (mode==='custom'?'block':'none'); updateRateDisplay(); }
+    function saveCustomRate() { customRate = parseFloat(document.getElementById('custom-rate-input').value) || 0.054; localStorage.setItem('osaka_custom_rate', customRate); updateRateDisplay(); }
+    function updateRateDisplay() { currentRate = (useMode === 'live') ? liveRate : customRate; const text = document.getElementById('fx-rate-text'); if(text) text.innerText = `按 ${useMode === 'live' ? '實時' : '自訂'} ${currentRate.toFixed(4)} 計`; convertCurrency('jpy'); }
+    function convertCurrency(source) { const jpyIn = document.getElementById('jpy-input'), hkdIn = document.getElementById('hkd-input'); if(!jpyIn || !hkdIn) return; if(source === 'jpy') { const val = parseFloat(jpyIn.value); hkdIn.value = !isNaN(val) ? (val * currentRate).toFixed(2) : ''; } else { const val = parseFloat(hkdIn.value); jpyIn.value = !isNaN(val) ? (val / currentRate).toFixed(0) : ''; } }
     function updateJapanTime() { const options = { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }; try { const timeString = new Intl.DateTimeFormat('en-GB', options).format(new Date()); document.querySelectorAll('.local-clock').forEach(el => el.innerText = timeString); } catch(e) {} }
     setInterval(updateJapanTime, 1000);
 
-    function toggleMusic(audioId, btnId, defaultIcon, playingIcon) { const targetAudio = document.getElementById(audioId), targetBtn = document.getElementById(btnId), span = targetBtn.querySelector('span'); if (!targetAudio.paused) { targetAudio.pause(); targetBtn.classList.remove('playing'); span.innerText = defaultIcon; return; } document.querySelectorAll('audio').forEach(a => { a.pause(); a.parentElement.classList.remove('playing'); a.parentElement.querySelector('span').innerText = (a.id === 'audio-mozart' ? '🎼' : '🎹'); }); span.innerText = playingIcon; targetAudio.play().then(() => targetBtn.classList.add('playing')); }
-    
-    function goNext() { 
-        const all = Array.from(document.querySelectorAll('.single-page')), unflipped = all.filter(p => !p.classList.contains('flipped')); 
-        if (unflipped.length > 1) unflipped[0].classList.add('flipped'); 
-        else all.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 50)); 
-    }
-    
-    function goPrev() { 
-        const all = Array.from(document.querySelectorAll('.single-page')), flipped = all.filter(p => p.classList.contains('flipped')); 
-        if (flipped.length > 0) {
-            flipped[flipped.length - 1].classList.remove('flipped');
-        } else {
-            all.slice(0, -1).forEach(p => p.classList.add('flipped'));
-        }
-    }
+    function toggleMusic(audioId, btnId, defaultIcon, playingIcon) { const targetAudio = document.getElementById(audioId), targetBtn = document.getElementById(btnId), span = targetBtn.querySelector('span'); if (!targetAudio.paused) { targetAudio.pause(); targetBtn.classList.remove('playing'); span.innerText = defaultIcon; return; } document.querySelectorAll('audio').forEach(a => { a.pause(); a.parentElement.classList.remove('playing'); a.parentElement.querySelector('span').innerText = (a.id === 'audio-mozart' ? '🎼' : '🎹'); }); span.innerText = playingIcon; targetAudio.play().then(() => targetBtn.classList.add('playing')).catch(()=>{}); }
+    function goNext() { const all = Array.from(document.querySelectorAll('.single-page')), unflipped = all.filter(p => !p.classList.contains('flipped')); if (unflipped.length > 1) unflipped[0].classList.add('flipped'); else all.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 50)); }
+    function goPrev() { const all = Array.from(document.querySelectorAll('.single-page')), flipped = all.filter(p => p.classList.contains('flipped')); if (flipped.length > 0) flipped[flipped.length - 1].classList.remove('flipped'); else all.slice(0, -1).forEach(p => p.classList.add('flipped')); }
     
     function saveStayInfo() { 
-        const stayData = { stayPeriod: document.getElementById('stay-period-label').value, stayName: document.getElementById('stay-name').value, staySubname: document.getElementById('stay-subname').value, stayAddr: document.getElementById('stay-addr').value, stayCheckin: document.getElementById('stay-checkin').value, stayCheckout: document.getElementById('stay-checkout').value, flightAirline: document.getElementById('flight-airline-input').value, flightOutDate: document.getElementById('flight-out-date').value, flightOutT1: document.getElementById('flight-out-t1').value, flightOutLoc1: document.getElementById('flight-out-loc1').value, flightOutDur: document.getElementById('flight-out-dur').value, flightOutT2: document.getElementById('flight-out-t2').value, flightOutLoc2: document.getElementById('flight-out-loc2').value, flightInDate: document.getElementById('flight-in-date').value, flightInT1: document.getElementById('flight-in-t1').value, flightInLoc1: document.getElementById('flight-in-loc1').value, flightInDur: document.getElementById('flight-in-dur').value, flightInT2: document.getElementById('flight-in-t2').value, flightInLoc2: document.getElementById('flight-in-loc2').value, insHkProvider: document.getElementById('ins-hk-provider').value, insHkPhone: document.getElementById('ins-hk-phone').value, insJpProvider: document.getElementById('ins-jp-provider').value, insJpPhone: document.getElementById('ins-jp-phone').value }; 
+        const stayData = { 
+            stayPeriod: document.getElementById('stay-period-label').value, 
+            stayName: document.getElementById('stay-name').value, 
+            staySubname: document.getElementById('stay-subname').value, 
+            stayAddr: document.getElementById('stay-addr').value, 
+            stayCheckin: document.getElementById('stay-checkin').value, 
+            stayCheckout: document.getElementById('stay-checkout').value, 
+            flightAirline: document.getElementById('flight-airline-input').value, 
+            flightOutDate: document.getElementById('flight-out-date').value, 
+            flightOutT1: document.getElementById('flight-out-t1').value, 
+            flightOutLoc1: document.getElementById('flight-out-loc1').value, 
+            flightOutDur: document.getElementById('flight-out-dur').value, 
+            flightOutT2: document.getElementById('flight-out-t2').value, 
+            flightOutLoc2: document.getElementById('flight-out-loc2').value, 
+            flightInDate: document.getElementById('flight-in-date').value, 
+            flightInT1: document.getElementById('flight-in-t1').value, 
+            flightInLoc1: document.getElementById('flight-in-loc1').value, 
+            flightInDur: document.getElementById('flight-in-dur').value, 
+            flightInT2: document.getElementById('flight-in-t2').value, 
+            flightInLoc2: document.getElementById('flight-in-loc2').value, 
+            insHkProvider: document.getElementById('ins-hk-provider').value, 
+            insHkPhone: document.getElementById('ins-hk-phone').value, 
+            insJpProvider: document.getElementById('ins-jp-provider').value, 
+            insJpPhone: document.getElementById('ins-jp-phone').value,
+            customDayName: document.getElementById('custom-day-name').value
+        }; 
         for (let i = 1; i <= 8; i++) { const el = document.getElementById(`day-label-${i}`); if (el) stayData[`dayLabel${i}`] = el.value; } 
         localStorage.setItem('osaka_stay_info', JSON.stringify(stayData)); 
     }
 
-    function openDynamicMap(btn) { const loc = btn.parentElement.parentElement.querySelector('.loc-input').value; if (loc) openMapModal(loc); else showToast('⚠️ 填寫地點'); }
+    function openDynamicMap(btn) { const loc = btn.parentElement.parentElement.querySelector('.loc-input').value; if (loc) openMapModal(loc); else showToast('⚠️ 請填寫地點內容'); }
     function openStaticMap(address) { if (address) openMapModal(address); }
-    function openMapModal(query) { const modal = document.getElementById('map-modal'), iframe = document.getElementById('map-iframe'); document.getElementById('map-modal-title').innerText = "地圖: " + query; iframe.src = "https://www.google.com/maps/embed/v1/place?key=YOUR_KEY_HERE&q=" + encodeURIComponent(query); modal.style.display = 'flex'; }
+    function openMapModal(query) { 
+        const modal = document.getElementById('map-modal'), iframe = document.getElementById('map-iframe'); 
+        document.getElementById('map-modal-title').innerText = "地圖: " + query; 
+        iframe.src = "https://www.google.com/maps?q=" + encodeURIComponent(query) + "&output=embed"; 
+        modal.style.display = 'flex'; 
+    }
     function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; document.getElementById('map-iframe').src = ''; }
     function showToast(msg) { const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); }
 
@@ -711,39 +706,41 @@
     function finalCalc() { const input = document.getElementById('jpy-input'); try { input.value = Math.round(eval(input.value.replace(/[^0-9+\-*/.]/g, ''))); convertCurrency('jpy'); } catch(e){} }
     function appendCalc(char) { const input = document.getElementById('jpy-input'); if(char === 'AC') input.value = ''; else if(char === 'DEL') input.value = input.value.slice(0,-1); else if(char === '=') finalCalc(); else input.value += char; handleCalcInput(); convertCurrency('jpy'); }
     function toggleNumPad() { const p = document.getElementById('num-pad'); p.style.display = (p.style.display==='grid'?'none':'grid'); }
-    function addSpent(cat) { const jpy = parseFloat(document.getElementById('jpy-input').value), hkd = parseFloat(document.getElementById('hkd-input').value); if(!jpy) return; let day = currentLedgerDay==='all'?1:currentLedgerDay; ledgerByDay[day].push({cat, jpy, hkd}); saveLedger(); renderLedger(); closeCategory(); showToast("✅ 已記錄"); }
+    function addSpent(cat) { const jpy = parseFloat(document.getElementById('jpy-input').value), hkd = parseFloat(document.getElementById('hkd-input').value); if(!jpy) return; let day = currentLedgerDay==='all'?1:currentLedgerDay; ledgerByDay[day].push({cat, jpy, hkd}); saveLedger(); renderLedger(); closeCategory(); showToast("✅ 已記錄花費"); }
+    function addCustomSpent() { const cat = prompt("輸入分類名稱："); if(cat) addSpent(cat); }
     function openCategory() { if(!document.getElementById('jpy-input').value) return; document.getElementById('category-overlay').style.display = 'flex'; }
     function closeCategory() { document.getElementById('category-overlay').style.display = 'none'; }
     function saveLedger() { localStorage.setItem('osaka_ledger_days', JSON.stringify(ledgerByDay)); }
-    
+    function quickMath(op, label) { const input = document.getElementById('jpy-input'); input.value = Math.round(eval(input.value + op)); handleCalcInput(); convertCurrency('jpy'); showToast(`✅ 已套用 ${label}`); }
+    function customDiscountMath() { const p = prompt("輸入折扣成數 (例: 85 代表 85 折):"); if(p) quickMath(`*${parseFloat(p)/100}`, `${p}折`); }
+
     function renderLedger() {
         const list = document.getElementById('ledger-list'), totalEl = document.getElementById('ledger-total');
-        if(!list) return;
-        list.innerHTML = ''; let tj = 0, th = 0;
+        if(!list) return; list.innerHTML = ''; let tj = 0, th = 0;
         Object.keys(ledgerByDay).forEach(d => {
             if (currentLedgerDay==='all' || currentLedgerDay==d) {
                 ledgerByDay[d].forEach((item, idx) => {
                     tj += item.jpy; th += item.hkd;
                     const div = document.createElement('div'); div.className = 'ledger-item';
                     div.innerHTML = `<span>[D${d}] ${escapeHTML(item.cat)}</span><span>¥${item.jpy} ($${Math.round(item.hkd)})</span>`;
-                    div.onclick = () => { if(confirm("刪除？")) { ledgerByDay[d].splice(idx,1); saveLedger(); renderLedger(); } };
+                    div.onclick = () => { if(confirm("確定刪除此項紀錄？")) { ledgerByDay[d].splice(idx,1); saveLedger(); renderLedger(); } };
                     list.appendChild(div);
                 });
             }
         });
-        if(totalEl) totalEl.innerText = `總計：¥${tj.toLocaleString()} ($${Math.round(th).toLocaleString()})`;
+        if(totalEl) totalEl.innerText = `日圓(港幣) 總計：¥${tj.toLocaleString()} ($${Math.round(th).toLocaleString()})`;
     }
 
-    function changeLedgerDay(v) { currentLedgerDay = v; renderLedger(); }
-    function clearLedger() { if(confirm("確定清空？")) { Object.keys(ledgerByDay).forEach(k => ledgerByDay[k]=[]); saveLedger(); renderLedger(); } }
+    function changeLedgerDay(v) { currentLedgerDay = v; document.getElementById('custom-day-name').style.display = (v==='custom'?'block':'none'); renderLedger(); }
+    function clearLedger() { if(confirm("確定清空所有顯示的紀錄？")) { if(currentLedgerDay==='all') Object.keys(ledgerByDay).forEach(k => ledgerByDay[k]=[]); else ledgerByDay[currentLedgerDay] = []; saveLedger(); renderLedger(); } }
 
     function exportData() {
-        saveAllRundowns(); saveStayInfo();
-        const all = { rundowns: {}, stay: localStorage.getItem('osaka_stay_info'), ledger: localStorage.getItem('osaka_ledger_days') };
+        saveAllRundowns(); saveStayInfo(); savePackingStatus();
+        const all = { rundowns: {}, stay: localStorage.getItem('osaka_stay_info'), ledger: localStorage.getItem('osaka_ledger_days'), packing: localStorage.getItem('osaka_packing_status') };
         for(let i=1; i<=8; i++) all.rundowns[i] = localStorage.getItem(`osaka_rundown_day${i}`);
-        const pass = prompt("設定加密密碼："); if(!pass) return;
+        const pass = prompt("設定加密密碼 (用於分享代碼)："); if(!pass) return;
         const encrypted = CryptoJS.AES.encrypt(JSON.stringify(all), pass).toString();
-        navigator.clipboard.writeText(encrypted); showToast("✅ 代碼已複製");
+        navigator.clipboard.writeText(encrypted); showToast("✅ 加密行程代碼已複製到剪貼簿");
     }
     function importData() {
         const code = prompt("貼上加密代碼："), pass = prompt("輸入解密密碼："); if(!code || !pass) return;
@@ -751,24 +748,42 @@
             const dec = JSON.parse(CryptoJS.AES.decrypt(code, pass).toString(CryptoJS.enc.Utf8));
             for(let i=1; i<=8; i++) if(dec.rundowns[i]) localStorage.setItem(`osaka_rundown_day${i}`, dec.rundowns[i]);
             localStorage.setItem('osaka_stay_info', dec.stay); localStorage.setItem('osaka_ledger_days', dec.ledger);
+            if(dec.packing) localStorage.setItem('osaka_packing_status', dec.packing);
             location.reload();
-        } catch(e) { alert("解密失敗"); }
+        } catch(e) { alert("解密失敗，請檢查代碼或密碼是否正確"); }
     }
 
     window.addEventListener('load', () => {
         const savedStay = JSON.parse(localStorage.getItem('osaka_stay_info') || "{}");
         const savedLedger = localStorage.getItem('osaka_ledger_days');
+        const savedPacking = JSON.parse(localStorage.getItem('osaka_packing_status') || "{}");
+        const savedMode = localStorage.getItem('osaka_fx_mode');
+        const savedCRate = localStorage.getItem('osaka_custom_rate');
+
         if(savedLedger) ledgerByDay = JSON.parse(savedLedger);
+        if(savedMode) switchFX(savedMode);
+        if(savedCRate) { customRate = parseFloat(savedCRate); document.getElementById('custom-rate-input').value = customRate; }
+        
         fetchLiveExchangeRate(); updateJapanTime(); renderLedger();
+
         for (let i = 1; i <= 8; i++) { 
             const saved = JSON.parse(localStorage.getItem(`osaka_rundown_day${i}`) || "[]"); 
             saved.forEach(r => addNewRow(`day${i}-list`, r, false)); 
         }
-        const fields = ['stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2','insHkProvider','insHkPhone','insJpProvider','insJpPhone'];
+
+        Object.keys(savedPacking).forEach(id => { const el = document.getElementById(id); if(el) el.checked = savedPacking[id]; });
+
+        const fields = ['stayPeriod','stayName','staySubname','stayAddr','stayCheckin','stayCheckout','flightAirline','flightOutDate','flightOutT1','flightOutLoc1','flightOutDur','flightOutT2','flightOutLoc2','flightInDate','flightInT1','flightInLoc1','flightInDur','flightInT2','flightInLoc2','insHkProvider','insHkPhone','insJpProvider','insJpPhone','customDayName'];
         fields.forEach(f => {
-            const el = document.getElementById('stay-'+f.replace(/([A-Z])/g, '-$1').toLowerCase()) || document.getElementById(f.replace(/([A-Z])/g, '-$1').toLowerCase());
-            if(el && savedStay[f]) el.value = savedStay[f];
+            let elId = f.replace(/([A-Z])/g, '-$1').toLowerCase();
+            if(!elId.startsWith('stay-') && !['flight-','ins-'].some(p=>elId.startsWith(p))) elId = 'stay-' + elId;
+            const el = document.getElementById(elId) || document.getElementById(f);
+            if(el && savedStay[f] !== undefined) el.value = savedStay[f];
         });
+        
+        if(document.getElementById('custom-day-name').value) {
+            document.getElementById('custom-day-name').style.display = (document.getElementById('ledger-day-select').value === 'custom' ? 'block' : 'none');
+        }
     });
 </script>
 </body>
