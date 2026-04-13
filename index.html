@@ -139,12 +139,13 @@
 
         .hero-cover {
             height: 100%; border-radius: 0;
-            background-image: linear-gradient(rgba(255,255,255,0.1), rgba(0,0,0,0.45)), 
+            /* 修改處：調整背景層次，下半部使用更透明的白色漸層來提升暗部（貓貓處）的亮度 */
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.3) 100%), 
                               url('https://raw.githubusercontent.com/katyc0916/Katy/refs/heads/main/IMG_7325.png') !important;
             background-size: cover !important; background-position: center !important;
             display: flex; flex-direction: column; justify-content: flex-end;
             padding: 0 !important; 
-            filter: saturate(1.4) brightness(1.15) contrast(1.15);
+            filter: saturate(1.4) brightness(1.2) contrast(1.1); /* 微調亮度基礎值 */
         }
 
         .hero-text-block { 
