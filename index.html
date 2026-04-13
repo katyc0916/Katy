@@ -310,12 +310,23 @@
             flex: 1; background: #f0f7ff; border: none; border-radius: 6px; padding: 6px 10px; 
             font-size: 0.8rem; color: var(--transport-blue); font-weight: bold; outline: none; font-family: inherit; resize: none; overflow: hidden; min-height: 1.2em;
         }
+        
+        /* 專業修改：優化預覽圖顯示 */
         .preview-box { 
-            width: 100%; box-sizing: border-box; margin-top: 2px; padding-left: 43px;
+            width: 100%; box-sizing: border-box; margin-top: 6px; padding-left: 43px;
         }
         .preview-input { 
             width: 100%; background: #fffbe6; border: 1px dashed #ffe58f; border-radius: 6px; padding: 4px 8px;
-            font-size: 0.7rem; color: #8c6d1f; outline: none; font-family: inherit; box-sizing: border-box;
+            font-size: 0.7rem; color: #8c6d1f; outline: none; font-family: inherit; box-sizing: border-box; margin-bottom: 6px;
+        }
+        .preview-box img {
+            width: 100%; 
+            max-height: 150px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            display: none;
+            border: 1px solid rgba(162, 210, 255, 0.4);
         }
 
         .map-icon-btn { font-size: 1.1rem; cursor: pointer; padding: 2px 4px; background: rgba(162, 210, 255, 0.2); border-radius: 4px; text-decoration: none; margin-left: auto; }
@@ -609,13 +620,40 @@
                     <textarea class="transport-input" placeholder="建議交通方式..." rows="1" oninput="saveAllRundowns(); autoResizeTextarea(this)">${escapeHTML(trans)}</textarea>
                 </div>
                 <div class="preview-box">
-                    <input type="text" class="preview-input" placeholder="🔗 景點預覽圖 URL..." value="${escapeHTML(img)}" oninput="saveAllRundowns()">
+                    <input type="text" class="preview-input" placeholder="🔗 景點預覽圖 URL..." value="${escapeHTML(img)}" oninput="this.nextElementSibling.src=this.value; saveAllRundowns()">
+                    <img src="${escapeHTML(img)}" onerror="this.style.display='none'" onload="this.style.display='block'">
                 </div>
             </div>
         `;
         
-        let pt; div.addEventListener('touchstart', (e) => { if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return; div.classList.add('pressing'); pt = setTimeout(() => { if(confirm("🗑️ 刪除此行程？")) { div.remove(); saveAllRundowns(); } }, 800); });
-        div.addEventListener('touchend', () => { clearTimeout(pt); div.classList.remove('pressing'); });
+        let startX = 0; let currentX = 0;
+        div.addEventListener('touchstart', (e) => { 
+            if(['TEXTAREA', 'INPUT', 'IMG'].includes(e.target.tagName) || e.target.classList.contains('map-icon-btn')) return; 
+            startX = e.touches[0].clientX; currentX = startX; 
+            div.style.transition = 'none'; 
+        }, {passive: true});
+        
+        div.addEventListener('touchmove', (e) => { 
+            if (startX === 0) return; 
+            currentX = e.touches[0].clientX; 
+            let diff = currentX - startX; 
+            if (diff < 0) div.style.transform = `translateX(${diff}px)`; 
+        }, {passive: true});
+        
+        div.addEventListener('touchend', () => { 
+            if (startX === 0) return; 
+            let diff = currentX - startX; 
+            div.style.transition = 'transform 0.3s, opacity 0.3s'; 
+            if (diff < -80) { 
+                if (confirm("🗑️ 刪除此行程？")) { 
+                    div.style.transform = `translateX(-100vw)`; 
+                    div.style.opacity = '0'; 
+                    setTimeout(() => { div.remove(); saveAllRundowns(); }, 300); 
+                } else { div.style.transform = 'translateX(0)'; } 
+            } else { div.style.transform = 'translateX(0)'; } 
+            startX = 0; 
+        });
+
         container.appendChild(div);
         div.querySelectorAll('textarea').forEach(autoResizeTextarea);
         if (shouldSave) saveAllRundowns();
@@ -774,9 +812,7 @@
 
         Object.keys(savedPacking).forEach(id => { const el = document.getElementById(id); if(el) el.checked = savedPacking[id]; });
 
-        // 改良後的自動回填邏輯，直接匹配 ID
         Object.keys(savedStay).forEach(key => {
-            // 將駝峰式命名轉回 HTML 的 ID 格式 (例如 stayName -> stay-name)
             let id = key.replace(/([A-Z])/g, "-$1").toLowerCase();
             let el = document.getElementById(id);
             if(el) {
