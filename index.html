@@ -525,12 +525,13 @@
     <div class="nav-item" onclick="jumpToPage(2)"><img src="https://img.icons8.com/emoji/48/shopping-bags.png">Shop</div>
     <div class="nav-item" onclick="jumpToPage(13)"><img src="https://img.icons8.com/emoji/48/money-bag-emoji.png">Budget</div>
     <div class="nav-item" onclick="exportData()"><img src="https://img.icons8.com/emoji/48/outbox-tray.png">Share</div>
+    <div class="nav-item" onclick="importData()"><img src="https://img.icons8.com/emoji/48/inbox-tray.png">Sync</div>
     <div class="nav-item" onclick="jumpToPage(14)"><img src="https://img.icons8.com/emoji/48/sos-button-emoji.png" style="width:24px; height:24px; margin-bottom:1px;"><span style="color:var(--osaka-red); font-weight:bold; display:block; margin-top:1px;">SOS</span></div>
 </div>
 
 <div id="map-modal" class="map-modal-overlay">
     <div class="map-modal-header"><span id="map-modal-title" class="map-modal-title">地圖預覽</span><button onclick="closeMapModal()" class="map-modal-close">關閉 X</button></div>
-    <div class="map-modal-body"><iframe id="map-iframe" src="" allowfullscreen="" loading="lazy"></iframe></div>
+    <div class="map-modal-body"><iframe id="map-iframe" src=""></iframe></div>
 </div>
 
 <div id="toast" class="toast-notification"></div>
@@ -570,17 +571,20 @@
     let currentRate = 0.052, liveRate = 0.052, customRate = 0.054, useMode = 'live';
     let ledgerByDay = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], custom:[] }, currentLedgerDay = 'all';
 
+    // 修復：新增兌換函數
     function convertCurrency(source) {
         const jpyInput = document.getElementById('jpy-input');
         const hkdInput = document.getElementById('hkd-input');
+        const updateTimeEl = document.getElementById('fx-update-time');
         
         if (source === 'jpy') {
             try {
+                // 處理可能包含算式的內容
                 let rawVal = jpyInput.value.replace(/[^0-9+\-*/.]/g, '');
                 if (rawVal === "") { hkdInput.value = ""; return; }
                 let result = eval(rawVal);
                 hkdInput.value = (result * currentRate).toFixed(2);
-            } catch(e) { }
+            } catch(e) { /* 計算未完成不報錯 */ }
         } else if (source === 'hkd') {
             let val = parseFloat(hkdInput.value);
             if (isNaN(val)) { jpyInput.value = ""; return; }
@@ -816,12 +820,12 @@
     function openDynamicMap(btn) { const loc = btn.parentElement.parentElement.querySelector('.loc-input').value; if (loc) openMapModal(loc); else showToast('⚠️ 請填寫地點內容'); }
     function openStaticMap(address) { if (address) openMapModal(address); }
     
+    // 修改：改用官方支援且具備 HTTPS 安全性的標準 Embed 格式
     function openMapModal(query) { 
         const modal = document.getElementById('map-modal'), iframe = document.getElementById('map-iframe'); 
         document.getElementById('map-modal-title').innerText = "地圖: " + query; 
-        // 改用官方支援的 Embed 格式，自動處理 HTTPS
-        const encodedQuery = encodeURIComponent(query);
-        iframe.src = `https://maps.google.com/maps?q=${encodedQuery}&output=embed&t=&z=15&ie=UTF8&iwloc=&output=embed`; 
+        // 使用官方 HTTPS 嵌入網址格式，無需 API Key，且解決 Mixed Content 警告
+        iframe.src = "https://www.google.com/maps?q=" + encodeURIComponent(query) + "&output=embed"; 
         modal.style.display = 'flex'; 
     }
     
