@@ -284,7 +284,26 @@
         }
 
         .time-input { width: 60px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
-        .loc-input { flex: 1; background: transparent; border: none; font-weight: bold; font-size: 1rem; outline: none; color: #1a1b26; font-family: inherit; line-height: 1.4; resize: none; overflow: hidden; min-height: 1.4em; }
+        
+        /* 螢光筆修改部分：增加背景漸層與 inline-block 效果 */
+        .loc-input { 
+            flex: 1; 
+            background: linear-gradient(to right, rgba(162, 210, 255, 0.7) 0%, rgba(162, 210, 255, 0.1) 100%); 
+            border: none; 
+            font-weight: bold; 
+            font-size: 1rem; 
+            outline: none; 
+            color: #1a1b26; 
+            font-family: inherit; 
+            line-height: 1.4; 
+            resize: none; 
+            overflow: hidden; 
+            min-height: 1.4em; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            display: inline-block; 
+            box-sizing: border-box;
+        }
         
         .transport-box { 
             display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box; padding-left: 43px; 
