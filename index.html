@@ -285,7 +285,6 @@
 
         .time-input { width: 60px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
         
-        /* 螢光筆修改部分：增加背景漸層與 inline-block 效果 */
         .loc-input { 
             flex: 1; 
             background: linear-gradient(to right, rgba(162, 210, 255, 0.7) 0%, rgba(162, 210, 255, 0.1) 100%); 
@@ -381,7 +380,7 @@
         .q-btn { flex: 1; background: white; border: 1.5px solid var(--theme-blue); padding: 8px 4px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; text-align: center; }
         .q-btn:active { background: var(--theme-blue); color: white; }
         .ledger-container { margin-top: 15px; max-height: 250px; overflow-y: auto; width: 100%; }
-        .ledger-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid var(--osaka-red); font-size: 0.85rem; transition: opacity 0.3s; }
+        .ledger-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid var(--osaka-red); font-size: 0.85rem; transition: opacity 0.3s, transform 0.3s; transform-origin: left center; }
         .ledger-item.checked-off { opacity: 0.4; text-decoration: line-through; border-left-color: #aaa; }
         .category-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
@@ -433,7 +432,6 @@
 
         .rundown-container { display: flex; flex-direction: column; width: 100%; }
 
-        /* 修改後的「分帳中心」專屬樣式，確保不超出邊框 */
         .settlement-row { display: flex; gap: 4px; margin-bottom: 10px; width: 100%; align-items: stretch; }
         .settlement-select { flex: 1.2; padding: 4px 2px; border: 1.5px solid var(--theme-blue); border-radius: 8px; font-size: 0.8rem; font-family: inherit; outline: none; background: white; min-width: 0; }
         .settlement-amt { flex: 1; padding: 4px; border: 1.5px solid var(--theme-blue); border-radius: 8px; font-size: 0.8rem; text-align: center; outline: none; min-width: 0; }
@@ -884,6 +882,31 @@
     function quickMath(op, label) { const input = document.getElementById('jpy-input'); try { input.value = Math.round(eval(input.value + op)); handleCalcInput(); convertCurrency('jpy'); showToast(`✅ 已套用 ${label}`); } catch(e){} }
     function customDiscountMath() { const p = prompt("輸入折扣成數 (例: 85 代表 85 折):"); if(p) quickMath(`*${parseFloat(p)/100}`, `${p}折`); }
 
+    function makeSwipeable(el, onConfirm) {
+        let startX = 0, currentX = 0;
+        el.addEventListener('touchstart', (e) => { 
+            startX = e.touches[0].clientX; 
+            el.style.transition = 'none'; 
+        }, {passive: true});
+        el.addEventListener('touchmove', (e) => {
+            currentX = e.touches[0].clientX;
+            let diff = currentX - startX;
+            if (diff < 0) el.style.transform = `translateX(${diff}px)`;
+        }, {passive: true});
+        el.addEventListener('touchend', () => {
+            let diff = currentX - startX;
+            el.style.transition = 'transform 0.3s, opacity 0.3s';
+            if (diff < -80) {
+                if (confirm("🗑️ 確定要刪除此項紀錄？")) {
+                    el.style.transform = `translateX(-100vw)`;
+                    el.style.opacity = '0';
+                    setTimeout(onConfirm, 300);
+                } else { el.style.transform = 'translateX(0)'; }
+            } else { el.style.transform = 'translateX(0)'; }
+            startX = 0; currentX = 0;
+        });
+    }
+
     function renderLedger() {
         const list = document.getElementById('ledger-list'), totalEl = document.getElementById('ledger-total');
         if(!list) return; list.innerHTML = ''; let tj = 0, th = 0;
@@ -893,7 +916,11 @@
                     tj += item.jpy; th += item.hkd;
                     const div = document.createElement('div'); div.className = 'ledger-item';
                     div.innerHTML = `<span>[D${d}] ${escapeHTML(item.cat)}</span><span>¥${item.jpy} ($${Math.round(item.hkd)})</span>`;
-                    div.onclick = () => { if(confirm("確定刪除此項紀錄？")) { ledgerByDay[d].splice(idx,1); saveLedger(); renderLedger(); } };
+                    makeSwipeable(div, () => {
+                        ledgerByDay[d].splice(idx, 1);
+                        saveLedger();
+                        renderLedger();
+                    });
                     list.appendChild(div);
                 });
             }
@@ -918,6 +945,7 @@
         document.getElementById('set-to').selectedIndex = 0;
         showToast("✅ 已加入分帳清單");
     }
+    
     function renderSettlement() {
         const list = document.getElementById('settlement-list');
         if(!list) return;
@@ -931,13 +959,17 @@
             div.innerHTML = `
                 <div style="display:flex; align-items:center;">
                     <input type="checkbox" class="settlement-check" ${isChecked} onchange="toggleSettlementCheck(${idx}, this)">
-                    <span>👤 <b>${escapeHTML(item.from)}</b> 給 <b>${escapeHTML(item.to)}</b></span>
+                    <span>👤 <b>${escapeHTML(item.from)}</b> 👉 <b>${escapeHTML(item.to)}</b></span>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span>$${item.amt}</span>
-                    <span onclick="deleteSettlement(${idx})" style="font-size:1.1rem; color:#ccc;">🗑️</span>
                 </div>
             `;
+            makeSwipeable(div, () => {
+                settlementData.splice(idx, 1);
+                saveSettlement();
+                renderSettlement();
+            });
             list.appendChild(div);
         });
     }
@@ -947,14 +979,6 @@
         if(el.checked) fireConfetti(el);
         saveSettlement();
         renderSettlement();
-    }
-
-    function deleteSettlement(idx) {
-        if(confirm("刪除這筆分帳紀錄？")) {
-            settlementData.splice(idx, 1);
-            saveSettlement();
-            renderSettlement();
-        }
     }
 
     function saveSettlement() { localStorage.setItem('osaka_settlement', JSON.stringify(settlementData)); }
