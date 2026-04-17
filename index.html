@@ -380,7 +380,7 @@
         .q-btn { flex: 1; background: white; border: 1.5px solid var(--theme-blue); padding: 8px 4px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; text-align: center; }
         .q-btn:active { background: var(--theme-blue); color: white; }
         .ledger-container { margin-top: 15px; max-height: 250px; overflow-y: auto; width: 100%; }
-        .ledger-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid var(--osaka-red); font-size: 0.85rem; transition: opacity 0.3s, transform 0.3s; transform-origin: left center; }
+        .ledger-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px; background: white; border-radius: 8px; margin-bottom: 5px; border-left: 4px solid var(--osaka-red); font-size: 0.85rem; transition: transform 0.3s, opacity 0.3s; position: relative; width: 100%; box-sizing: border-box; overflow: hidden; }
         .ledger-item.checked-off { opacity: 0.4; text-decoration: line-through; border-left-color: #aaa; }
         .category-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
@@ -647,7 +647,7 @@
     function fireConfetti(el) {
         if (!el.checked) return;
         const rect = el.getBoundingClientRect();
-        confetti({ particleCount: 100, spread: 70, origin: { x: rect.left / window.innerWidth, y: rect.top / window.innerHeight }, colors: ['#e63946', '#a2d2ff', '#ffffff'] });
+        confetti({ particleCount: 100, spread: 70, origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight }, colors: ['#e63946', '#a2d2ff', '#ffffff'] });
     }
 
     function moveRow(btn, direction) {
@@ -713,37 +713,44 @@
             </div>
         `;
         
-        let startX = 0; let currentX = 0;
-        div.addEventListener('touchstart', (e) => { 
-            if(['TEXTAREA', 'INPUT', 'IMG', 'SPAN'].includes(e.target.tagName) || e.target.classList.contains('map-icon-btn') || e.target.classList.contains('sort-arrow')) return; 
-            startX = e.touches[0].clientX; currentX = startX; 
-            div.style.transition = 'none'; 
-        }, {passive: true});
-        
-        div.addEventListener('touchmove', (e) => { 
-            if (startX === 0) return; 
-            currentX = e.touches[0].clientX; 
-            let diff = currentX - startX; 
-            if (diff < 0) div.style.transform = `translateX(${diff}px)`; 
-        }, {passive: true});
-        
-        div.addEventListener('touchend', () => { 
-            if (startX === 0) return; 
-            let diff = currentX - startX; 
-            div.style.transition = 'transform 0.3s, opacity 0.3s'; 
-            if (diff < -80) { 
-                if (confirm("🗑️ 刪除此行程？")) { 
-                    div.style.transform = `translateX(-100vw)`; 
-                    div.style.opacity = '0'; 
-                    setTimeout(() => { div.remove(); saveAllRundowns(); }, 300); 
-                } else { div.style.transform = 'translateX(0)'; } 
-            } else { div.style.transform = 'translateX(0)'; } 
-            startX = 0; 
+        addSwipeToDelete(div, () => {
+            if (confirm("🗑️ 刪除此行程？")) {
+                div.remove();
+                saveAllRundowns();
+            }
         });
 
         container.appendChild(div);
         div.querySelectorAll('textarea').forEach(autoResizeTextarea);
         if (shouldSave) saveAllRundowns();
+    }
+
+    function addSwipeToDelete(el, deleteCallback) {
+        let startX = 0; let currentX = 0;
+        el.addEventListener('touchstart', (e) => { 
+            if(['TEXTAREA', 'INPUT', 'IMG', 'SPAN', 'SELECT'].includes(e.target.tagName) || e.target.classList.contains('map-icon-btn') || e.target.classList.contains('sort-arrow') || e.target.classList.contains('arrival-check') || e.target.classList.contains('settlement-check')) return; 
+            startX = e.touches[0].clientX; currentX = startX; 
+            el.style.transition = 'none'; 
+        }, {passive: true});
+        
+        el.addEventListener('touchmove', (e) => { 
+            if (startX === 0) return; 
+            currentX = e.touches[0].clientX; 
+            let diff = currentX - startX; 
+            if (diff < 0) el.style.transform = `translateX(${diff}px)`; 
+        }, {passive: true});
+        
+        el.addEventListener('touchend', () => { 
+            if (startX === 0) return; 
+            let diff = currentX - startX; 
+            el.style.transition = 'transform 0.3s, opacity 0.3s'; 
+            if (diff < -80) { 
+                el.style.transform = `translateX(-100vw)`; 
+                el.style.opacity = '0'; 
+                setTimeout(() => { deleteCallback(); }, 300); 
+            } else { el.style.transform = 'translateX(0)'; } 
+            startX = 0; 
+        });
     }
 
     function autoResizeTextarea(el) { el.style.height = '1.4em'; if (el.scrollHeight > el.offsetHeight) el.style.height = el.scrollHeight + 'px'; }
@@ -864,7 +871,7 @@
     function openMapModal(query) { 
         const modal = document.getElementById('map-modal'), iframe = document.getElementById('map-iframe'); 
         document.getElementById('map-modal-title').innerText = "地圖: " + query; 
-        iframe.src = "https://www.google.com/maps?q=" + encodeURIComponent(query) + "&output=embed"; 
+        iframe.src = "https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=" + encodeURIComponent(query); 
         modal.style.display = 'flex'; 
     }
     function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; document.getElementById('map-iframe').src = ''; }
@@ -882,31 +889,6 @@
     function quickMath(op, label) { const input = document.getElementById('jpy-input'); try { input.value = Math.round(eval(input.value + op)); handleCalcInput(); convertCurrency('jpy'); showToast(`✅ 已套用 ${label}`); } catch(e){} }
     function customDiscountMath() { const p = prompt("輸入折扣成數 (例: 85 代表 85 折):"); if(p) quickMath(`*${parseFloat(p)/100}`, `${p}折`); }
 
-    function makeSwipeable(el, onConfirm) {
-        let startX = 0, currentX = 0;
-        el.addEventListener('touchstart', (e) => { 
-            startX = e.touches[0].clientX; 
-            el.style.transition = 'none'; 
-        }, {passive: true});
-        el.addEventListener('touchmove', (e) => {
-            currentX = e.touches[0].clientX;
-            let diff = currentX - startX;
-            if (diff < 0) el.style.transform = `translateX(${diff}px)`;
-        }, {passive: true});
-        el.addEventListener('touchend', () => {
-            let diff = currentX - startX;
-            el.style.transition = 'transform 0.3s, opacity 0.3s';
-            if (diff < -80) {
-                if (confirm("🗑️ 確定要刪除此項紀錄？")) {
-                    el.style.transform = `translateX(-100vw)`;
-                    el.style.opacity = '0';
-                    setTimeout(onConfirm, 300);
-                } else { el.style.transform = 'translateX(0)'; }
-            } else { el.style.transform = 'translateX(0)'; }
-            startX = 0; currentX = 0;
-        });
-    }
-
     function renderLedger() {
         const list = document.getElementById('ledger-list'), totalEl = document.getElementById('ledger-total');
         if(!list) return; list.innerHTML = ''; let tj = 0, th = 0;
@@ -916,11 +898,15 @@
                     tj += item.jpy; th += item.hkd;
                     const div = document.createElement('div'); div.className = 'ledger-item';
                     div.innerHTML = `<span>[D${d}] ${escapeHTML(item.cat)}</span><span>¥${item.jpy} ($${Math.round(item.hkd)})</span>`;
-                    makeSwipeable(div, () => {
-                        ledgerByDay[d].splice(idx, 1);
-                        saveLedger();
-                        renderLedger();
+                    
+                    addSwipeToDelete(div, () => {
+                        if(confirm("確定刪除此項紀錄？")) {
+                            ledgerByDay[d].splice(idx,1);
+                            saveLedger();
+                            renderLedger();
+                        }
                     });
+                    
                     list.appendChild(div);
                 });
             }
@@ -961,15 +947,19 @@
                     <input type="checkbox" class="settlement-check" ${isChecked} onchange="toggleSettlementCheck(${idx}, this)">
                     <span>👤 <b>${escapeHTML(item.from)}</b> 👉 <b>${escapeHTML(item.to)}</b></span>
                 </div>
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; align-items:center;">
                     <span>$${item.amt}</span>
                 </div>
             `;
-            makeSwipeable(div, () => {
-                settlementData.splice(idx, 1);
-                saveSettlement();
-                renderSettlement();
+            
+            addSwipeToDelete(div, () => {
+                if(confirm("刪除這筆分帳紀錄？")) {
+                    settlementData.splice(idx, 1);
+                    saveSettlement();
+                    renderSettlement();
+                }
             });
+
             list.appendChild(div);
         });
     }
@@ -998,6 +988,7 @@
         const encrypted = CryptoJS.AES.encrypt(JSON.stringify(all), pass).toString();
         navigator.clipboard.writeText(encrypted); showToast("✅ 加密行程代碼已複製到剪貼簿");
     }
+    
     function importData() {
         const code = prompt("貼上加密代碼："), pass = prompt("輸入解密密碼："); if(!code || !pass) return;
         try {
