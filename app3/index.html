@@ -650,10 +650,8 @@
             document.body.classList.add('has-active-translation');
         }
 
-        // 動態字體調整功能
         function adjustPresFontSize(delta) {
             currentPresFontSize += delta;
-            // 限制字體大小範圍：4vh 到 15vh 之間
             if (currentPresFontSize < 4) currentPresFontSize = 4;
             if (currentPresFontSize > 15) currentPresFontSize = 15;
             document.getElementById('presentation-text').style.fontSize = currentPresFontSize + 'vh';
@@ -752,7 +750,7 @@
             if (id === 'menu-view') {
                 document.getElementById('main-container').style.display = 'flex';
                 document.body.classList.remove('has-active-translation', 'is-forced-landscape');
-                window.speechSynthesis.cancel(); // 切換時停止所有語音
+                window.speechSynthesis.cancel();
             } else {
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
@@ -864,11 +862,9 @@
             try {
                 let formal = await translate(`Formal English: ${text}`, 'en');
                 formal = cleanTranslation(formal);
-                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
                 let slang = await translate(`Casual slang English: ${text}`, 'en');
                 slang = cleanTranslation(slang);
-                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
                 appData[currentSceneType][catId].push({ origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck });
@@ -907,22 +903,19 @@
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
         async function processTranslation(userInput, chatID) {
-            addMessage(userInput, true, null, chatID, false); 
             try {
                 let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
                 formal = cleanTranslation(formal);
-                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
                 let slang = await translate(`Translate to casual slang English: ${userInput}`, 'en');
                 slang = cleanTranslation(slang);
-                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
                 const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 appData[key].push(translationData);
                 saveData();
-                addMessage(null, false, translationData, chatID, false);
+                renderHistory(chatID);
             } catch (e) { console.error(e); }
         }
 
@@ -935,12 +928,10 @@
             const d = await r.json(); return d[0][0][0];
         }
 
-        // 修改語音播放：點擊第二次即停止
         function playSpeech(text) {
             if(!text) return;
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
-                // 如果目前的播放器正在說話，點擊即停止，不繼續播放下一段
                 return;
             }
             const u = new SpeechSynthesisUtterance(text); 
