@@ -312,6 +312,24 @@
             color: var(--primary-color);
         }
 
+        .deepl-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 8px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .deepl-btn:hover {
+            background: var(--user-bubble-bg);
+            transform: translateY(-1px);
+        }
+
         .text-input-area {
             padding: 15px;
             background: white;
@@ -654,6 +672,22 @@
             setTimeout(() => { switchLayer('menu-view'); }, 500);
         }
 
+        function launchDeepLApp(text) {
+            const encodedText = encodeURIComponent(text);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const webUrl = 'https://www.deepl.com/translator#zh/en/' + encodedText;
+
+            if (isAndroid) {
+                // 利用 Android Intent 強制喚醒 DeepL 應用程式 (package: com.deepl.mobiletranslator)
+                // 若未安裝則 fallback 至網頁版
+                const intentUrl = 'intent://www.deepl.com/translator#zh/en/' + encodedText + '#Intent;scheme=https;package=com.deepl.mobiletranslator;S.browser_fallback_url=' + encodeURIComponent(webUrl) + ';end';
+                window.location.href = intentUrl;
+            } else {
+                // iOS 上的 Safari 支援 Universal Links，打開這段 URL 會自動偵測並跳轉至 DeepL App
+                window.open(webUrl, '_blank');
+            }
+        }
+
         let recognition;
         let isRecording = false;
         let currentSceneType = '';
@@ -665,13 +699,11 @@
             hotel: { title: "🏨 HOTEL", categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" } }
         };
 
-        // 修改初始化邏輯：增加 voice 和 text 存儲
         let appData = JSON.parse(localStorage.getItem('katyGo_v1_data')) || { 
             dining: {}, shopping: {}, transport: {}, hotel: {},
             voice: [], text: [] 
         };
 
-        // 確保結構完整性
         Object.keys(SCENE_CONFIG).forEach(scene => {
             if(!appData[scene]) appData[scene] = {};
             Object.keys(SCENE_CONFIG[scene].categories).forEach(cat => {
@@ -716,7 +748,6 @@
                 const target = document.getElementById(id);
                 target.style.display = 'flex';
                 
-                // 切換介面時載入歷史紀錄
                 const chatID = id === 'voice-interface' ? 'voice-chat' : (id === 'text-interface' ? 'text-chat' : null);
                 if(chatID) {
                     renderHistory(chatID);
@@ -724,7 +755,6 @@
             }
         }
 
-        // 新增功能：載入 voice 或 text 的歷史紀錄
         function renderHistory(chatID) {
             const chatBox = document.getElementById(chatID);
             chatBox.innerHTML = '';
@@ -733,12 +763,10 @@
             
             if(items.length === 0) {
                 let msg = key === 'voice' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
-                addMessage(msg, false, null, chatID, false); // false 代表不重覆存入歷史
+                addMessage(msg, false, null, chatID, false); 
             } else {
                 items.forEach((item, index) => {
-                    // 渲染使用者輸入
                     addMessage(item.origin, true, null, chatID, false, index);
-                    // 渲染 AI 翻譯
                     addMessage(null, false, item, chatID, false, index);
                 });
             }
@@ -805,6 +833,10 @@
                     <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.slang.replace(/'/g, "\\'")}')">🔊</span>
                     <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.slang.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span>
                     <div class="translation-sub"><span class="check-text">└ ${item.slang_check}</span></div>
+
+                    <div style="text-align: right;">
+                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${item.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button>
+                    </div>
                 `;
 
                 let startX = 0;
@@ -869,7 +901,6 @@
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
         async function processTranslation(userInput, chatID) {
-            // 使用者訊息不在此時單獨存入 appData，待 AI 翻譯完後一起存入一個物件
             addMessage(userInput, true, null, chatID, false); 
             try {
                 let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
@@ -882,7 +913,6 @@
 
                 const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
                 
-                // 存入對應數據庫並保存
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 appData[key].push(translationData);
                 saveData();
@@ -919,20 +949,16 @@
             window.speechSynthesis.speak(u);
         }
 
-        // 修改 addMessage 加入刪除同步邏輯
         function addMessage(text, isUser, data, chatID, isNew = true, index = null) {
             const chatBox = document.getElementById(chatID);
             const wrapper = document.createElement('div');
             wrapper.className = 'chat-item-wrapper';
             
-            // 處理刪除
             const del = document.createElement('div');
             del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
             del.onclick = (e) => { 
                 e.stopPropagation(); 
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
-                // 如果是 AI 回覆或是使用者回覆，我們都需要找到對應的索引來刪除整個對話組
-                // 這裡為了簡化，如果是載入歷史的，我們已知其 index
                 if(index !== null) {
                     appData[key].splice(index, 1);
                     saveData();
@@ -959,6 +985,10 @@
                     <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.slang.replace(/'/g, "\\'")}')">🔊</span>
                     <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.slang.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
                     <div class="translation-sub"><span class="check-text">└ ${data.slang_check}</span></div>
+
+                    <div style="text-align: right;">
+                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${data.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button>
+                    </div>
                 `;
             }
             let startX = 0;
@@ -975,7 +1005,6 @@
             }
         }
 
-        // 修改清空功能，同步清空數據庫
         function clearChat(id) { 
             if(confirm("確定要清除紀錄嗎？")) { 
                 const key = id === 'voice-chat' ? 'voice' : 'text';
