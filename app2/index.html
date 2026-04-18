@@ -463,6 +463,7 @@
             line-height: 1.2;
             word-break: break-all;
             margin-bottom: 10px;
+            transition: font-size 0.2s ease;
         }
 
         #presentation-subtext {
@@ -474,8 +475,10 @@
         .pres-controls {
             margin-top: 30px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .pres-btn {
@@ -488,6 +491,7 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 10px rgba(188, 0, 45, 0.2);
             cursor: pointer;
+            font-weight: bold;
         }
 
         .pres-close-hint {
@@ -516,6 +520,8 @@
         
         <div class="pres-controls">
             <button class="pres-btn" onclick="playSpeech(activeTranslation.ja)">🔊</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustFontSize(1)">+</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustFontSize(-1)">-</button>
             <button class="pres-btn" style="background: #2b2b2b;" onclick="closeForcedLandscape()">✕</button>
         </div>
 
@@ -601,12 +607,21 @@
     <script>
         // 展示模式邏輯
         let activeTranslation = { ja: '', origin: '' };
+        let currentFontSize = 8; // 單位為 vh
 
         function updatePresentationMode(ja, origin) {
             activeTranslation = { ja, origin };
             document.getElementById('presentation-text').innerText = ja;
             document.getElementById('presentation-subtext').innerText = origin;
             document.body.classList.add('has-active-translation');
+        }
+
+        // 調整展示模式字體大小
+        function adjustFontSize(delta) {
+            currentFontSize += delta;
+            if (currentFontSize < 3) currentFontSize = 3;
+            if (currentFontSize > 20) currentFontSize = 20;
+            document.getElementById('presentation-text').style.fontSize = currentFontSize + 'vh';
         }
 
         // 強制橫屏進入展示模式
@@ -647,13 +662,11 @@
             hotel: { title: "🏨 HOTEL", categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" } }
         };
 
-        // 讀取所有資料，包括語音和文字紀錄
         let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || { 
             dining: {}, shopping: {}, transport: {}, hotel: {},
             history: { 'voice-chat': [], 'text-chat': [] } 
         };
 
-        // 確保結構完整
         if (!appData.history) appData.history = { 'voice-chat': [], 'text-chat': [] };
         Object.keys(SCENE_CONFIG).forEach(scene => {
             if(!appData[scene]) appData[scene] = {};
@@ -703,7 +716,6 @@
             }
         }
 
-        // 渲染歷史紀錄
         function renderHistory(chatID) {
             const chatBox = document.getElementById(chatID);
             chatBox.innerHTML = '';
@@ -846,17 +858,21 @@
             const d = await r.json(); return d[0][0][0];
         }
 
+        // 修改後的語音播放：具備開關切換功能
         function playSpeech(text) {
             if(!text) return;
-            const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP';
-            window.speechSynthesis.speak(u);
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            } else {
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'ja-JP';
+                window.speechSynthesis.speak(u);
+            }
         }
 
-        // 修改後的 addMessage 支援儲存與歷史索引
         function addMessage(text, isUser, data, chatID, shouldSave, historyIndex) {
             const chatBox = document.getElementById(chatID);
             
-            // 如果需要儲存到 history
             if (shouldSave) {
                 appData.history[chatID].push({ text, isUser, data });
                 saveData();
