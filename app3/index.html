@@ -266,32 +266,48 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
+        .translated-title {
+            font-size: 0.65rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: block;
+            margin-top: 8px;
+        }
+
         .translated-ja {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: inline-block;
             line-height: 1.2;
-            margin-bottom: 5px;
-            color: var(--primary-color);
+            margin-bottom: 2px;
+            color: var(--text-color);
+            font-weight: bold;
         }
 
         .translation-sub {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #777;
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding-top: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+            margin-bottom: 5px;
+        }
+
+        .translation-sub:last-child {
+            border-bottom: none;
         }
 
         .check-text {
-            color: #2b2b2b;
-            font-weight: 500;
+            color: #666;
+            font-weight: normal;
+            font-style: italic;
         }
 
         .speak-icon, .expand-icon {
             cursor: pointer;
             margin-left: 10px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             vertical-align: middle;
             color: var(--primary-color);
         }
@@ -461,12 +477,13 @@
         }
 
         #presentation-text {
-            font-size: 8vh;
+            font-size: 7vh;
             font-weight: bold;
             color: var(--primary-color);
             line-height: 1.2;
-            word-break: break-all;
+            word-break: break-word;
             margin-bottom: 10px;
+            padding: 0 10%;
         }
 
         #presentation-subtext {
@@ -518,7 +535,7 @@
         <div id="presentation-subtext"></div>
         
         <div class="pres-controls">
-            <button class="pres-btn" onclick="playSpeech(activeTranslation.en)">🔊</button>
+            <button class="pres-btn" id="pres-speak-btn">🔊</button>
             <button class="pres-btn" style="background: #2b2b2b;" onclick="closeForcedLandscape()">✕</button>
         </div>
 
@@ -602,17 +619,17 @@
     </div>
 
     <script>
-        let activeTranslation = { en: '', origin: '' };
+        let activeTranslation = { formal: '', slang: '', origin: '' };
 
-        function updatePresentationMode(en, origin) {
-            activeTranslation = { en, origin };
-            document.getElementById('presentation-text').innerText = en;
+        function updatePresentationMode(text, origin) {
+            document.getElementById('presentation-text').innerText = text;
             document.getElementById('presentation-subtext').innerText = origin;
+            document.getElementById('pres-speak-btn').onclick = () => playSpeech(text);
             document.body.classList.add('has-active-translation');
         }
 
-        function forceLandscapePresentation(en, origin) {
-            updatePresentationMode(en, origin);
+        function forceLandscapePresentation(text, origin) {
+            updatePresentationMode(text, origin);
             document.body.classList.add('is-forced-landscape');
             document.getElementById('close-hint-text').innerText = "點擊 X 按鈕回到直向模式";
         }
@@ -743,9 +760,22 @@
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble ai-bubble';
                 bubble.style.width = '100%'; bubble.style.maxWidth = '100%';
-                bubble.onclick = () => updatePresentationMode(item.en, item.origin);
 
-                bubble.innerHTML = `<div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div><strong class="translated-ja">${item.en}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.en.replace(/'/g, "\\'")}')">🔊</span><span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.en.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span><div class="translation-sub"><span class="check-text">ZH Check: ${item.zh_check}</span></div>`;
+                bubble.innerHTML = `
+                    <div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div>
+                    <span class="translated-title">Formal</span>
+                    <strong class="translated-ja">${item.formal}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.formal.replace(/'/g, "\\'")}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.formal.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${item.formal_check}</span></div>
+                    
+                    <span class="translated-title">Slang / Casual</span>
+                    <strong class="translated-ja">${item.slang}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.slang.replace(/'/g, "\\'")}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.slang.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${item.slang_check}</span></div>
+                `;
+
                 let startX = 0;
                 wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
                 wrapper.addEventListener('touchend', (e) => {
@@ -765,16 +795,21 @@
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
             try {
-                const enText = await translate(text, 'en');
-                const zhCheck = await translate(enText, 'zh-TW', 'en');
-                appData[currentSceneType][catId].push({ origin: text, en: enText, zh_check: zhCheck });
+                // 獲取正式版
+                let formal = await translate(`Please translate this into formal English: ${text}`, 'en');
+                formal = cleanTranslation(formal);
+                const formalCheck = await translate(formal, 'zh-TW', 'en');
+                // 獲取非正式版
+                let slang = await translate(`Please translate this into casual slang English: ${text}`, 'en');
+                slang = cleanTranslation(slang);
+                const slangCheck = await translate(slang, 'zh-TW', 'en');
+
+                appData[currentSceneType][catId].push({ origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck });
                 saveData();
                 const box = document.getElementById(`cat-box-${catId}`);
                 box.classList.add('active'); box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
                 setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-                updatePresentationMode(enText, text);
-                playSpeech(enText);
             } catch (e) { alert("翻譯失敗"); }
         }
 
@@ -807,12 +842,33 @@
         async function processTranslation(userInput, chatID) {
             addMessage(userInput, true, null, chatID);
             try {
-                const enText = await translate(userInput, 'en');
-                const zhCheck = await translate(enText, 'zh-TW', 'en');
-                addMessage(null, false, { en: enText, zh_check: zhCheck, origin: userInput }, chatID);
-                updatePresentationMode(enText, userInput);
-                playSpeech(enText);
+                let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
+                formal = cleanTranslation(formal);
+                const formalCheck = await translate(formal, 'zh-TW', 'en');
+
+                let slang = await translate(`Translate to casual slang English: ${userInput}`, 'en');
+                slang = cleanTranslation(slang);
+                const slangCheck = await translate(slang, 'zh-TW', 'en');
+
+                addMessage(null, false, { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck }, chatID);
             } catch (e) { console.error(e); }
+        }
+
+        function cleanTranslation(text) {
+            const filters = [
+                /Translate to formal English:/gi,
+                /Translate to casual slang English:/gi,
+                /Please translate this into formal English:/gi,
+                /Please translate this into casual slang English:/gi,
+                /翻譯成正式英文：/g,
+                /翻譯成休閒俚語英語：/g,
+                /翻譯成休閒俚語英語:/g
+            ];
+            let cleaned = text;
+            filters.forEach(regex => {
+                cleaned = cleaned.replace(regex, "");
+            });
+            return cleaned.trim();
         }
 
         async function translate(q, tl, sl = 'auto') {
@@ -839,8 +895,19 @@
             if (isUser) bubble.innerText = text;
             else if (typeof text === 'string') bubble.innerText = text;
             else {
-                bubble.onclick = () => updatePresentationMode(data.en, data.origin);
-                bubble.innerHTML = `<strong class="translated-ja">${data.en}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.en.replace(/'/g, "\\'")}')">🔊</span><span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.en.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span><div class="translation-sub"><span class="check-text">ZH Check: ${data.zh_check}</span></div>`;
+                bubble.innerHTML = `
+                    <span class="translated-title">Formal</span>
+                    <strong class="translated-ja">${data.formal}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.formal.replace(/'/g, "\\'")}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.formal.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${data.formal_check}</span></div>
+                    
+                    <span class="translated-title">Slang / Casual</span>
+                    <strong class="translated-ja">${data.slang}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.slang.replace(/'/g, "\\'")}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.slang.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${data.slang_check}</span></div>
+                `;
             }
             let startX = 0;
             wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
@@ -864,4 +931,3 @@
     </script>
 </body>
 </html>
-
