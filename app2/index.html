@@ -430,9 +430,51 @@
         .scene-number { font-weight: bold; color: var(--primary-color); margin-right: 5px; }
 
         footer { padding: 10px 20px 20px 20px; font-size: 0.7rem; color: #aaa; flex-shrink: 0; }
+
+        /* 展示模式樣式 */
+        #presentation-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        #presentation-text {
+            font-size: 8vh;
+            font-weight: bold;
+            color: var(--primary-color);
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        #presentation-subtext {
+            font-size: 3vh;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        /* 橫屏偵測自動開啟展示模式 (僅當有內容時) */
+        @media screen and (orientation: landscape) {
+            body.has-active-translation #presentation-overlay {
+                display: flex;
+            }
+        }
+
     </style>
 </head>
 <body>
+
+    <div id="presentation-overlay">
+        <div id="presentation-text"></div>
+        <div id="presentation-subtext"></div>
+        <p style="position: absolute; bottom: 20px; font-size: 0.7rem; color: #bbb;">旋轉手機回到直向以關閉</p>
+    </div>
 
     <div class="container" id="main-container">
         <header class="hero">
@@ -511,7 +553,16 @@
     </div>
 
     <script>
-        // JS 部分邏輯保持不變，確保功能完整整合
+        // 展示模式邏輯
+        let activeTranslation = { ja: '', origin: '' };
+
+        function updatePresentationMode(ja, origin) {
+            activeTranslation = { ja, origin };
+            document.getElementById('presentation-text').innerText = ja;
+            document.getElementById('presentation-subtext').innerText = origin;
+            document.body.classList.add('has-active-translation');
+        }
+
         function launchCameraTranslate() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
@@ -576,6 +627,7 @@
             document.querySelectorAll('.interface-layer').forEach(el => el.style.display = 'none');
             if (id === 'menu-view') {
                 document.getElementById('main-container').style.display = 'flex';
+                document.body.classList.remove('has-active-translation');
             } else {
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
@@ -628,11 +680,14 @@
                 wrapper.className = 'chat-item-wrapper';
                 const del = document.createElement('div');
                 del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-                del.onclick = () => { appData[currentSceneType][catId].splice(index, 1); saveData(); renderCategoryItems(catId); };
+                del.onclick = (e) => { e.stopPropagation(); appData[currentSceneType][catId].splice(index, 1); saveData(); renderCategoryItems(catId); };
+                
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble ai-bubble';
                 bubble.style.width = '100%'; bubble.style.maxWidth = '100%';
-                bubble.innerHTML = `<div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div><strong class="translated-ja">${item.ja}</strong><span class="speak-icon" onclick="playSpeech('${item.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>`;
+                bubble.onclick = () => updatePresentationMode(item.ja, item.origin); // 點擊氣泡設定為當前展示內容
+
+                bubble.innerHTML = `<div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div><strong class="translated-ja">${item.ja}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>`;
                 let startX = 0;
                 wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
                 wrapper.addEventListener('touchend', (e) => {
@@ -660,6 +715,7 @@
                 box.classList.add('active'); box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
                 setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                updatePresentationMode(jaText, text); // 自動進入展示內容準備
                 playSpeech(jaText);
             } catch (e) { alert("翻譯失敗"); }
         }
@@ -695,7 +751,8 @@
             try {
                 const jaText = await translate(userInput, 'ja');
                 const [zh, en] = await Promise.all([translate(jaText, 'zh-TW', 'ja'), translate(jaText, 'en', 'ja')]);
-                addMessage(null, false, { ja: jaText, zh, en }, chatID);
+                addMessage(null, false, { ja: jaText, zh, en, origin: userInput }, chatID);
+                updatePresentationMode(jaText, userInput); // 自動進入展示內容準備
                 playSpeech(jaText);
             } catch (e) { console.error(e); }
         }
@@ -716,13 +773,15 @@
             wrapper.className = 'chat-item-wrapper';
             const del = document.createElement('div');
             del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-            del.onclick = () => wrapper.remove();
+            del.onclick = (e) => { e.stopPropagation(); wrapper.remove(); }
+            
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
             if (isUser) bubble.innerText = text;
             else if (typeof text === 'string') bubble.innerText = text;
             else {
-                bubble.innerHTML = `<strong class="translated-ja">${data.ja}</strong><span class="speak-icon" onclick="playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${data.zh}<br>EN: ${data.en}</div>`;
+                bubble.onclick = () => updatePresentationMode(data.ja, data.origin);
+                bubble.innerHTML = `<strong class="translated-ja">${data.ja}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${data.zh}<br>EN: ${data.en}</div>`;
             }
             let startX = 0;
             wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
@@ -735,7 +794,7 @@
             setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        function clearChat(id) { if(confirm("確定要清除紀錄嗎？")) document.getElementById(id).innerHTML = ''; }
+        function clearChat(id) { if(confirm("確定要清除紀錄嗎？")) { document.getElementById(id).innerHTML = ''; document.body.classList.remove('has-active-translation'); } }
         function handleTextInput(inputId, chatId) {
             const field = document.getElementById(inputId);
             const text = field.value.trim();
