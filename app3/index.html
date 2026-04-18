@@ -642,6 +642,20 @@
     <script>
         let activeTranslation = { formal: '', slang: '', origin: '' };
         let currentPresFontSize = 7; // 預設 7vh
+        let currentSpeakingText = ""; // 用於追蹤當前正在播放的內容
+
+        // 安全防護：轉義 HTML 特殊字符防止代碼注入
+        function escapeHTML(str) {
+            if (!str) return '';
+            const p = document.createElement('p');
+            p.textContent = str;
+            return p.innerHTML;
+        }
+
+        // 安全防護：清理語音播放字符串
+        function cleanForJS(str) {
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+        }
 
         function updatePresentationMode(text, origin) {
             document.getElementById('presentation-text').innerText = text;
@@ -751,6 +765,7 @@
                 document.getElementById('main-container').style.display = 'flex';
                 document.body.classList.remove('has-active-translation', 'is-forced-landscape');
                 window.speechSynthesis.cancel();
+                currentSpeakingText = "";
             } else {
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
@@ -828,22 +843,26 @@
                 bubble.className = 'chat-bubble ai-bubble';
                 bubble.style.width = '100%'; bubble.style.maxWidth = '100%';
 
+                const safeOrigin = escapeHTML(item.origin);
+                const safeFormal = escapeHTML(item.formal);
+                const safeSlang = escapeHTML(item.slang);
+
                 bubble.innerHTML = `
-                    <div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div>
+                    <div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${safeOrigin}</div>
                     <span class="translated-title">Formal</span>
-                    <strong class="translated-ja">${item.formal}</strong>
-                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.formal.replace(/'/g, "\\'")}')">🔊</span>
-                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.formal.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span>
-                    <div class="translation-sub"><span class="check-text">└ ${item.formal_check}</span></div>
+                    <strong class="translated-ja">${safeFormal}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${cleanForJS(item.formal)}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${cleanForJS(item.formal)}', '${cleanForJS(item.origin)}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${escapeHTML(item.formal_check)}</span></div>
                     
                     <span class="translated-title">Slang / Casual</span>
-                    <strong class="translated-ja">${item.slang}</strong>
-                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.slang.replace(/'/g, "\\'")}')">🔊</span>
-                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.slang.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span>
-                    <div class="translation-sub"><span class="check-text">└ ${item.slang_check}</span></div>
+                    <strong class="translated-ja">${safeSlang}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${cleanForJS(item.slang)}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${cleanForJS(item.slang)}', '${cleanForJS(item.origin)}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${escapeHTML(item.slang_check)}</span></div>
 
                     <div style="text-align: right;">
-                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${item.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button>
+                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${cleanForJS(item.origin)}')">🔍 DeepL 強力校對</button>
                     </div>
                 `;
 
@@ -926,9 +945,6 @@
             return text.replace(/Formal English:|Casual slang English:|Translate to/gi, "").trim();
         }
 
-        /**
-         * 專業修改：加入 Try-Catch, Retry 機制與多行處理
-         */
         async function translate(q, tl, sl = 'auto', retries = 3) {
             const delay = (ms) => new Promise(res => setTimeout(res, ms));
             
@@ -943,32 +959,44 @@
                     
                     const data = await response.json();
                     
-                    // 處理 Google Translate 返回的多段文本拼合
                     if (data && data[0]) {
-                        return data[0].map(x => x[0]).join('').trim();
+                        return data[0].map(item => item[0]).join('').trim();
                     }
                     return "";
                 } catch (error) {
-                    console.warn(`Translation attempt ${i + 1} failed. Retrying...`, error);
-                    if (i === retries - 1) {
-                        console.error("All translation retries failed.");
-                        throw error;
-                    }
-                    // 指數退避：每次重試等待時間增加 (500ms, 1000ms, 1500ms)
+                    console.warn(`Translation attempt ${i + 1} failed.`, error);
+                    if (i === retries - 1) throw error;
                     await delay(500 * (i + 1));
                 }
             }
         }
 
+        // 修改後的 playSpeech 函式：實現再次點擊停止功能
         function playSpeech(text) {
             if(!text) return;
-            if (window.speechSynthesis.speaking) {
+            
+            // 如果當前正在播放，且點擊的是同一段文字，則停止播放
+            if (window.speechSynthesis.speaking && currentSpeakingText === text) {
                 window.speechSynthesis.cancel();
-                // 如果是按同一個按鈕則停止，如果不是則停止後繼續下一段
+                currentSpeakingText = "";
+                return;
             }
+
+            // 如果正在播放其他內容，先取消
+            window.speechSynthesis.cancel();
+            
             const u = new SpeechSynthesisUtterance(text); 
             u.lang = 'en-US';
             u.rate = 0.9;
+            
+            u.onstart = () => {
+                currentSpeakingText = text;
+            };
+
+            u.onend = () => {
+                currentSpeakingText = "";
+            };
+
             window.speechSynthesis.speak(u);
         }
 
@@ -1005,22 +1033,29 @@
             
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
-            if (isUser) bubble.innerText = text;
-            else if (typeof text === 'string') bubble.innerText = text;
-            else {
+            
+            if (isUser) {
+                bubble.textContent = text; 
+            } else if (typeof text === 'string') {
+                bubble.textContent = text;
+            } else {
+                const safeOrigin = escapeHTML(data.origin);
+                const safeFormal = escapeHTML(data.formal);
+                const safeSlang = escapeHTML(data.slang);
+
                 bubble.innerHTML = `
                     <span class="translated-title">Formal</span>
-                    <strong class="translated-ja">${data.formal}</strong>
-                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.formal.replace(/'/g, "\\'")}')">🔊</span>
-                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.formal.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
-                    <div class="translation-sub"><span class="check-text">└ ${data.formal_check}</span></div>
+                    <strong class="translated-ja">${safeFormal}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${cleanForJS(data.formal)}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${cleanForJS(data.formal)}', '${cleanForJS(data.origin)}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${escapeHTML(data.formal_check)}</span></div>
                     
                     <span class="translated-title">Slang / Casual</span>
-                    <strong class="translated-ja">${data.slang}</strong>
-                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.slang.replace(/'/g, "\\'")}')">🔊</span>
-                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.slang.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
-                    <div class="translation-sub"><span class="check-text">└ ${data.slang_check}</span></div>
-                    <div style="text-align: right;"><button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${data.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button></div>
+                    <strong class="translated-ja">${safeSlang}</strong>
+                    <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${cleanForJS(data.slang)}')">🔊</span>
+                    <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${cleanForJS(data.slang)}', '${cleanForJS(data.origin)}')">📱</span>
+                    <div class="translation-sub"><span class="check-text">└ ${escapeHTML(data.slang_check)}</span></div>
+                    <div style="text-align: right;"><button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${cleanForJS(data.origin)}')">🔍 DeepL 強力校對</button></div>
                 `;
             }
             setupSwipe(wrapper, chatBox);
@@ -1035,6 +1070,7 @@
                 saveData();
                 renderHistory(id);
                 window.speechSynthesis.cancel();
+                currentSpeakingText = "";
             } 
         }
 
