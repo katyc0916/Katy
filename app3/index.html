@@ -665,13 +665,21 @@
             hotel: { title: "🏨 HOTEL", categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" } }
         };
 
-        let appData = JSON.parse(localStorage.getItem('katyGo_v1_data')) || { dining: {}, shopping: {}, transport: {}, hotel: {} };
+        // 修改初始化邏輯：增加 voice 和 text 存儲
+        let appData = JSON.parse(localStorage.getItem('katyGo_v1_data')) || { 
+            dining: {}, shopping: {}, transport: {}, hotel: {},
+            voice: [], text: [] 
+        };
 
+        // 確保結構完整性
         Object.keys(SCENE_CONFIG).forEach(scene => {
+            if(!appData[scene]) appData[scene] = {};
             Object.keys(SCENE_CONFIG[scene].categories).forEach(cat => {
                 if(!appData[scene][cat]) appData[scene][cat] = [];
             });
         });
+        if(!appData.voice) appData.voice = [];
+        if(!appData.text) appData.text = [];
 
         function initAutoGrow(id) {
             const el = document.getElementById(id);
@@ -707,14 +715,32 @@
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
                 target.style.display = 'flex';
+                
+                // 切換介面時載入歷史紀錄
                 const chatID = id === 'voice-interface' ? 'voice-chat' : (id === 'text-interface' ? 'text-chat' : null);
                 if(chatID) {
-                    const chatBox = document.getElementById(chatID);
-                    if(chatBox.children.length === 0) {
-                        let msg = id === 'voice-interface' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
-                        addMessage(msg, false, null, chatID);
-                    }
+                    renderHistory(chatID);
                 }
+            }
+        }
+
+        // 新增功能：載入 voice 或 text 的歷史紀錄
+        function renderHistory(chatID) {
+            const chatBox = document.getElementById(chatID);
+            chatBox.innerHTML = '';
+            const key = chatID === 'voice-chat' ? 'voice' : 'text';
+            const items = appData[key];
+            
+            if(items.length === 0) {
+                let msg = key === 'voice' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
+                addMessage(msg, false, null, chatID, false); // false 代表不重覆存入歷史
+            } else {
+                items.forEach((item, index) => {
+                    // 渲染使用者輸入
+                    addMessage(item.origin, true, null, chatID, false, index);
+                    // 渲染 AI 翻譯
+                    addMessage(null, false, item, chatID, false, index);
+                });
             }
         }
 
@@ -755,7 +781,12 @@
                 wrapper.className = 'chat-item-wrapper';
                 const del = document.createElement('div');
                 del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-                del.onclick = (e) => { e.stopPropagation(); appData[currentSceneType][catId].splice(index, 1); saveData(); renderCategoryItems(catId); };
+                del.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    appData[currentSceneType][catId].splice(index, 1); 
+                    saveData(); 
+                    renderCategoryItems(catId); 
+                };
                 
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble ai-bubble';
@@ -795,11 +826,9 @@
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
             try {
-                // 獲取正式版
                 let formal = await translate(`Please translate this into formal English: ${text}`, 'en');
                 formal = cleanTranslation(formal);
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
-                // 獲取非正式版
                 let slang = await translate(`Please translate this into casual slang English: ${text}`, 'en');
                 slang = cleanTranslation(slang);
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
@@ -840,7 +869,8 @@
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
         async function processTranslation(userInput, chatID) {
-            addMessage(userInput, true, null, chatID);
+            // 使用者訊息不在此時單獨存入 appData，待 AI 翻譯完後一起存入一個物件
+            addMessage(userInput, true, null, chatID, false); 
             try {
                 let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
                 formal = cleanTranslation(formal);
@@ -850,7 +880,14 @@
                 slang = cleanTranslation(slang);
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
-                addMessage(null, false, { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck }, chatID);
+                const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
+                
+                // 存入對應數據庫並保存
+                const key = chatID === 'voice-chat' ? 'voice' : 'text';
+                appData[key].push(translationData);
+                saveData();
+
+                addMessage(null, false, translationData, chatID, false);
             } catch (e) { console.error(e); }
         }
 
@@ -882,13 +919,28 @@
             window.speechSynthesis.speak(u);
         }
 
-        function addMessage(text, isUser, data, chatID) {
+        // 修改 addMessage 加入刪除同步邏輯
+        function addMessage(text, isUser, data, chatID, isNew = true, index = null) {
             const chatBox = document.getElementById(chatID);
             const wrapper = document.createElement('div');
             wrapper.className = 'chat-item-wrapper';
+            
+            // 處理刪除
             const del = document.createElement('div');
             del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-            del.onclick = (e) => { e.stopPropagation(); wrapper.remove(); }
+            del.onclick = (e) => { 
+                e.stopPropagation(); 
+                const key = chatID === 'voice-chat' ? 'voice' : 'text';
+                // 如果是 AI 回覆或是使用者回覆，我們都需要找到對應的索引來刪除整個對話組
+                // 這裡為了簡化，如果是載入歷史的，我們已知其 index
+                if(index !== null) {
+                    appData[key].splice(index, 1);
+                    saveData();
+                    renderHistory(chatID);
+                } else {
+                    wrapper.remove();
+                }
+            }
             
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
@@ -917,10 +969,24 @@
                 } else if (diff < -50) wrapper.classList.remove('swiped');
             }, {passive: true});
             wrapper.append(del, bubble); chatBox.appendChild(wrapper);
-            setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
+            
+            if(isNew) {
+                setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
+            }
         }
 
-        function clearChat(id) { if(confirm("確定要清除紀錄嗎？")) { document.getElementById(id).innerHTML = ''; document.body.classList.remove('has-active-translation', 'is-forced-landscape'); } }
+        // 修改清空功能，同步清空數據庫
+        function clearChat(id) { 
+            if(confirm("確定要清除紀錄嗎？")) { 
+                const key = id === 'voice-chat' ? 'voice' : 'text';
+                appData[key] = [];
+                saveData();
+                document.getElementById(id).innerHTML = ''; 
+                document.body.classList.remove('has-active-translation', 'is-forced-landscape'); 
+                renderHistory(id);
+            } 
+        }
+
         function handleTextInput(inputId, chatId) {
             const field = document.getElementById(inputId);
             const text = field.value.trim();
