@@ -618,7 +618,6 @@
 
         function closeForcedLandscape() {
             document.body.classList.remove('is-forced-landscape');
-            // 如果物理上不是橫屏，則會自動隱藏 overlay (透過 CSS media query 控制)
         }
 
         function launchCameraTranslate() {
@@ -648,9 +647,16 @@
             hotel: { title: "🏨 HOTEL", categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" } }
         };
 
-        let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || { dining: {}, shopping: {}, transport: {}, hotel: {} };
+        // 讀取所有資料，包括語音和文字紀錄
+        let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || { 
+            dining: {}, shopping: {}, transport: {}, hotel: {},
+            history: { 'voice-chat': [], 'text-chat': [] } 
+        };
 
+        // 確保結構完整
+        if (!appData.history) appData.history = { 'voice-chat': [], 'text-chat': [] };
         Object.keys(SCENE_CONFIG).forEach(scene => {
+            if(!appData[scene]) appData[scene] = {};
             Object.keys(SCENE_CONFIG[scene].categories).forEach(cat => {
                 if(!appData[scene][cat]) appData[scene][cat] = [];
             });
@@ -692,12 +698,23 @@
                 target.style.display = 'flex';
                 const chatID = id === 'voice-interface' ? 'voice-chat' : (id === 'text-interface' ? 'text-chat' : null);
                 if(chatID) {
-                    const chatBox = document.getElementById(chatID);
-                    if(chatBox.children.length === 0) {
-                        let msg = id === 'voice-interface' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
-                        addMessage(msg, false, null, chatID);
-                    }
+                    renderHistory(chatID);
                 }
+            }
+        }
+
+        // 渲染歷史紀錄
+        function renderHistory(chatID) {
+            const chatBox = document.getElementById(chatID);
+            chatBox.innerHTML = '';
+            const history = appData.history[chatID];
+            if (history.length === 0) {
+                let msg = chatID === 'voice-chat' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
+                addMessage(msg, false, null, chatID, false);
+            } else {
+                history.forEach((item, index) => {
+                    addMessage(item.text, item.isUser, item.data, chatID, false, index);
+                });
             }
         }
 
@@ -738,7 +755,12 @@
                 wrapper.className = 'chat-item-wrapper';
                 const del = document.createElement('div');
                 del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-                del.onclick = (e) => { e.stopPropagation(); appData[currentSceneType][catId].splice(index, 1); saveData(); renderCategoryItems(catId); };
+                del.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    appData[currentSceneType][catId].splice(index, 1); 
+                    saveData(); 
+                    renderCategoryItems(catId); 
+                };
                 
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble ai-bubble';
@@ -746,11 +768,14 @@
                 bubble.onclick = () => updatePresentationMode(item.ja, item.origin);
 
                 bubble.innerHTML = `<div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div><strong class="translated-ja">${item.ja}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${item.ja.replace(/'/g, "\\'")}')">🔊</span><span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${item.ja.replace(/'/g, "\\'")}', '${item.origin.replace(/'/g, "\\'")}')">📱</span><div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>`;
+                
                 let startX = 0;
                 wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
                 wrapper.addEventListener('touchend', (e) => {
                     let diff = startX - e.changedTouches[0].clientX;
-                    if (diff > 50) { box.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
+                    if (diff > 50) { 
+                        box.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); 
+                        wrapper.classList.add('swiped');
                     } else if (diff < -50) wrapper.classList.remove('swiped');
                 }, {passive: true});
                 wrapper.append(del, bubble); box.appendChild(wrapper);
@@ -805,11 +830,12 @@
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
         async function processTranslation(userInput, chatID) {
-            addMessage(userInput, true, null, chatID);
+            addMessage(userInput, true, null, chatID, true);
             try {
                 const jaText = await translate(userInput, 'ja');
                 const [zh, en] = await Promise.all([translate(jaText, 'zh-TW', 'ja'), translate(jaText, 'en', 'ja')]);
-                addMessage(null, false, { ja: jaText, zh, en, origin: userInput }, chatID);
+                const data = { ja: jaText, zh, en, origin: userInput };
+                addMessage(null, false, data, chatID, true);
                 updatePresentationMode(jaText, userInput);
                 playSpeech(jaText);
             } catch (e) { console.error(e); }
@@ -826,34 +852,65 @@
             window.speechSynthesis.speak(u);
         }
 
-        function addMessage(text, isUser, data, chatID) {
+        // 修改後的 addMessage 支援儲存與歷史索引
+        function addMessage(text, isUser, data, chatID, shouldSave, historyIndex) {
             const chatBox = document.getElementById(chatID);
+            
+            // 如果需要儲存到 history
+            if (shouldSave) {
+                appData.history[chatID].push({ text, isUser, data });
+                saveData();
+                historyIndex = appData.history[chatID].length - 1;
+            }
+
             const wrapper = document.createElement('div');
             wrapper.className = 'chat-item-wrapper';
+            
             const del = document.createElement('div');
             del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
-            del.onclick = (e) => { e.stopPropagation(); wrapper.remove(); }
+            del.onclick = (e) => { 
+                e.stopPropagation(); 
+                if (historyIndex !== undefined) {
+                    appData.history[chatID].splice(historyIndex, 1);
+                    saveData();
+                    renderHistory(chatID);
+                } else {
+                    wrapper.remove();
+                }
+            }
             
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
             if (isUser) bubble.innerText = text;
-            else if (typeof text === 'string') bubble.innerText = text;
+            else if (typeof text === 'string' && !data) bubble.innerText = text;
             else {
                 bubble.onclick = () => updatePresentationMode(data.ja, data.origin);
                 bubble.innerHTML = `<strong class="translated-ja">${data.ja}</strong><span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span><span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.ja.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span><div class="translation-sub">ZH: ${data.zh}<br>EN: ${data.en}</div>`;
             }
+
             let startX = 0;
             wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
             wrapper.addEventListener('touchend', (e) => {
                 let diff = startX - e.changedTouches[0].clientX;
-                if (diff > 50) { chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
+                if (diff > 50) { 
+                    chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); 
+                    wrapper.classList.add('swiped');
                 } else if (diff < -50) wrapper.classList.remove('swiped');
             }, {passive: true});
+
             wrapper.append(del, bubble); chatBox.appendChild(wrapper);
             setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        function clearChat(id) { if(confirm("確定要清除紀錄嗎？")) { document.getElementById(id).innerHTML = ''; document.body.classList.remove('has-active-translation', 'is-forced-landscape'); } }
+        function clearChat(id) { 
+            if(confirm("確定要清除紀錄嗎？")) { 
+                appData.history[id] = [];
+                saveData();
+                renderHistory(id);
+                document.body.classList.remove('has-active-translation', 'is-forced-landscape'); 
+            } 
+        }
+
         function handleTextInput(inputId, chatId) {
             const field = document.getElementById(inputId);
             const text = field.value.trim();
