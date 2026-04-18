@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Japan Go - Your Ultimate Travel Companion</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
@@ -22,12 +22,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* 防止背景捲動 */
+        }
+
         body {
             font-family: 'Montserrat', 'Noto Sans TC', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
-            overflow-x: hidden;
             user-select: none;
         }
 
@@ -45,18 +50,20 @@
         }
 
         .container {
-            min-height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 20px;
             text-align: center;
+            overflow-y: auto;
         }
 
         .hero {
-            margin-bottom: 30px;
+            margin: 20px 0 30px 0;
             animation: fadeIn 1.5s ease-out;
+            flex-shrink: 0;
         }
 
         h1 {
@@ -93,6 +100,8 @@
             gap: 15px;
             width: 100%;
             max-width: 320px;
+            margin-bottom: 40px;
+            flex-shrink: 0;
         }
 
         .main-btn {
@@ -119,18 +128,21 @@
             border-color: var(--primary-color);
         }
 
+        /* ----- 改良版介面層級 ----- */
         .interface-layer {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
-            max-width: 400px;
-            height: 85vh;
-            background: var(--glass);
-            border-radius: 24px;
+            max-width: 500px;
+            height: 100dvh; /* 動態填滿螢幕高度 */
+            background: var(--bg-color);
+            z-index: 1000;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border: 1px solid rgba(188, 0, 45, 0.1);
-            backdrop-filter: blur(10px);
+            border: none;
         }
 
         .layer-header {
@@ -140,10 +152,11 @@
             align-items: center;
             background: white;
             flex-shrink: 0;
+            height: 60px;
         }
 
         .chat-container {
-            flex: 1 1 auto;
+            flex: 1;
             overflow-y: auto;
             padding: 20px 0;
             display: flex;
@@ -238,13 +251,14 @@
         }
 
         .text-input-area {
-            padding: 12px 15px;
+            padding: 15px;
             background: white;
             border-top: 1px solid #eee;
             flex-shrink: 0;
             display: flex;
             align-items: flex-end;
             gap: 10px;
+            padding-bottom: max(15px, env(safe-area-inset-bottom)); /* 適配 iPhone 底部條 */
         }
 
         #text-input-field, .scene-input, #scene-category-input-field {
@@ -256,10 +270,9 @@
             font-size: 1rem;
             resize: none;
             outline: none;
-            max-height: 120px;
+            max-height: 100px;
             min-height: 40px;
             line-height: 20px;
-            overflow-y: auto;
         }
 
         .send-btn-sm {
@@ -275,20 +288,18 @@
             cursor: pointer;
             flex-shrink: 0;
             font-size: 1.2rem;
-            transition: opacity 0.2s;
         }
 
-        .send-btn-sm:active { opacity: 0.7; }
-
         .voice-controls {
-            padding: 25px;
+            padding: 20px 25px;
             background: white;
             border-top: 1px solid #eee;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
 
         .record-btn {
@@ -300,6 +311,7 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 6px 20px rgba(188, 0, 45, 0.3);
         }
+
         .record-btn.recording { animation: pulse 1.2s infinite; background: #2b2b2b; }
 
         @keyframes pulse {
@@ -332,7 +344,7 @@
             margin-bottom: 10px;
         }
         .category-header {
-            background: var(--glass);
+            background: white;
             padding: 14px 20px;
             border-radius: 16px;
             font-weight: bold;
@@ -342,38 +354,32 @@
             align-items: center;
             border: 1px solid rgba(188, 0, 45, 0.1);
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .category-header:active { transform: scale(0.98); }
         .category-header::after {
             content: '▼';
             font-size: 0.8rem;
             transition: transform 0.3s;
             color: #aaa;
         }
-        .category-header.open::after {
-            transform: rotate(180deg);
-            color: var(--primary-color);
-        }
+        .category-header.open::after { transform: rotate(180deg); color: var(--primary-color); }
+        
         .category-content {
             display: none;
             padding-top: 15px;
             flex-direction: column;
             gap: 15px;
         }
-        .category-content.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
+        .category-content.active { display: flex; animation: fadeIn 0.3s ease; }
+
         #scene-category-select {
             padding: 10px;
             border-radius: 15px;
             border: 1px solid #ddd;
-            outline: none;
             background: white;
             font-family: inherit;
             color: var(--text-color);
             font-weight: 500;
+            max-width: 100px;
         }
         .scene-origin-text {
             font-size: 0.85rem; 
@@ -382,11 +388,9 @@
             border-bottom: 1px solid #eee; 
             padding-bottom: 6px;
         }
-        .scene-number {
-            font-weight: bold; 
-            color: var(--primary-color); 
-            margin-right: 5px;
-        }
+        .scene-number { font-weight: bold; color: var(--primary-color); margin-right: 5px; }
+
+        footer { margin-top: auto; padding: 20px; font-size: 0.75rem; color: #aaa; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -407,61 +411,59 @@
             <div class="main-btn" onclick="switchScene('hotel', '🏨 HOTEL')"><span>🏨</span><small>HOTEL</small></div>
         </main>
 
-        <div id="voice-interface" class="interface-layer">
-            <div class="layer-header">
-                <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
-                <span style="flex:1; font-size: 1.2rem; text-align: center;">🗣️</span>
-                <button class="clear-all-btn" onclick="clearChat('voice-chat')">Clear</button>
-            </div>
-            <div class="chat-container" id="voice-chat"></div>
-            <div class="voice-controls">
-                <button class="record-btn" id="record-trigger">🎤</button>
-                <p id="status-text" style="font-size: 0.75rem; color: #888; font-weight: 500;">HOLD TO SPEAK</p>
-            </div>
-        </div>
-
-        <div id="text-interface" class="interface-layer">
-            <div class="layer-header">
-                <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
-                <span style="flex:1; font-size: 1.2rem; text-align: center;">✍️</span>
-                <button class="clear-all-btn" onclick="clearChat('text-chat')">Clear</button>
-            </div>
-            <div class="chat-container" id="text-chat"></div>
-            <div class="text-input-area">
-                <textarea id="text-input-field" rows="1" placeholder="輸入文字..."></textarea>
-                <button class="send-btn-sm" onclick="handleTextInput('text-input-field', 'text-chat')">GO</button>
-            </div>
-        </div>
-
-        <div id="scene-category-interface" class="interface-layer">
-            <div class="layer-header">
-                <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
-                <span id="scene-category-title" style="flex:1; font-size: 1rem; text-align: center; letter-spacing: 1px;">SCENE</span>
-                <button class="clear-all-btn" onclick="clearCurrentSceneData()">Clear</button>
-            </div>
-            
-            <div class="chat-container" id="scene-category-container" style="padding: 15px 0;">
-                </div>
-
-            <div class="text-input-area">
-                <select id="scene-category-select">
-                    </select>
-                <textarea id="scene-category-input-field" rows="1" placeholder="輸入需翻譯文字..."></textarea>
-                <button class="send-btn-sm" onclick="handleSceneCategoryInput()">GO</button>
-            </div>
-        </div>
-
-        <footer style="margin-top: auto; padding: 30px; font-size: 0.75rem; color: #aaa;">
+        <footer id="main-footer">
             &copy; 2026 JAPAN GO. DESIGNED FOR HK TRAVELERS.
         </footer>
+    </div>
+
+    <div id="voice-interface" class="interface-layer">
+        <div class="layer-header">
+            <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
+            <span style="flex:1; font-size: 1.2rem; text-align: center;">🗣️</span>
+            <button class="clear-all-btn" onclick="clearChat('voice-chat')">Clear</button>
+        </div>
+        <div class="chat-container" id="voice-chat"></div>
+        <div class="voice-controls">
+            <button class="record-btn" id="record-trigger">🎤</button>
+            <p id="status-text" style="font-size: 0.75rem; color: #888; font-weight: 500;">HOLD TO SPEAK</p>
+        </div>
+    </div>
+
+    <div id="text-interface" class="interface-layer">
+        <div class="layer-header">
+            <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
+            <span style="flex:1; font-size: 1.2rem; text-align: center;">✍️</span>
+            <button class="clear-all-btn" onclick="clearChat('text-chat')">Clear</button>
+        </div>
+        <div class="chat-container" id="text-chat"></div>
+        <div class="text-input-area">
+            <textarea id="text-input-field" rows="1" placeholder="輸入文字..."></textarea>
+            <button class="send-btn-sm" onclick="handleTextInput('text-input-field', 'text-chat')">GO</button>
+        </div>
+    </div>
+
+    <div id="scene-category-interface" class="interface-layer">
+        <div class="layer-header">
+            <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
+            <span id="scene-category-title" style="flex:1; font-size: 1rem; text-align: center; letter-spacing: 1px;">SCENE</span>
+            <button class="clear-all-btn" onclick="clearCurrentSceneData()">Clear</button>
+        </div>
+        
+        <div class="chat-container" id="scene-category-container">
+            </div>
+
+        <div class="text-input-area">
+            <select id="scene-category-select"></select>
+            <textarea id="scene-category-input-field" rows="1" placeholder="輸入需翻譯文字..."></textarea>
+            <button class="send-btn-sm" onclick="handleSceneCategoryInput()">GO</button>
+        </div>
     </div>
 
     <script>
         let recognition;
         let isRecording = false;
-        let currentSceneType = ''; // 追蹤目前所在的場景
+        let currentSceneType = '';
 
-        // 分類配置表
         const SCENE_CONFIG = {
             dining: {
                 title: "🍱 DINING",
@@ -481,19 +483,16 @@
             }
         };
 
-        // 從 LocalStorage 載入數據，若無則初始化
         let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || {
             dining: {}, shopping: {}, transport: {}, hotel: {}
         };
 
-        // 初始化所有分類的數組空間
         Object.keys(SCENE_CONFIG).forEach(scene => {
             Object.keys(SCENE_CONFIG[scene].categories).forEach(cat => {
                 if(!appData[scene][cat]) appData[scene][cat] = [];
             });
         });
 
-        // 文字框自動增高邏輯
         function initAutoGrow(id) {
             const el = document.getElementById(id);
             el.addEventListener('input', function() {
@@ -520,9 +519,13 @@
         }
 
         function switchLayer(id) {
-            document.getElementById('menu-view').style.display = (id === 'menu-view') ? 'grid' : 'none';
+            // 隱藏所有介面
             document.querySelectorAll('.interface-layer').forEach(el => el.style.display = 'none');
-            if (id !== 'menu-view') {
+            
+            if (id === 'menu-view') {
+                document.getElementById('main-container').style.display = 'flex';
+            } else {
+                document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
                 target.style.display = 'flex';
                 
@@ -537,25 +540,19 @@
             }
         }
 
-        // 切換場景分頁並生成內容
         function switchScene(type, titleText) {
             currentSceneType = type;
             const config = SCENE_CONFIG[type];
-            
-            // 設定標題
             document.getElementById('scene-category-title').innerText = config.title;
             
-            // 生成下拉選單
             const select = document.getElementById('scene-category-select');
             select.innerHTML = '';
             Object.keys(config.categories).forEach(key => {
                 const opt = document.createElement('option');
-                opt.value = key;
-                opt.innerText = config.categories[key];
+                opt.value = key; opt.innerText = config.categories[key];
                 select.appendChild(opt);
             });
 
-            // 生成分類區塊
             const container = document.getElementById('scene-category-container');
             container.innerHTML = '';
             Object.keys(config.categories).forEach(key => {
@@ -568,7 +565,6 @@
                 container.appendChild(wrapper);
                 renderCategoryItems(key);
             });
-
             switchLayer('scene-category-interface');
         }
 
@@ -585,8 +581,6 @@
             items.forEach((item, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'chat-item-wrapper';
-                wrapper.style.padding = '2px 0';
-
                 const del = document.createElement('div');
                 del.className = 'delete-btn-hidden';
                 del.innerText = 'DELETE';
@@ -607,7 +601,6 @@
                     <div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>
                 `;
 
-                // 滑動刪除
                 let startX = 0;
                 wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
                 wrapper.addEventListener('touchend', (e) => {
@@ -630,9 +623,7 @@
             const catId = select.value;
 
             if(!text) return;
-            field.value = '';
-            field.style.height = '40px';
-            field.blur();
+            field.value = ''; field.style.height = '40px'; field.blur();
 
             try {
                 const jaText = await translate(text, 'ja');
@@ -640,51 +631,28 @@
                     translate(jaText, 'zh-TW', 'ja'),
                     translate(jaText, 'en', 'ja')
                 ]);
-
                 appData[currentSceneType][catId].push({ origin: text, ja: jaText, zh: zh, en: en });
                 saveData();
-
-                // 自動展開並更新
                 const box = document.getElementById(`cat-box-${catId}`);
                 box.classList.add('active');
                 box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
-                
                 setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
                 playSpeech(jaText);
-            } catch (e) { alert("翻譯失敗，請檢查網路。"); }
+            } catch (e) { alert("翻譯失敗"); }
         }
 
         function clearCurrentSceneData() {
-            if(confirm(`確定要清除整個 ${SCENE_CONFIG[currentSceneType].title} 的紀錄嗎？`)) {
-                Object.keys(SCENE_CONFIG[currentSceneType].categories).forEach(cat => {
-                    appData[currentSceneType][cat] = [];
-                });
+            if(confirm(`確定要清除所有紀錄嗎？`)) {
+                Object.keys(SCENE_CONFIG[currentSceneType].categories).forEach(cat => appData[currentSceneType][cat] = []);
                 saveData();
                 switchScene(currentSceneType, ''); 
             }
         }
 
-        function saveData() {
-            localStorage.setItem('japanGo_v2_data', JSON.stringify(appData));
-        }
+        function saveData() { localStorage.setItem('japanGo_v2_data', JSON.stringify(appData)); }
 
-        // --- 以下為通用翻譯與語音邏輯 (保持不變) ---
-
-        function clearChat(id) {
-            if(confirm("確定要清除紀錄嗎？")) document.getElementById(id).innerHTML = '';
-        }
-
-        function handleTextInput(inputId, chatId) {
-            const field = document.getElementById(inputId);
-            const text = field.value.trim();
-            if(!text) return;
-            processTranslation(text, chatId);
-            field.value = '';
-            field.style.height = '40px';
-            field.blur();
-        }
-
+        // Voice
         const recordBtn = document.getElementById('record-trigger');
         const statusText = document.getElementById('status-text');
 
@@ -701,8 +669,6 @@
             statusText.innerText = "HOLD TO SPEAK";
         }
 
-        recordBtn.addEventListener('mousedown', (e) => { e.preventDefault(); if(!isRecording){startRecordingUI(); recognition.start();} });
-        recordBtn.addEventListener('mouseup', (e) => { e.preventDefault(); recognition.stop(); });
         recordBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if(!isRecording){startRecordingUI(); recognition.start();} });
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
@@ -710,10 +676,7 @@
             addMessage(userInput, true, null, chatID);
             try {
                 const jaText = await translate(userInput, 'ja');
-                const [zh, en] = await Promise.all([
-                    translate(jaText, 'zh-TW', 'ja'),
-                    translate(jaText, 'en', 'ja')
-                ]);
+                const [zh, en] = await Promise.all([translate(jaText, 'zh-TW', 'ja'), translate(jaText, 'en', 'ja')]);
                 addMessage(null, false, { ja: jaText, zh, en }, chatID);
                 playSpeech(jaText);
             } catch (e) { console.error(e); }
@@ -721,13 +684,11 @@
 
         async function translate(q, tl, sl = 'auto') {
             const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURI(q)}`);
-            const d = await r.json();
-            return d[0][0][0];
+            const d = await r.json(); return d[0][0][0];
         }
 
         function playSpeech(text) {
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'ja-JP';
+            const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP';
             window.speechSynthesis.speak(u);
         }
 
@@ -736,16 +697,13 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'chat-item-wrapper';
             const del = document.createElement('div');
-            del.className = 'delete-btn-hidden';
-            del.innerText = 'DELETE';
+            del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
             del.onclick = () => wrapper.remove();
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'}`;
-            if (isUser) {
-                bubble.innerText = text;
-            } else if (typeof text === 'string') {
-                bubble.innerText = text;
-            } else {
+            if (isUser) bubble.innerText = text;
+            else if (typeof text === 'string') bubble.innerText = text;
+            else {
                 bubble.innerHTML = `
                     <strong class="translated-ja">${data.ja}</strong>
                     <span class="speak-icon" onclick="playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span>
@@ -760,9 +718,17 @@
                     wrapper.classList.add('swiped');
                 } else if (diff < -50) wrapper.classList.remove('swiped');
             }, {passive: true});
-            wrapper.append(del, bubble);
-            chatBox.appendChild(wrapper);
+            wrapper.append(del, bubble); chatBox.appendChild(wrapper);
             setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
+        }
+
+        function clearChat(id) { if(confirm("確定要清除紀錄嗎？")) document.getElementById(id).innerHTML = ''; }
+        function handleTextInput(inputId, chatId) {
+            const field = document.getElementById(inputId);
+            const text = field.value.trim();
+            if(!text) return;
+            processTranslation(text, chatId);
+            field.value = ''; field.style.height = '40px'; field.blur();
         }
     </script>
 </body>
