@@ -502,6 +502,7 @@
             word-break: break-word;
             margin-bottom: 10px;
             padding: 0 10%;
+            transition: font-size 0.2s ease;
         }
 
         #presentation-subtext {
@@ -513,7 +514,7 @@
         .pres-controls {
             margin-top: 30px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
 
@@ -522,8 +523,8 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 60px; height: 60px;
-            font-size: 1.5rem;
+            width: 55px; height: 55px;
+            font-size: 1.4rem;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 10px rgba(188, 0, 45, 0.2);
             cursor: pointer;
@@ -554,6 +555,8 @@
         
         <div class="pres-controls">
             <button class="pres-btn" id="pres-speak-btn">🔊</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustPresFontSize(-1)">-</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustPresFontSize(1)">+</button>
             <button class="pres-btn" style="background: #2b2b2b;" onclick="closeForcedLandscape()">✕</button>
         </div>
 
@@ -638,12 +641,22 @@
 
     <script>
         let activeTranslation = { formal: '', slang: '', origin: '' };
+        let currentPresFontSize = 7; // 預設 7vh
 
         function updatePresentationMode(text, origin) {
             document.getElementById('presentation-text').innerText = text;
             document.getElementById('presentation-subtext').innerText = origin;
             document.getElementById('pres-speak-btn').onclick = () => playSpeech(text);
             document.body.classList.add('has-active-translation');
+        }
+
+        // 動態字體調整功能
+        function adjustPresFontSize(delta) {
+            currentPresFontSize += delta;
+            // 限制字體大小範圍：4vh 到 15vh 之間
+            if (currentPresFontSize < 4) currentPresFontSize = 4;
+            if (currentPresFontSize > 15) currentPresFontSize = 15;
+            document.getElementById('presentation-text').style.fontSize = currentPresFontSize + 'vh';
         }
 
         function forceLandscapePresentation(text, origin) {
@@ -678,12 +691,9 @@
             const webUrl = 'https://www.deepl.com/translator#zh/en/' + encodedText;
 
             if (isAndroid) {
-                // 利用 Android Intent 強制喚醒 DeepL 應用程式 (package: com.deepl.mobiletranslator)
-                // 若未安裝則 fallback 至網頁版
                 const intentUrl = 'intent://www.deepl.com/translator#zh/en/' + encodedText + '#Intent;scheme=https;package=com.deepl.mobiletranslator;S.browser_fallback_url=' + encodeURIComponent(webUrl) + ';end';
                 window.location.href = intentUrl;
             } else {
-                // iOS 上的 Safari 支援 Universal Links，打開這段 URL 會自動偵測並跳轉至 DeepL App
                 window.open(webUrl, '_blank');
             }
         }
@@ -710,11 +720,10 @@
                 if(!appData[scene][cat]) appData[scene][cat] = [];
             });
         });
-        if(!appData.voice) appData.voice = [];
-        if(!appData.text) appData.text = [];
 
         function initAutoGrow(id) {
             const el = document.getElementById(id);
+            if(!el) return;
             el.addEventListener('input', function() {
                 this.style.height = '40px';
                 this.style.height = (this.scrollHeight) + 'px';
@@ -743,6 +752,7 @@
             if (id === 'menu-view') {
                 document.getElementById('main-container').style.display = 'flex';
                 document.body.classList.remove('has-active-translation', 'is-forced-landscape');
+                window.speechSynthesis.cancel(); // 切換時停止所有語音
             } else {
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
@@ -839,13 +849,7 @@
                     </div>
                 `;
 
-                let startX = 0;
-                wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
-                wrapper.addEventListener('touchend', (e) => {
-                    let diff = startX - e.changedTouches[0].clientX;
-                    if (diff > 50) { box.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
-                    } else if (diff < -50) wrapper.classList.remove('swiped');
-                }, {passive: true});
+                setupSwipe(wrapper, box);
                 wrapper.append(del, bubble); box.appendChild(wrapper);
             });
         }
@@ -858,11 +862,13 @@
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
             try {
-                let formal = await translate(`Please translate this into formal English: ${text}`, 'en');
+                let formal = await translate(`Formal English: ${text}`, 'en');
                 formal = cleanTranslation(formal);
+                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
-                let slang = await translate(`Please translate this into casual slang English: ${text}`, 'en');
+                let slang = await translate(`Casual slang English: ${text}`, 'en');
                 slang = cleanTranslation(slang);
+                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
                 appData[currentSceneType][catId].push({ origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck });
@@ -905,37 +911,23 @@
             try {
                 let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
                 formal = cleanTranslation(formal);
+                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
-
                 let slang = await translate(`Translate to casual slang English: ${userInput}`, 'en');
                 slang = cleanTranslation(slang);
+                // 優化校對：強制從英文 (sl=en) 翻譯回繁體中文 (tl=zh-TW)
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
                 const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
-                
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 appData[key].push(translationData);
                 saveData();
-
                 addMessage(null, false, translationData, chatID, false);
             } catch (e) { console.error(e); }
         }
 
         function cleanTranslation(text) {
-            const filters = [
-                /Translate to formal English:/gi,
-                /Translate to casual slang English:/gi,
-                /Please translate this into formal English:/gi,
-                /Please translate this into casual slang English:/gi,
-                /翻譯成正式英文：/g,
-                /翻譯成休閒俚語英語：/g,
-                /翻譯成休閒俚語英語:/g
-            ];
-            let cleaned = text;
-            filters.forEach(regex => {
-                cleaned = cleaned.replace(regex, "");
-            });
-            return cleaned.trim();
+            return text.replace(/Formal English:|Casual slang English:|Translate to/gi, "").trim();
         }
 
         async function translate(q, tl, sl = 'auto') {
@@ -943,10 +935,30 @@
             const d = await r.json(); return d[0][0][0];
         }
 
+        // 修改語音播放：點擊第二次即停止
         function playSpeech(text) {
             if(!text) return;
-            const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US';
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                // 如果目前的播放器正在說話，點擊即停止，不繼續播放下一段
+                return;
+            }
+            const u = new SpeechSynthesisUtterance(text); 
+            u.lang = 'en-US';
+            u.rate = 0.9;
             window.speechSynthesis.speak(u);
+        }
+
+        function setupSwipe(wrapper, chatBox) {
+            let startX = 0;
+            wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
+            wrapper.addEventListener('touchend', (e) => {
+                let diff = startX - e.changedTouches[0].clientX;
+                if (diff > 50) { 
+                    chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); 
+                    wrapper.classList.add('swiped');
+                } else if (diff < -50) wrapper.classList.remove('swiped');
+            }, {passive: true});
         }
 
         function addMessage(text, isUser, data, chatID, isNew = true, index = null) {
@@ -985,24 +997,12 @@
                     <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${data.slang.replace(/'/g, "\\'")}')">🔊</span>
                     <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${data.slang.replace(/'/g, "\\'")}', '${data.origin.replace(/'/g, "\\'")}')">📱</span>
                     <div class="translation-sub"><span class="check-text">└ ${data.slang_check}</span></div>
-
-                    <div style="text-align: right;">
-                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${data.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button>
-                    </div>
+                    <div style="text-align: right;"><button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${data.origin.replace(/'/g, "\\'")}')">🔍 DeepL 強力校對</button></div>
                 `;
             }
-            let startX = 0;
-            wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
-            wrapper.addEventListener('touchend', (e) => {
-                let diff = startX - e.changedTouches[0].clientX;
-                if (diff > 50) { chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
-                } else if (diff < -50) wrapper.classList.remove('swiped');
-            }, {passive: true});
+            setupSwipe(wrapper, chatBox);
             wrapper.append(del, bubble); chatBox.appendChild(wrapper);
-            
-            if(isNew) {
-                setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
-            }
+            if(isNew) setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
         function clearChat(id) { 
@@ -1010,9 +1010,8 @@
                 const key = id === 'voice-chat' ? 'voice' : 'text';
                 appData[key] = [];
                 saveData();
-                document.getElementById(id).innerHTML = ''; 
-                document.body.classList.remove('has-active-translation', 'is-forced-landscape'); 
                 renderHistory(id);
+                window.speechSynthesis.cancel();
             } 
         }
 
