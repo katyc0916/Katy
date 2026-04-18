@@ -55,13 +55,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 20px;
+            padding: max(2dvh, 10px) 20px;
             text-align: center;
-            overflow-y: auto;
+            overflow: hidden; /* 確保主畫面維持全螢幕，防止溢出捲動 */
         }
 
         .hero {
-            margin: 20px 0 30px 0;
+            margin: max(2dvh, 10px) 0 max(3dvh, 15px) 0;
             animation: fadeIn 1.5s ease-out;
             flex-shrink: 0;
         }
@@ -94,7 +94,7 @@
             text-transform: uppercase;
         }
 
-        /* ----- 新增：Google Translate 橫向方塊樣式 ----- */
+        /* ----- Google Translate 橫向方塊樣式 ----- */
         .global-scan-banner {
             display: flex;
             align-items: center;
@@ -112,8 +112,8 @@
             width: 100%;
             max-width: 320px;
             border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 25px;
+            padding: max(1.5dvh, 12px) 15px;
+            margin-bottom: max(3dvh, 15px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             font-size: 1.1rem;
         }
@@ -138,11 +138,12 @@
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: max(1.5dvh, 10px);
             width: 100%;
-            max-width: 320px;
-            margin-bottom: 40px;
-            flex-shrink: 0;
+            /* 核心修改：利用 42dvh 限制寬度，讓短螢幕下按鈕能等比例縮小，不再撐爆螢幕 */
+            max-width: min(320px, 42dvh);
+            margin-bottom: max(2dvh, 10px);
+            flex-shrink: 1;
         }
 
         .main-btn {
@@ -375,7 +376,7 @@
             width: 8px; height: 8px;
             background-color: var(--primary-color);
             border-radius: 50%;
-            margin: 15px auto;
+            margin: max(1dvh, 8px) auto;
         }
 
         .scene-category-wrapper {
@@ -429,7 +430,13 @@
         }
         .scene-number { font-weight: bold; color: var(--primary-color); margin-right: 5px; }
 
-        footer { margin-top: auto; padding: 20px; font-size: 0.75rem; color: #aaa; flex-shrink: 0; }
+        footer { 
+            margin-top: auto; 
+            padding: max(1.5dvh, 10px) 20px; 
+            font-size: 0.75rem; 
+            color: #aaa; 
+            flex-shrink: 0; 
+        }
     </style>
 </head>
 <body>
