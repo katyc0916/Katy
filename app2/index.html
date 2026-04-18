@@ -461,27 +461,29 @@
     </div>
 
     <script>
-        // 修改點：新增喚醒 App 功能
+        // 專業修改：喚醒 App 邏輯優化
         function launchCameraTranslate() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
 
-            // Google Translate 的深度連結協議
-            // iOS 使用 googletranslate://
-            // Android 使用特定 intent://
+            // 定義 App 協議連結
             const iosUrl = "googletranslate://"; 
             const androidUrl = "intent://#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
-            const fallbackUrl = "https://translate.google.com/";
 
+            // 執行跳轉
             if (isiOS) {
                 window.location.href = iosUrl;
-                // 如果幾秒後沒反應，通常是因為沒裝 App，可以跳轉到網頁版
-                setTimeout(() => { window.location.href = fallbackUrl; }, 2000);
             } else if (isAndroid) {
                 window.location.href = androidUrl;
             } else {
-                window.open(fallbackUrl, '_blank');
+                window.open("https://translate.google.com/", '_blank');
             }
+
+            // 核心邏輯：在點擊跳轉後的瞬間，確保網頁內部已經回到了主選單
+            // 這樣用戶在手機上手動「返回」或從多工界面切換回來時，看到的就是主頁。
+            setTimeout(() => {
+                switchLayer('menu-view');
+            }, 500);
         }
 
         let recognition;
@@ -543,7 +545,6 @@
         }
 
         function switchLayer(id) {
-            // 隱藏所有介面
             document.querySelectorAll('.interface-layer').forEach(el => el.style.display = 'none');
             
             if (id === 'menu-view') {
@@ -676,7 +677,6 @@
 
         function saveData() { localStorage.setItem('japanGo_v2_data', JSON.stringify(appData)); }
 
-        // Voice
         const recordBtn = document.getElementById('record-trigger');
         const statusText = document.getElementById('status-text');
 
