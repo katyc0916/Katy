@@ -873,7 +873,7 @@
                 box.classList.add('active'); box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
                 setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-            } catch (e) { alert("翻譯失敗"); }
+            } catch (e) { alert("翻譯失敗，請檢查網路連線。"); }
         }
 
         function clearCurrentSceneData() {
@@ -916,23 +916,55 @@
                 appData[key].push(translationData);
                 saveData();
                 renderHistory(chatID);
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                alert("翻譯過程出錯，請稍後再試。");
+            }
         }
 
         function cleanTranslation(text) {
             return text.replace(/Formal English:|Casual slang English:|Translate to/gi, "").trim();
         }
 
-        async function translate(q, tl, sl = 'auto') {
-            const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURI(q)}`);
-            const d = await r.json(); return d[0][0][0];
+        /**
+         * 專業修改：加入 Try-Catch, Retry 機制與多行處理
+         */
+        async function translate(q, tl, sl = 'auto', retries = 3) {
+            const delay = (ms) => new Promise(res => setTimeout(res, ms));
+            
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(q)}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // 處理 Google Translate 返回的多段文本拼合
+                    if (data && data[0]) {
+                        return data[0].map(x => x[0]).join('').trim();
+                    }
+                    return "";
+                } catch (error) {
+                    console.warn(`Translation attempt ${i + 1} failed. Retrying...`, error);
+                    if (i === retries - 1) {
+                        console.error("All translation retries failed.");
+                        throw error;
+                    }
+                    // 指數退避：每次重試等待時間增加 (500ms, 1000ms, 1500ms)
+                    await delay(500 * (i + 1));
+                }
+            }
         }
 
         function playSpeech(text) {
             if(!text) return;
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
-                return;
+                // 如果是按同一個按鈕則停止，如果不是則停止後繼續下一段
             }
             const u = new SpeechSynthesisUtterance(text); 
             u.lang = 'en-US';
