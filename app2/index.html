@@ -94,6 +94,47 @@
             text-transform: uppercase;
         }
 
+        /* ----- 新增：Google Translate 橫向方塊樣式 ----- */
+        .global-scan-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+
+        .main-banner {
+            background: var(--glass);
+            border: 1px solid rgba(188, 0, 45, 0.1);
+            width: 100%;
+            max-width: 320px;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            font-size: 1.1rem;
+        }
+
+        .sub-banner {
+            background: white;
+            width: 100%;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 1rem;
+        }
+
+        .global-scan-banner:hover {
+            background: var(--user-bubble-bg);
+            border-color: var(--primary-color);
+        }
+        .main-banner:hover {
+            transform: translateY(-3px);
+        }
+        /* ------------------------------------------- */
+
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -128,7 +169,6 @@
             border-color: var(--primary-color);
         }
 
-        /* ----- 改良版介面層級 ----- */
         .interface-layer {
             display: none;
             position: fixed;
@@ -137,7 +177,7 @@
             transform: translateX(-50%);
             width: 100%;
             max-width: 500px;
-            height: 100dvh; /* 動態填滿螢幕高度 */
+            height: 100dvh; 
             background: var(--bg-color);
             z-index: 1000;
             flex-direction: column;
@@ -258,7 +298,7 @@
             display: flex;
             align-items: flex-end;
             gap: 10px;
-            padding-bottom: max(15px, env(safe-area-inset-bottom)); /* 適配 iPhone 底部條 */
+            padding-bottom: max(15px, env(safe-area-inset-bottom)); 
         }
 
         #text-input-field, .scene-input, #scene-category-input-field {
@@ -338,7 +378,6 @@
             margin: 15px auto;
         }
 
-        /* ----- 分類場景專屬樣式 ----- */
         .scene-category-wrapper {
             padding: 0 15px;
             margin-bottom: 10px;
@@ -402,10 +441,13 @@
             <p class="subtitle">Travel Translator</p>
         </header>
 
+        <div class="global-scan-banner main-banner" onclick="launchCameraTranslate()">
+            💡 Google Translate 💡
+        </div>
+
         <main class="menu-grid" id="menu-view">
             <div class="main-btn" onclick="switchLayer('voice-interface')"><span>🗣️</span><small>VOICE</small></div>
             <div class="main-btn" onclick="switchLayer('text-interface')"><span>✍️</span><small>TEXT</small></div>
-            <div class="main-btn" onclick="launchCameraTranslate()"><span>📷</span><small>SCAN</small></div>
             <div class="main-btn" onclick="switchScene('dining', '🍱 DINING')"><span>🍱</span><small>DINING</small></div>
             <div class="main-btn" onclick="switchScene('shopping', '🛍️ SHOPPING')"><span>🛍️</span><small>SHOPPING</small></div>
             <div class="main-btn" onclick="switchScene('transport', '🚆 TRANSIT')"><span>🚆</span><small>TRANSIT</small></div>
@@ -423,6 +465,9 @@
             <span style="flex:1; font-size: 1.2rem; text-align: center;">🗣️</span>
             <button class="clear-all-btn" onclick="clearChat('voice-chat')">Clear</button>
         </div>
+        <div class="global-scan-banner sub-banner" onclick="launchCameraTranslate()">
+            💡 Google Translate 💡
+        </div>
         <div class="chat-container" id="voice-chat"></div>
         <div class="voice-controls">
             <button class="record-btn" id="record-trigger">🎤</button>
@@ -435,6 +480,9 @@
             <button class="back-btn" onclick="switchLayer('menu-view')">← Back</button>
             <span style="flex:1; font-size: 1.2rem; text-align: center;">✍️</span>
             <button class="clear-all-btn" onclick="clearChat('text-chat')">Clear</button>
+        </div>
+        <div class="global-scan-banner sub-banner" onclick="launchCameraTranslate()">
+            💡 Google Translate 💡
         </div>
         <div class="chat-container" id="text-chat"></div>
         <div class="text-input-area">
@@ -449,9 +497,11 @@
             <span id="scene-category-title" style="flex:1; font-size: 1rem; text-align: center; letter-spacing: 1px;">SCENE</span>
             <button class="clear-all-btn" onclick="clearCurrentSceneData()">Clear</button>
         </div>
+        <div class="global-scan-banner sub-banner" onclick="launchCameraTranslate()">
+            💡 Google Translate 💡
+        </div>
         
-        <div class="chat-container" id="scene-category-container">
-            </div>
+        <div class="chat-container" id="scene-category-container"></div>
 
         <div class="text-input-area">
             <select id="scene-category-select"></select>
@@ -461,16 +511,13 @@
     </div>
 
     <script>
-        // 專業修改：喚醒 App 邏輯優化
         function launchCameraTranslate() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
 
-            // 定義 App 協議連結
             const iosUrl = "googletranslate://"; 
             const androidUrl = "intent://#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
 
-            // 執行跳轉
             if (isiOS) {
                 window.location.href = iosUrl;
             } else if (isAndroid) {
@@ -479,8 +526,6 @@
                 window.open("https://translate.google.com/", '_blank');
             }
 
-            // 核心邏輯：在點擊跳轉後的瞬間，確保網頁內部已經回到了主選單
-            // 這樣用戶在手機上手動「返回」或從多工界面切換回來時，看到的就是主頁。
             setTimeout(() => {
                 switchLayer('menu-view');
             }, 500);
