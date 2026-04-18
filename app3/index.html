@@ -795,13 +795,12 @@
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
             try {
-                // Optimized Formal Prompt - Explicitly request English
-                let formal = await translate(`Directly translate into polite, formal English for a customer: ${text}`, 'en');
+                // 獲取正式版
+                let formal = await translate(`Please translate this into formal English: ${text}`, 'en');
                 formal = cleanTranslation(formal);
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
-                
-                // Optimized Slang Prompt - Explicitly request English slang
-                let slang = await translate(`Directly translate into natural, conversational native English slang or casual idioms: ${text}`, 'en');
+                // 獲取非正式版
+                let slang = await translate(`Please translate this into casual slang English: ${text}`, 'en');
                 slang = cleanTranslation(slang);
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
@@ -843,13 +842,11 @@
         async function processTranslation(userInput, chatID) {
             addMessage(userInput, true, null, chatID);
             try {
-                // Optimized Formal Prompt
-                let formal = await translate(`Directly translate into polite, formal English: ${userInput}`, 'en');
+                let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
                 formal = cleanTranslation(formal);
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
 
-                // Optimized Slang Prompt
-                let slang = await translate(`Directly translate into natural, casual native English slang: ${userInput}`, 'en');
+                let slang = await translate(`Translate to casual slang English: ${userInput}`, 'en');
                 slang = cleanTranslation(slang);
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
@@ -858,17 +855,12 @@
         }
 
         function cleanTranslation(text) {
-            // Remove common AI pre-fixes or formatting that Google API might accidentally return
             const filters = [
-                /^"|"$/g, 
-                /Directly translate into polite, formal English:/gi,
-                /Directly translate into natural, casual native English slang:/gi,
-                /Please translate into polite, professional English suitable for a customer speaking to staff:/gi,
-                /Please translate into natural, conversational English using common idioms or phrasal verbs, as if talking to a friend:/gi,
                 /Translate to formal English:/gi,
                 /Translate to casual slang English:/gi,
+                /Please translate this into formal English:/gi,
+                /Please translate this into casual slang English:/gi,
                 /翻譯成正式英文：/g,
-                /翻譯成正式英文:/g,
                 /翻譯成休閒俚語英語：/g,
                 /翻譯成休閒俚語英語:/g
             ];
