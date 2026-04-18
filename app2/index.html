@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Japan Go - Your Ultimate Travel Companion</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@300;500&display=swap" rel="stylesheet">
     <style>
@@ -25,7 +25,8 @@
         html, body {
             height: 100%;
             width: 100%;
-            overflow: hidden; /* 防止背景捲動 */
+            overflow: hidden; 
+            position: fixed; /* 徹底防止橡皮筋回彈效果 */
         }
 
         body {
@@ -50,24 +51,24 @@
         }
 
         .container {
-            height: 100dvh;
+            height: 100dvh; /* 動態視窗高度 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: max(2dvh, 10px) 20px;
+            justify-content: space-between; /* 將內容撐開，Footer 靠底 */
+            padding: 20px;
             text-align: center;
-            overflow: hidden; /* 確保主畫面維持全螢幕，防止溢出捲動 */
+            box-sizing: border-box;
         }
 
         .hero {
-            margin: max(2dvh, 10px) 0 max(3dvh, 15px) 0;
+            margin-top: 10px;
             animation: fadeIn 1.5s ease-out;
             flex-shrink: 0;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 3.2rem; /* 稍微縮小以騰出空間 */
             letter-spacing: 2px;
             color: var(--text-color);
             position: relative;
@@ -87,14 +88,13 @@
         }
 
         .subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #666;
-            margin-top: 10px;
+            margin-top: 5px;
             letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        /* ----- Google Translate 橫向方塊樣式 ----- */
         .global-scan-banner {
             display: flex;
             align-items: center;
@@ -112,8 +112,8 @@
             width: 100%;
             max-width: 320px;
             border-radius: 20px;
-            padding: max(1.5dvh, 12px) 15px;
-            margin-bottom: max(3dvh, 15px);
+            padding: 15px;
+            margin: 15px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             font-size: 1.1rem;
         }
@@ -133,23 +133,22 @@
         .main-banner:hover {
             transform: translateY(-3px);
         }
-        /* ------------------------------------------- */
 
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: max(1.5dvh, 10px);
+            gap: 12px;
             width: 100%;
-            /* 核心修改：利用 42dvh 限制寬度，讓短螢幕下按鈕能等比例縮小，不再撐爆螢幕 */
-            max-width: min(320px, 42dvh);
-            margin-bottom: max(2dvh, 10px);
-            flex-shrink: 1;
+            max-width: 320px;
+            flex: 1; /* 佔據剩餘空間 */
+            align-content: center; /* 垂直居中選單 */
+            margin-bottom: 10px;
         }
 
         .main-btn {
             background: var(--glass);
             border: 1px solid rgba(188, 0, 45, 0.1);
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 1.1 / 1; /* 稍微扁平一點以符合手機螢幕 */
             border-radius: 20px;
             display: flex;
             flex-direction: column;
@@ -161,7 +160,7 @@
             text-decoration: none;
         }
 
-        .main-btn span { font-size: 2.2rem; }
+        .main-btn span { font-size: 2rem; }
         .main-btn small { font-size: 0.65rem; color: #999; margin-top: 5px; font-weight: bold; }
 
         .main-btn:hover {
@@ -376,7 +375,7 @@
             width: 8px; height: 8px;
             background-color: var(--primary-color);
             border-radius: 50%;
-            margin: max(1dvh, 8px) auto;
+            margin: 10px auto;
         }
 
         .scene-category-wrapper {
@@ -430,13 +429,7 @@
         }
         .scene-number { font-weight: bold; color: var(--primary-color); margin-right: 5px; }
 
-        footer { 
-            margin-top: auto; 
-            padding: max(1.5dvh, 10px) 20px; 
-            font-size: 0.75rem; 
-            color: #aaa; 
-            flex-shrink: 0; 
-        }
+        footer { padding: 10px 20px 20px 20px; font-size: 0.7rem; color: #aaa; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -518,10 +511,10 @@
     </div>
 
     <script>
+        // JS 部分邏輯保持不變，確保功能完整整合
         function launchCameraTranslate() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
-
             const iosUrl = "googletranslate://"; 
             const androidUrl = "intent://#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
 
@@ -532,10 +525,7 @@
             } else {
                 window.open("https://translate.google.com/", '_blank');
             }
-
-            setTimeout(() => {
-                switchLayer('menu-view');
-            }, 500);
+            setTimeout(() => { switchLayer('menu-view'); }, 500);
         }
 
         let recognition;
@@ -543,27 +533,13 @@
         let currentSceneType = '';
 
         const SCENE_CONFIG = {
-            dining: {
-                title: "🍱 DINING",
-                categories: { people: "人數", seating: "座位", time: "時間", food: "食物", checkout: "結帳" }
-            },
-            shopping: {
-                title: "🛍️ SHOPPING",
-                categories: { size: "呎吋", color: "顏色", price: "價錢", pay: "結帳", others: "其他" }
-            },
-            transport: {
-                title: "🚆 TRANSIT",
-                categories: { station: "車站", ticketing: "票務", time: "時間", walk: "步行", others: "其他" }
-            },
-            hotel: {
-                title: "🏨 HOTEL",
-                categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" }
-            }
+            dining: { title: "🍱 DINING", categories: { people: "人數", seating: "座位", time: "時間", food: "食物", checkout: "結帳" } },
+            shopping: { title: "🛍️ SHOPPING", categories: { size: "呎吋", color: "顏色", price: "價錢", pay: "結帳", others: "其他" } },
+            transport: { title: "🚆 TRANSIT", categories: { station: "車站", ticketing: "票務", time: "時間", walk: "步行", others: "其他" } },
+            hotel: { title: "🏨 HOTEL", categories: { checkin: "登記", luggage: "寄存", fee: "收費", inquiry: "詢問", others: "其他", emergency: "緊急" } }
         };
 
-        let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || {
-            dining: {}, shopping: {}, transport: {}, hotel: {}
-        };
+        let appData = JSON.parse(localStorage.getItem('japanGo_v2_data')) || { dining: {}, shopping: {}, transport: {}, hotel: {} };
 
         Object.keys(SCENE_CONFIG).forEach(scene => {
             Object.keys(SCENE_CONFIG[scene].categories).forEach(cat => {
@@ -598,16 +574,14 @@
 
         function switchLayer(id) {
             document.querySelectorAll('.interface-layer').forEach(el => el.style.display = 'none');
-            
             if (id === 'menu-view') {
                 document.getElementById('main-container').style.display = 'flex';
             } else {
                 document.getElementById('main-container').style.display = 'none';
                 const target = document.getElementById(id);
                 target.style.display = 'flex';
-                
-                if(id === 'voice-interface' || id === 'text-interface') {
-                    const chatID = id === 'voice-interface' ? 'voice-chat' : 'text-chat';
+                const chatID = id === 'voice-interface' ? 'voice-chat' : (id === 'text-interface' ? 'text-chat' : null);
+                if(chatID) {
                     const chatBox = document.getElementById(chatID);
                     if(chatBox.children.length === 0) {
                         let msg = id === 'voice-interface' ? "你好！長按麥克風開始說話。" : "請輸入你想翻譯的文字。";
@@ -621,7 +595,6 @@
             currentSceneType = type;
             const config = SCENE_CONFIG[type];
             document.getElementById('scene-category-title').innerText = config.title;
-            
             const select = document.getElementById('scene-category-select');
             select.innerHTML = '';
             Object.keys(config.categories).forEach(key => {
@@ -629,16 +602,12 @@
                 opt.value = key; opt.innerText = config.categories[key];
                 select.appendChild(opt);
             });
-
             const container = document.getElementById('scene-category-container');
             container.innerHTML = '';
             Object.keys(config.categories).forEach(key => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'scene-category-wrapper';
-                wrapper.innerHTML = `
-                    <div class="category-header" onclick="toggleCategoryUI(this, '${key}')">${config.categories[key]}</div>
-                    <div class="category-content" id="cat-box-${key}"></div>
-                `;
+                wrapper.innerHTML = `<div class="category-header" onclick="toggleCategoryUI(this, '${key}')">${config.categories[key]}</div><div class="category-content" id="cat-box-${key}"></div>`;
                 container.appendChild(wrapper);
                 renderCategoryItems(key);
             });
@@ -654,42 +623,24 @@
             const box = document.getElementById(`cat-box-${catId}`);
             box.innerHTML = '';
             const items = appData[currentSceneType][catId];
-
             items.forEach((item, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'chat-item-wrapper';
                 const del = document.createElement('div');
-                del.className = 'delete-btn-hidden';
-                del.innerText = 'DELETE';
-                del.onclick = () => {
-                    appData[currentSceneType][catId].splice(index, 1);
-                    saveData();
-                    renderCategoryItems(catId);
-                };
-
+                del.className = 'delete-btn-hidden'; del.innerText = 'DELETE';
+                del.onclick = () => { appData[currentSceneType][catId].splice(index, 1); saveData(); renderCategoryItems(catId); };
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble ai-bubble';
-                bubble.style.width = '100%';
-                bubble.style.maxWidth = '100%';
-                bubble.innerHTML = `
-                    <div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div>
-                    <strong class="translated-ja">${item.ja}</strong>
-                    <span class="speak-icon" onclick="playSpeech('${item.ja.replace(/'/g, "\\'")}')">🔊</span>
-                    <div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>
-                `;
-
+                bubble.style.width = '100%'; bubble.style.maxWidth = '100%';
+                bubble.innerHTML = `<div class="scene-origin-text"><span class="scene-number">${index + 1}.</span>${item.origin}</div><strong class="translated-ja">${item.ja}</strong><span class="speak-icon" onclick="playSpeech('${item.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${item.zh}<br>EN: ${item.en}</div>`;
                 let startX = 0;
                 wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
                 wrapper.addEventListener('touchend', (e) => {
                     let diff = startX - e.changedTouches[0].clientX;
-                    if (diff > 50) {
-                        box.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped'));
-                        wrapper.classList.add('swiped');
+                    if (diff > 50) { box.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
                     } else if (diff < -50) wrapper.classList.remove('swiped');
                 }, {passive: true});
-
-                wrapper.append(del, bubble);
-                box.appendChild(wrapper);
+                wrapper.append(del, bubble); box.appendChild(wrapper);
             });
         }
 
@@ -698,21 +649,15 @@
             const field = document.getElementById('scene-category-input-field');
             const text = field.value.trim();
             const catId = select.value;
-
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
-
             try {
                 const jaText = await translate(text, 'ja');
-                const [zh, en] = await Promise.all([
-                    translate(jaText, 'zh-TW', 'ja'),
-                    translate(jaText, 'en', 'ja')
-                ]);
+                const [zh, en] = await Promise.all([translate(jaText, 'zh-TW', 'ja'), translate(jaText, 'en', 'ja')]);
                 appData[currentSceneType][catId].push({ origin: text, ja: jaText, zh: zh, en: en });
                 saveData();
                 const box = document.getElementById(`cat-box-${catId}`);
-                box.classList.add('active');
-                box.previousElementSibling.classList.add('open');
+                box.classList.add('active'); box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
                 setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
                 playSpeech(jaText);
@@ -722,8 +667,7 @@
         function clearCurrentSceneData() {
             if(confirm(`確定要清除所有紀錄嗎？`)) {
                 Object.keys(SCENE_CONFIG[currentSceneType].categories).forEach(cat => appData[currentSceneType][cat] = []);
-                saveData();
-                switchScene(currentSceneType, ''); 
+                saveData(); switchScene(currentSceneType, ''); 
             }
         }
 
@@ -733,15 +677,13 @@
         const statusText = document.getElementById('status-text');
 
         function startRecordingUI() {
-            isRecording = true;
-            recordBtn.classList.add('recording');
+            isRecording = true; recordBtn.classList.add('recording');
             statusText.innerText = "LISTENING...";
             if (navigator.vibrate) navigator.vibrate(50);
         }
 
         function stopRecordingUI() {
-            isRecording = false;
-            recordBtn.classList.remove('recording');
+            isRecording = false; recordBtn.classList.remove('recording');
             statusText.innerText = "HOLD TO SPEAK";
         }
 
@@ -780,18 +722,13 @@
             if (isUser) bubble.innerText = text;
             else if (typeof text === 'string') bubble.innerText = text;
             else {
-                bubble.innerHTML = `
-                    <strong class="translated-ja">${data.ja}</strong>
-                    <span class="speak-icon" onclick="playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span>
-                    <div class="translation-sub">ZH: ${data.zh}<br>EN: ${data.en}</div>`;
+                bubble.innerHTML = `<strong class="translated-ja">${data.ja}</strong><span class="speak-icon" onclick="playSpeech('${data.ja.replace(/'/g, "\\'")}')">🔊</span><div class="translation-sub">ZH: ${data.zh}<br>EN: ${data.en}</div>`;
             }
             let startX = 0;
             wrapper.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {passive: true});
             wrapper.addEventListener('touchend', (e) => {
                 let diff = startX - e.changedTouches[0].clientX;
-                if (diff > 50) {
-                    chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped'));
-                    wrapper.classList.add('swiped');
+                if (diff > 50) { chatBox.querySelectorAll('.chat-item-wrapper').forEach(el => el.classList.remove('swiped')); wrapper.classList.add('swiped');
                 } else if (diff < -50) wrapper.classList.remove('swiped');
             }, {passive: true});
             wrapper.append(del, bubble); chatBox.appendChild(wrapper);
