@@ -405,6 +405,7 @@
         <main class="menu-grid" id="menu-view">
             <div class="main-btn" onclick="switchLayer('voice-interface')"><span>🗣️</span><small>VOICE</small></div>
             <div class="main-btn" onclick="switchLayer('text-interface')"><span>✍️</span><small>TEXT</small></div>
+            <div class="main-btn" onclick="launchCameraTranslate()"><span>📷</span><small>SCAN</small></div>
             <div class="main-btn" onclick="switchScene('dining', '🍱 DINING')"><span>🍱</span><small>DINING</small></div>
             <div class="main-btn" onclick="switchScene('shopping', '🛍️ SHOPPING')"><span>🛍️</span><small>SHOPPING</small></div>
             <div class="main-btn" onclick="switchScene('transport', '🚆 TRANSIT')"><span>🚆</span><small>TRANSIT</small></div>
@@ -460,6 +461,29 @@
     </div>
 
     <script>
+        // 修改點：新增喚醒 App 功能
+        function launchCameraTranslate() {
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+
+            // Google Translate 的深度連結協議
+            // iOS 使用 googletranslate://
+            // Android 使用特定 intent://
+            const iosUrl = "googletranslate://"; 
+            const androidUrl = "intent://#Intent;scheme=googletranslate;package=com.google.android.apps.translate;end";
+            const fallbackUrl = "https://translate.google.com/";
+
+            if (isiOS) {
+                window.location.href = iosUrl;
+                // 如果幾秒後沒反應，通常是因為沒裝 App，可以跳轉到網頁版
+                setTimeout(() => { window.location.href = fallbackUrl; }, 2000);
+            } else if (isAndroid) {
+                window.location.href = androidUrl;
+            } else {
+                window.open(fallbackUrl, '_blank');
+            }
+        }
+
         let recognition;
         let isRecording = false;
         let currentSceneType = '';
