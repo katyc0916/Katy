@@ -1,1 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart English Dictation Master | Pro Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0277bd;
+            --light-blue: #e3f2fd;
+            --accent-green: #66bb6a;
+            --text-dark: #263238;
+            --bg-gradient: linear-gradient(135deg, #f5fbf9 0%, #e3f2fd 100%);
+            --highlight-yellow: #fff59d;
+        }
 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px 15px 150px 15px;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-top: 12px solid var(--accent-green);
+            position: relative;
+        }
+
+        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
+
+        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        .page-content.active { display: block; }
+        .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--primary-blue); transform: translateY(-3px); }
+        .card i { font-size: 30px; display: block; margin-bottom: 10px; }
+
+        #ocrTextEditor, #scopeRawEditor {
+            width: 100%; height: 300px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
+            margin-top: 10px; resize: vertical; box-sizing: border-box;
+        }
+        .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; }
+
+        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+
+        .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
+        .file-upload-wrapper input[type="file"] { display: none; }
+        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        
+        .list-item-row { 
+            position: relative; 
+            overflow: hidden; 
+            background: #e53935; 
+            touch-action: pan-y;
+            border-bottom: 1px solid #eee;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .item-main-content {
+            background: white;
+            padding: 18px 12px;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .delete-btn-overlay {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .swiped-left .item-main-content {
+            transform: translateX(-80px);
+        }
+        
+        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .category-header { 
+            background: #f8f9fa; padding: 12px 15px; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid #eee;
+        }
+        .category-content { display: block; padding: 10px; background: #fff; }
+        .category-content.collapsed { display: none; }
+        .cat-count { background: var(--primary-blue); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
+        .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .cat-delete-btn:hover { background: #ef9a9a; color: white; }
+
+        .cloze-box { font-size: 1.2rem; background: #fafafa; padding: 25px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .status-msg { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
+
+        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; }
+        .tab-btn.active { background: var(--light-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
+
+        .vocab-row-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; }
+        .phonetic-line { display: flex; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
+        .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
+        .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
+        
+        .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+        .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
+        .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
+        
+        .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
+        .item-details.show { display: block; }
+        
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.4; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+
+        .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
+
+        mark.highlighter {
+            background-color: var(--highlight-yellow);
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Advanced Dictation Master</h1>
+
+        <div id="homePage" class="page-content active">
+            <div class="portal-grid">
+                <div class="card" onclick="switchPage('scan')"><i>📸</i><h3>Smart Scan</h3><p>Photo to Text</p></div>
+                <div class="card" onclick="switchPage('scope')"><i>📋</i><h3>Scope</h3><p>Manage List</p></div>
+                <div class="card" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
+                <div class="card" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
+            </div>
+        </div>
+
+        <div id="scanPage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <h2>Step 1: Layout-Aware Scan</h2>
+            <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
+                <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
+                <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text Content...</div>
+            </div>
+            <div id="editorSection" style="display:none; margin-top: 20px;">
+                <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
+                <textarea id="ocrTextEditor"></textarea>
+                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('ocrTextEditor')">➕ Add Selected</button>
+                        <button id="btnAddAllScan" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ Add All</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🧹 Clear All</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="btn-action" style="background:#4db6ac; width: 100%;" onclick="manuallySaveToRaw()">💾 Archive to Raw Texts</button>
+                        <span id="scanToast" class="toast-added">✓ Added</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scopePage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <h2>📋 Scope Management</h2>
+            <div class="tab-container">
+                <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Raw Texts</div>
+                <div id="btnDictTab" class="tab-btn" onclick="switchScopeTab('dictTab')">🎯 Dictation Scope</div>
+            </div>
+
+            <div id="rawTab" class="tab-content active">
+                <select id="rawTextSelect" class="raw-select" onchange="loadRawText()">
+                    <option value="">-- Select a saved scan --</option>
+                </select>
+                <textarea id="scopeRawEditor" style="display:none;"></textarea>
+                <div id="rawActions" style="margin-top:15px; display:none; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
+                        <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
+                        <button class="btn-action" style="background:#4db6ac; padding: 12px 15px;" onclick="saveRawChanges()">💾 Save Changes</button>
+                        <span id="rawToast" class="toast-added">✓ Added</span>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button class="btn-action" style="background: #e53935; padding: 10px 20px; font-size: 14px;" onclick="deleteCurrentRaw()">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dictTab" class="tab-content">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Vocab</button>
+                    <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Wipe All</button>
+                </div>
+                <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; margin-bottom: 15px;">
+                    💡 <b>Highlighter Tip:</b> Wrap word with <code>==</code> to highlight. <br>
+                    Example: <i>Take <b>==advantage==</b> of</i>
+                </div>
+                <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Tip: Tap headers to expand/collapse. Swipe left on items to delete.</div>
+                <div id="vocabList"></div>
+            </div>
+        </div>
+
+        <div id="dictationPage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div style="text-align:center">
+                <h3 id="dictProgress">0 / 0</h3>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn-action" onclick="speakTarget('en-GB')">🔊 UK</button>
+                    <button class="btn-action" onclick="speakTarget('en-US')" style="background:#455a64;">🔊 US</button>
+                </div>
+                <p id="dictHint" style="padding: 0 10px; min-height: 40px;"></p>
+                <input type="text" id="dictInput" placeholder="Enter spelling..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <br><br>
+                <button class="btn-action" onclick="checkDictation()" style="width:100%">Submit Answer</button>
+                <div id="dictResult" class="status-msg"></div>
+            </div>
+        </div>
+
+        <div id="clozePage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div style="text-align:center">
+                <h3 id="clozeProgress">0 / 0</h3>
+                <div id="clozeDisplay" class="cloze-box"></div>
+                <input type="text" id="clozeInput" placeholder="Correct form..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <br><br>
+                <button class="btn-action" onclick="checkCloze()" style="width:100%">Verify Form</button>
+                <div id="clozeResult" class="status-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vocabData = JSON.parse(localStorage.getItem('masterVocab')) || [];
+        let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
+        let currentIndex = 0;
+        let touchStartX = 0;
+
+        function stripMarkers(str) {
+            return str.replace(/==/g, '');
+        }
+
+        function formatDisplay(str) {
+            return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>');
+        }
+
+        function handleFileSelect(input) {
+            const fileLabel = document.getElementById('fileLabel');
+            if (input.files && input.files[0]) {
+                fileLabel.innerText = "📄 " + input.files[0].name;
+                processOCR(input.files[0]);
+            } else {
+                fileLabel.innerText = "📁 Click to Upload Image";
+            }
+        }
+
+        async function processOCR(file) {
+            const loader = document.getElementById('ocrLoading');
+            loader.style.display = 'block';
+
+            try {
+                const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
+                await worker.setParameters({
+                    preserve_interword_spaces: '1',
+                    tessedit_pageseg_mode: '3', 
+                });
+                const { data } = await worker.recognize(file);
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                await img.decode();
+                const midX = img.width / 2;
+                const leftBlocks = [];
+                const rightBlocks = [];
+                data.blocks.forEach(block => {
+                    const blockCenterX = (block.bbox.x0 + block.bbox.x1) / 2;
+                    if (blockCenterX < midX) { leftBlocks.push(block); } else { rightBlocks.push(block); }
+                });
+                const sortTopDown = (a, b) => a.bbox.y0 - b.bbox.y0;
+                leftBlocks.sort(sortTopDown);
+                rightBlocks.sort(sortTopDown);
+                const orderedText = [...leftBlocks, ...rightBlocks]
+                    .map(b => b.text.trim())
+                    .filter(t => t.length > 0)
+                    .join('\n\n');
+                await worker.terminate();
+                document.getElementById('ocrTextEditor').value = orderedText;
+                document.getElementById('editorSection').style.display = 'block';
+                loader.style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                alert("OCR Error: " + err.message);
+                loader.style.display = 'none';
+            }
+        }
+
+        const focusHandler = (e) => {
+            setTimeout(() => { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
+        };
+        document.getElementById('dictInput').addEventListener('focus', focusHandler);
+
+        function goHome() {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function switchPage(id) {
+            if ((id === 'dictation' || id === 'cloze') && vocabData.length === 0) {
+                alert("Please add items to Scope first!"); return;
+            }
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${id}Page`).classList.add('active');
+            if (id === 'scope') renderTable();
+            if (id === 'dictation' || id === 'cloze') startSession(id);
+            window.scrollTo(0,0);
+        }
+
+        function switchScopeTab(tabId) {
+            document.getElementById('btnRawTab').classList.remove('active');
+            document.getElementById('btnDictTab').classList.remove('active');
+            document.getElementById('rawTab').classList.remove('active');
+            document.getElementById('dictTab').classList.remove('active');
+            document.getElementById(tabId === 'rawTab' ? 'btnRawTab' : 'btnDictTab').classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'dictTab') renderTable();
+        }
+
+        async function fetchInfo(text) {
+            const cleanText = text.trim();
+            if (cleanText.includes('/')) {
+                const parts = cleanText.split('/').map(p => p.trim()).filter(p => p.length > 0);
+                const results = await Promise.all(parts.map(p => getSingleInfo(p)));
+                
+                return {
+                    word: cleanText,
+                    ukPhonetic: results.map(r => r.ukPhonetic).join(' / '),
+                    usPhonetic: results.map(r => r.usPhonetic).join(' / '),
+                    enDef: results.map((r, i) => `(${i+1}) ${r.enDef}`).join(' | '),
+                    zh: results.map(r => r.zh).join(' / '),
+                    category: "General"
+                };
+            } else {
+                return await getSingleInfo(cleanText);
+            }
+        }
+
+        async function getSingleInfo(cleanText) {
+            const isPhrase = cleanText.includes(' ');
+            const result = { word: cleanText, ukPhonetic: "/.../", usPhonetic: "/.../", enDef: "Searching definition...", zh: "Translating...", category: "General" };
+            
+            try {
+                const searchTxt = stripMarkers(cleanText.toLowerCase());
+                
+                const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(searchTxt)}`);
+                const dictData = await dictRes.json();
+                
+                if (Array.isArray(dictData)) {
+                    const entry = dictData[0];
+                    if (entry.phonetics) {
+                        const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk'));
+                        const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us'));
+                        result.ukPhonetic = uk ? uk.text : (entry.phonetic || "/.../");
+                        result.usPhonetic = us ? us.text : (entry.phonetic || "/.../");
+                    }
+                    if (entry.meanings && entry.meanings[0]) {
+                        result.enDef = entry.meanings[0].definitions[0].definition;
+                    }
+                } else if (isPhrase) {
+                    result.enDef = "Idiomatic expression / Phrase.";
+                    result.ukPhonetic = "N/A";
+                    result.usPhonetic = "N/A";
+                }
+
+                const transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(stripMarkers(cleanText))}&langpair=en|zh-HK`);
+                const transData = await transRes.json();
+                let translated = transData.responseData.translatedText;
+
+                // --- 專業翻譯修正區 (Expert Correction Layer) ---
+                const expertCorrections = {
+                    "my": "我的 (所有格)",
+                    "me": "我 (受格)",
+                    "seek": "尋找；尋求；請求",
+                    "some": "一些；一點點",
+                    "follow": "跟隨；遵循 (建議或規章)",
+                    "give": "給予；提供；贈送",
+                    "take": "拿取；採取；接受",
+                    "advice": "建議；忠告",
+                    "disregard": "忽視；不理會",
+                    "take advantage of": "利用；善用"
+                };
+
+                const lowText = stripMarkers(cleanText).toLowerCase();
+                if (expertCorrections[lowText]) {
+                    translated = expertCorrections[lowText];
+                    // 同時修正被 API 誤導的定義
+                    if (lowText === "my") result.enDef = "Belonging to or associated with the speaker.";
+                    if (lowText === "seek") result.enDef = "Attempt to find or substitute; ask for something.";
+                }
+
+                result.zh = translated;
+                
+            } catch (e) { 
+                result.enDef = "Service busy."; 
+                result.zh = "翻譯逾時";
+            }
+            return result;
+        }
+
+        async function extractTextToDictation(areaId) {
+            const area = document.getElementById(areaId);
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            if (!selectedText) { alert("Please highlight text first!"); return; }
+            const cat = prompt("Assign a category for this selection:", "General") || "General";
+            const info = await fetchInfo(selectedText);
+            info.category = cat;
+            vocabData.push(info);
+            saveData();
+            const toastId = areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast';
+            const toast = document.getElementById(toastId);
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+        }
+
+        async function addAllToDictation(areaId) {
+            const area = document.getElementById(areaId);
+            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length === 0) { alert("No valid text found in editor!"); return; }
+            const cat = prompt("Assign a category for these items:", "General") || "General";
+
+            const btnId = areaId === 'ocrTextEditor' ? 'btnAddAllScan' : 'btnAddAllRaw';
+            const btn = document.getElementById(btnId);
+            const originalText = btn.innerText;
+            btn.innerText = "•••"; 
+            btn.disabled = true;
+
+            try {
+                for (const line of lines) {
+                    const info = await fetchInfo(line);
+                    info.category = cat;
+                    vocabData.push(info);
+                }
+                saveData();
+                const toastId = areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast';
+                const toast = document.getElementById(toastId);
+                toast.innerText = "✓ Batch Added";
+                toast.style.opacity = '1';
+                setTimeout(() => { 
+                    toast.style.opacity = '0'; 
+                    toast.innerText = "✓ Added";
+                }, 2000);
+            } catch (err) {
+                alert("Error during batch processing.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function addNewManualVocab() {
+            const word = prompt("Enter English Word/Phrase (Use ==word== to highlight):");
+            if (!word) return;
+            const cat = prompt("Enter Category:", "General") || "General";
+            const info = await fetchInfo(word);
+            const zh = prompt("Enter Translation:", info.zh);
+            const def = prompt("Enter English Definition:", info.enDef);
+            vocabData.push({ word, zh, enDef: def, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
+            saveData();
+        }
+
+        function renderTable() {
+            const list = document.getElementById('vocabList');
+            if (vocabData.length === 0) { list.innerHTML = ""; return; }
+
+            const groups = vocabData.reduce((acc, item, index) => {
+                const cat = item.category || "Uncategorized";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push({ ...item, originalIndex: index });
+                return acc;
+            }, {});
+
+            list.innerHTML = Object.keys(groups).map(catName => `
+                <div class="category-group">
+                    <div class="category-header" onclick="toggleCategory('${catName}')">
+                        <div style="display: flex; align-items: center;">
+                            <span>📁 ${catName}</span>
+                            <span class="cat-count" style="margin-left: 10px;">${groups[catName].length}</span>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCategory('${catName}')">🗑️ Delete Group</button>
+                        </div>
+                    </div>
+                    <div id="cat-content-${catName}" class="category-content">
+                        ${groups[catName].map(item => `
+                            <div class="list-item-row" id="row-${item.originalIndex}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${item.originalIndex})" ontouchend="handleTouchEnd(event, ${item.originalIndex})">
+                                <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
+                                <div class="item-main-content">
+                                    <div class="vocab-row-header">
+                                        <span class="vocab-target">${formatDisplay(item.word)}</span>
+                                        <span class="vocab-zh">${item.zh}</span>
+                                        <div class="header-actions">
+                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
+                                            <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎ Edit</button>
+                                        </div>
+                                    </div>
+                                    <div id="details-${item.originalIndex}" class="item-details">
+                                        <div class="phonetic-line">
+                                            <div class="phonetic-item">
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-GB')">UK</button>
+                                                <span>${item.ukPhonetic}</span>
+                                            </div>
+                                            <div class="phonetic-item">
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-US')">US</button>
+                                                <span>${item.usPhonetic}</span>
+                                            </div>
+                                        </div>
+                                        <div class="definition-en-line">${item.enDef}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleCategory(catName) {
+            const content = document.getElementById(`cat-content-${catName}`);
+            content.classList.toggle('collapsed');
+        }
+
+        function deleteCategory(catName) {
+            if(confirm(`Permanently delete the group "${catName}" and all its contents?`)) {
+                vocabData = vocabData.filter(item => item.category !== catName);
+                saveData();
+            }
+        }
+
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+
+        function editVocab(index) {
+            const item = vocabData[index];
+            const w = prompt("Word (Use ==word== to highlight):", item.word); if(!w) return;
+            const z = prompt("Translation:", item.zh);
+            const d = prompt("Definition:", item.enDef);
+            const c = prompt("Category:", item.category || "General");
+            vocabData[index].word = w; 
+            vocabData[index].zh = z; 
+            vocabData[index].enDef = d;
+            vocabData[index].category = c;
+            saveData();
+        }
+
+        function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleTouchMove(e, index) {
+            let moveX = e.touches[0].clientX;
+            let diff = touchStartX - moveX;
+            let row = document.getElementById(`row-${index}`);
+            if (!row) return;
+            if (diff > 20 && diff < 100) { 
+                row.classList.add('swiped-left');
+            } else if (diff < -20) { 
+                row.classList.remove('swiped-left');
+            }
+        }
+        function handleTouchEnd(e, index) {
+            let touchEndX = e.changedTouches[0].clientX;
+            let row = document.getElementById(`row-${index}`);
+            if (!row) return;
+            if (touchStartX - touchEndX < 40) {
+                row.classList.remove('swiped-left');
+            }
+        }
+
+        function speakFromList(word, lang) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+        }
+
+        function deleteItem(i) {
+            if(confirm(`Remove "${stripMarkers(vocabData[i].word)}" from list?`)) {
+                vocabData.splice(i, 1);
+                saveData();
+            } else {
+                const row = document.getElementById(`row-${i}`);
+                if(row) row.classList.remove('swiped-left');
+            }
+        }
+
+        function clearAllVocab() { if(confirm("Are you sure you want to WIPE the entire list?")) { vocabData = []; saveData(); } }
+        function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
+        function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
+
+        function saveRawChanges() {
+            const id = document.getElementById('rawTextSelect').value;
+            const index = rawTextData.findIndex(r => r.id == id);
+            if (index !== -1) {
+                rawTextData[index].text = document.getElementById('scopeRawEditor').value;
+                saveRawData();
+                const toast = document.getElementById('rawToast');
+                toast.innerText = "✓ Changes Saved"; toast.style.opacity = '1';
+                setTimeout(() => { toast.style.opacity = '0'; toast.innerText = "✓ Added"; }, 1500);
+            }
+        }
+
+        function renderRawDropdown() {
+            const select = document.getElementById('rawTextSelect');
+            if(!select) return;
+            select.innerHTML = `<option value="">-- Select a saved scan --</option>` + 
+                rawTextData.map(item => `<option value="${item.id}">${item.date}</option>`).join('');
+        }
+
+        function loadRawText() {
+            const select = document.getElementById('rawTextSelect');
+            const item = rawTextData.find(r => r.id == select.value);
+            const editor = document.getElementById('scopeRawEditor');
+            const actions = document.getElementById('rawActions');
+            if (item) { 
+                editor.value = item.text; 
+                editor.style.display = 'block'; 
+                actions.style.display = 'flex'; 
+            }
+            else { 
+                editor.style.display = 'none'; 
+                actions.style.display = 'none'; 
+            }
+        }
+
+        function startSession(id) { currentIndex = 0; loadTask(id); }
+        function loadTask(id) {
+            const item = vocabData[currentIndex];
+            if (id === 'dictation') {
+                document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${vocabData.length}`;
+                document.getElementById('dictHint').innerHTML = `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b> ${item.zh}`;
+                document.getElementById('dictInput').value = "";
+            }
+        }
+
+        function checkDictation() {
+            const input = document.getElementById('dictInput').value.trim().toLowerCase();
+            const correct = stripMarkers(vocabData[currentIndex].word).toLowerCase();
+            const res = document.getElementById('dictResult');
+            if (input === correct) {
+                res.innerText = "Correct! ✨"; res.style.color = "green";
+                setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation');}, 1000);
+            } else {
+                res.innerText = `Incorrect. Correct spelling: "${stripMarkers(vocabData[currentIndex].word)}"`; res.style.color = "red";
+            }
+        }
+
+        function speakTarget(lang) {
+            const targetText = stripMarkers(vocabData[currentIndex].word);
+            const utterance = new SpeechSynthesisUtterance(targetText);
+            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+        }
+
+        function manuallySaveToRaw() {
+            const content = document.getElementById('ocrTextEditor').value.trim();
+            if(!content) { alert("Editor is empty!"); return; }
+            
+            rawTextData.push({ 
+                id: Date.now(), 
+                date: new Date().toLocaleString() + " (Scan)", 
+                text: content 
+            });
+            saveRawData();
+            
+            const toast = document.getElementById('scanToast');
+            toast.innerText = "✓ Archived to Scope";
+            toast.style.opacity = '1';
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                toast.innerText = "✓ Added";
+            }, 2000);
+        }
+
+        function clearEditor() { 
+            if(confirm("Discard current scan text?")) {
+                document.getElementById('ocrTextEditor').value = ""; 
+                document.getElementById('editorSection').style.display = 'none'; 
+                document.getElementById('fileLabel').innerText = "📁 Click to Upload Image";
+            }
+        }
+        function deleteCurrentRaw() {
+            const id = document.getElementById('rawTextSelect').value;
+            if(confirm("Permanently delete this archived scan?")) {
+                rawTextData = rawTextData.filter(r => r.id != id);
+                saveRawData(); 
+                loadRawText();
+            }
+        }
+        window.onload = () => { renderTable(); renderRawDropdown(); };
+    </script>
+</body>
+</html>
