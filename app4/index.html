@@ -401,7 +401,7 @@
                         result.enDef = entry.meanings[0].definitions[0].definition;
                     }
                 } else if (isPhrase) {
-                    result.enDef = "Idiomatic expression / Phrase.";
+                    result.enDef = "Idiomatic expression / Phrase / Sentence.";
                     result.ukPhonetic = "N/A";
                     result.usPhonetic = "N/A";
                 }
@@ -410,7 +410,6 @@
                 const transData = await transRes.json();
                 let translated = transData.responseData.translatedText;
 
-                // --- 專業翻譯修正區 (Expert Correction Layer) ---
                 const expertCorrections = {
                     "my": "我的 (所有格)",
                     "me": "我 (受格)",
@@ -427,7 +426,6 @@
                 const lowText = stripMarkers(cleanText).toLowerCase();
                 if (expertCorrections[lowText]) {
                     translated = expertCorrections[lowText];
-                    // 同時修正被 API 誤導的定義
                     if (lowText === "my") result.enDef = "Belonging to or associated with the speaker.";
                     if (lowText === "seek") result.enDef = "Attempt to find or substitute; ask for something.";
                 }
@@ -492,7 +490,7 @@
         }
 
         async function addNewManualVocab() {
-            const word = prompt("Enter English Word/Phrase (Use ==word== to highlight):");
+            const word = prompt("Enter English Word/Phrase/Sentence (Use ==word== to highlight):");
             if (!word) return;
             const cat = prompt("Enter Category:", "General") || "General";
             const info = await fetchInfo(word);
@@ -540,11 +538,11 @@
                                     <div id="details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
                                             <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-GB')">UK</button>
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-GB')">UK 🔊</button>
                                                 <span>${item.ukPhonetic}</span>
                                             </div>
                                             <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-US')">US</button>
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-US')">US 🔊</button>
                                                 <span>${item.usPhonetic}</span>
                                             </div>
                                         </div>
@@ -577,7 +575,7 @@
 
         function editVocab(index) {
             const item = vocabData[index];
-            const w = prompt("Word (Use ==word== to highlight):", item.word); if(!w) return;
+            const w = prompt("Word/Phrase/Sentence (Use ==word== to highlight):", item.word); if(!w) return;
             const z = prompt("Translation:", item.zh);
             const d = prompt("Definition:", item.enDef);
             const c = prompt("Category:", item.category || "General");
@@ -609,9 +607,22 @@
             }
         }
 
-        function speakFromList(word, lang) {
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+        /**
+         * 專業修改：優化後的發音功能
+         * 自動偵測輸入內容長度，調整語速以適應短句
+         */
+        function speakFromList(text, lang) {
+            window.speechSynthesis.cancel(); // 先停止當前所有發音
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            
+            // 如果是句子（包含空格且長度較長），稍微調慢語速，讓發音更清晰
+            if (text.trim().split(/\s+/).length > 3) {
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+            }
+            
+            window.speechSynthesis.speak(utterance);
         }
 
         function deleteItem(i) {
@@ -677,18 +688,22 @@
             const input = document.getElementById('dictInput').value.trim().toLowerCase();
             const correct = stripMarkers(vocabData[currentIndex].word).toLowerCase();
             const res = document.getElementById('dictResult');
-            if (input === correct) {
+            
+            // 移除標點符號進行比較，對句子聽寫更友好
+            const cleanInput = input.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+            const cleanCorrect = correct.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+
+            if (cleanInput === cleanCorrect) {
                 res.innerText = "Correct! ✨"; res.style.color = "green";
                 setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation');}, 1000);
             } else {
-                res.innerText = `Incorrect. Correct spelling: "${stripMarkers(vocabData[currentIndex].word)}"`; res.style.color = "red";
+                res.innerText = `Incorrect. Correct: "${stripMarkers(vocabData[currentIndex].word)}"`; res.style.color = "red";
             }
         }
 
         function speakTarget(lang) {
             const targetText = stripMarkers(vocabData[currentIndex].word);
-            const utterance = new SpeechSynthesisUtterance(targetText);
-            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+            speakFromList(targetText, lang);
         }
 
         function manuallySaveToRaw() {
