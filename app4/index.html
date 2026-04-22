@@ -43,7 +43,7 @@
 
         .page-content { display: none; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-        .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+        .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; dummy: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
@@ -279,6 +279,20 @@
             return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>');
         }
 
+        // 輔助函式：判斷是否包含中文字
+        function hasChinese(text) {
+            return /[\u4e00-\u9fa5]/.test(text);
+        }
+
+        // 輔助函式：清洗發音文本（去除標籤和詞性標記）
+        function cleanSpeechText(text) {
+            return text.replace(/==/g, '')
+                       .replace(/⟪.*?⟫/g, '')
+                       .replace(/\[.*?\]/g, '')
+                       .replace(/❖.*/g, '')
+                       .trim();
+        }
+
         function handleFileSelect(input) {
             const fileLabel = document.getElementById('fileLabel');
             if (input.files && input.files[0]) {
@@ -361,93 +375,114 @@
         }
 
         async function fetchInfo(text) {
-            const cleanText = text.trim();
-            if (cleanText.includes('/')) {
-                const parts = cleanText.split('/').map(p => p.trim()).filter(p => p.length > 0);
-                const results = await Promise.all(parts.map(p => getSingleInfo(p)));
-                
-                return {
-                    word: cleanText,
-                    ukPhonetic: results.map(r => r.ukPhonetic).join(' / '),
-                    usPhonetic: results.map(r => r.usPhonetic).join(' / '),
-                    enDef: results.map((r, i) => `(${i+1}) ${r.enDef}`).join(' | '),
-                    zh: results.map(r => r.zh).join(' / '),
-                    category: "General"
-                };
-            } else {
-                return await getSingleInfo(cleanText);
-            }
-        }
+            const cleanText = stripMarkers(text.trim());
+            const isChinese = hasChinese(cleanText);
+            const targetLang = isChinese ? 'en' : 'zh-TW';
 
-        async function getSingleInfo(cleanText) {
-            const isPhrase = cleanText.includes(' ');
-            const result = { word: cleanText, ukPhonetic: "/.../", usPhonetic: "/.../", enDef: "Searching definition...", zh: "Translating...", category: "General" };
+            const result = { 
+                word: text, 
+                ukPhonetic: "/.../", 
+                usPhonetic: "/.../", 
+                enDef: "Fetching definition...", 
+                zh: "Translating...", 
+                category: "General" 
+            };
             
             try {
-                const searchTxt = stripMarkers(cleanText.toLowerCase());
+                const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&dt=bd&dt=ex&dt=md&dt=ss&dt=rw&q=${encodeURIComponent(cleanText)}`;
+                const transResponse = await fetch(transUrl);
+                const data = await transResponse.json();
                 
-                const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(searchTxt)}`);
-                const dictData = await dictRes.json();
-                
-                if (Array.isArray(dictData)) {
+                if (!data) return result;
+
+                let primaryTranslation = "";
+                if (data[0] && data[0].length > 0) {
+                    primaryTranslation = data[0].map(x => x[0]).join('').trim();
+                }
+
+                const lookupStr = isChinese ? primaryTranslation : cleanText;
+                const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 2; 
+
+                let richZh = primaryTranslation;
+                let extraDefs = [];
+                let examples = [];
+
+                if (data[1]) {
+                    const alternatives = data[1].map(pos => {
+                        const posName = pos[0];
+                        const words = pos[1].slice(0, 5).join(', '); 
+                        return `[${posName}] ${words}`;
+                    }).join(' | ');
+                    if (alternatives) richZh += ` ⟪ ${alternatives} ⟫`;
+                }
+
+                if (data[12]) {
+                    data[12].forEach(pos => {
+                        const posName = pos[0];
+                        if (pos[1]) {
+                            pos[1].slice(0, 3).forEach(d => {
+                                extraDefs.push(`[${posName}] ${d[0]}`);
+                            });
+                        }
+                    });
+                }
+
+                if (data[13] && data[13][0]) {
+                    examples = data[13][0].slice(0, 3).map(ex => `✎ e.g., "${ex[0].replace(/<b>/g, '').replace(/<\/b>/g, '')}"`);
+                }
+
+                let dictData = null;
+                if (!isPhraseOrSentence) {
+                    const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
+                    try {
+                        const dictUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanLookup)}`;
+                        const dictRes = await fetch(dictUrl);
+                        if (dictRes.ok) dictData = await dictRes.json();
+                    } catch(e) { console.warn("Dict API connection issues."); }
+                }
+
+                result.zh = richZh || "Translation failure";
+                let combinedDefs = [];
+
+                if (dictData && Array.isArray(dictData)) {
                     const entry = dictData[0];
                     if (entry.phonetics) {
-                        const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk'));
-                        const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us'));
-                        result.ukPhonetic = uk ? uk.text : (entry.phonetic || "/.../");
-                        result.usPhonetic = us ? us.text : (entry.phonetic || "/.../");
+                        const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk')) || entry.phonetics.find(p => p.text && p.text.includes('UK'));
+                        const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us')) || entry.phonetics.find(p => p.text && p.text.includes('US'));
+                        result.ukPhonetic = (uk && uk.text) ? uk.text : (entry.phonetic || "/.../");
+                        result.usPhonetic = (us && us.text) ? us.text : (entry.phonetic || "/.../");
                     }
-                    if (entry.meanings && entry.meanings[0]) {
-                        result.enDef = entry.meanings[0].definitions[0].definition;
+                    
+                    if (entry.meanings) {
+                        entry.meanings.slice(0, 3).forEach(m => {
+                            const firstDef = m.definitions[0];
+                            let defStr = `[${m.partOfSpeech}] ${firstDef.definition}`;
+                            if (firstDef.example) defStr += ` ✎ e.g., "${firstDef.example}"`;
+                            combinedDefs.push(defStr);
+                        });
                     }
-                } else if (isPhrase) {
-                    result.enDef = "Idiomatic expression / Phrase / Sentence.";
-                    result.ukPhonetic = "N/A";
-                    result.usPhonetic = "N/A";
                 }
 
-                const transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(stripMarkers(cleanText))}&langpair=en|zh-HK`);
-                const transData = await transRes.json();
-                let translated = transData.responseData.translatedText;
-
-                // 專業版：擴充內建慣用語及專業詞彙庫 (Simulating Erudite app dictionary features)
-                const professionalDictionary = {
-                    "my": { zh: "我的 (所有格)", en: "Belonging to or associated with the speaker." },
-                    "me": { zh: "我 (受格)", en: "Used by a speaker to refer to himself or herself as the object of a verb or preposition." },
-                    "seek": { zh: "尋找；尋求；請求", en: "Attempt to find or substitute; ask for something." },
-                    "some": { zh: "一些；一點點", en: "An unspecified amount or number of." },
-                    "follow": { zh: "跟隨；遵循 (建議或規章)", en: "To move behind someone or something and go where they go; to act according to an instruction or precept." },
-                    "give": { zh: "給予；提供；贈送", en: "Freely transfer the possession of (something) to (someone); hand over to." },
-                    "take": { zh: "拿取；採取；接受", en: "Lay hold of (something) with one's hands; reach for and hold." },
-                    "advice": { zh: "建議；忠告", en: "Guidance or recommendations offered with regard to prudent future action." },
-                    "disregard": { zh: "忽視；不理會", en: "Pay no attention to; ignore." },
-                    "take advantage of": { zh: "利用；善用", en: "To make good use of the opportunities offered by (something)." },
-                    "talk the talk": { zh: "說得頭頭是道", en: "To speak confidently or boastfully about something." },
-                    "walk the walk": { zh: "付諸行動", en: "To actually do the things one boasts about or promises." },
-                    "talk the talk walk the walk": { zh: "說到做到", en: "To back up one's words with actions; to act in a way that matches one's statements." },
-                    "talk the talk, walk the walk": { zh: "說到做到", en: "To back up one's words with actions; to act in a way that matches one's statements." },
-                    "piece of cake": { zh: "輕而易舉的事", en: "Something easily achieved." },
-                    "under the weather": { zh: "身體不適", en: "Slightly unwell or in low spirits." },
-                    "bite the bullet": { zh: "咬緊牙關；硬著頭皮", en: "To decide to do something difficult or unpleasant that one has been putting off hesitating over." }
-                };
-
-                const lowText = stripMarkers(cleanText).toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim(); // 清理標點符號以提高配對率
+                if (combinedDefs.length > 0) {
+                    result.enDef = combinedDefs.join(' ❖ ');
+                    const missingEx = examples.filter(ex => !result.enDef.includes(ex));
+                    if (missingEx.length > 0) result.enDef += ' ❖ ' + missingEx.join(' ❖ ');
+                } else if (extraDefs.length > 0) {
+                    result.enDef = extraDefs.join(' ❖ ');
+                    if (examples.length > 0) result.enDef += ' ❖ ' + examples.join(' ❖ ');
+                } else {
+                    result.enDef = isPhraseOrSentence ? "❖ Context-aware sentence analysis complete." : "Standard definition provided by primary engine.";
+                    if (examples.length > 0) result.enDef += ' ❖ ' + examples.join(' ❖ ');
+                }
                 
-                // 套用專業字典覆寫，提升準確度
-                if (professionalDictionary[lowText]) {
-                    translated = professionalDictionary[lowText].zh;
-                    result.enDef = professionalDictionary[lowText].en;
-                    if (isPhrase && result.ukPhonetic === "N/A") {
-                        result.ukPhonetic = "/ Phrase /";
-                        result.usPhonetic = "/ Phrase /";
-                    }
+                if (isChinese && result.ukPhonetic === "/.../") {
+                    result.ukPhonetic = "N/A"; result.usPhonetic = "N/A";
                 }
-
-                result.zh = translated;
                 
             } catch (e) { 
-                result.enDef = "Service busy."; 
-                result.zh = "翻譯逾時";
+                console.error("Master Translation Error:", e);
+                result.zh = "Service unavailable.";
+                result.enDef = "Check connection."; 
             }
             return result;
         }
@@ -458,6 +493,7 @@
             if (!selectedText) { alert("Please highlight text first!"); return; }
             const cat = prompt("Assign a category for this selection:", "General") || "General";
             const info = await fetchInfo(selectedText);
+            info.word = selectedText;
             info.category = cat;
             vocabData.push(info);
             saveData();
@@ -482,6 +518,7 @@
             try {
                 for (const line of lines) {
                     const info = await fetchInfo(line);
+                    info.word = line;
                     info.category = cat;
                     vocabData.push(info);
                 }
@@ -503,7 +540,7 @@
         }
 
         async function addNewManualVocab() {
-            const word = prompt("Enter English Word/Phrase/Sentence (Use ==word== to highlight):");
+            const word = prompt("Enter English Word/Phrase (Use ==word== to highlight):");
             if (!word) return;
             const cat = prompt("Enter Category:", "General") || "General";
             const info = await fetchInfo(word);
@@ -536,7 +573,12 @@
                         </div>
                     </div>
                     <div id="cat-content-${catName}" class="category-content">
-                        ${groups[catName].map(item => `
+                        ${groups[catName].map(item => {
+                            // 核心：判斷發音目標（如果是中文輸入，則發音翻譯後的英文結果）
+                            const speechTarget = hasChinese(item.word) ? item.zh : item.word;
+                            const cleanSpeech = cleanSpeechText(speechTarget);
+
+                            return `
                             <div class="list-item-row" id="row-${item.originalIndex}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${item.originalIndex})" ontouchend="handleTouchEnd(event, ${item.originalIndex})">
                                 <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
@@ -551,11 +593,11 @@
                                     <div id="details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
                                             <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-GB')">UK 🔊</button>
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
                                                 <span>${item.ukPhonetic}</span>
                                             </div>
                                             <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${stripMarkers(item.word)}', 'en-US')">US 🔊</button>
+                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
                                                 <span>${item.usPhonetic}</span>
                                             </div>
                                         </div>
@@ -563,7 +605,7 @@
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 </div>
             `).join('');
@@ -588,14 +630,11 @@
 
         function editVocab(index) {
             const item = vocabData[index];
-            const w = prompt("Word/Phrase/Sentence (Use ==word== to highlight):", item.word); if(!w) return;
+            const w = prompt("Word:", item.word); if(!w) return;
             const z = prompt("Translation:", item.zh);
             const d = prompt("Definition:", item.enDef);
             const c = prompt("Category:", item.category || "General");
-            vocabData[index].word = w; 
-            vocabData[index].zh = z; 
-            vocabData[index].enDef = d;
-            vocabData[index].category = c;
+            vocabData[index].word = w; vocabData[index].zh = z; vocabData[index].enDef = d; vocabData[index].category = c;
             saveData();
         }
 
@@ -605,50 +644,31 @@
             let diff = touchStartX - moveX;
             let row = document.getElementById(`row-${index}`);
             if (!row) return;
-            if (diff > 20 && diff < 100) { 
-                row.classList.add('swiped-left');
-            } else if (diff < -20) { 
-                row.classList.remove('swiped-left');
-            }
+            if (diff > 20 && diff < 100) { row.classList.add('swiped-left'); } 
+            else if (diff < -20) { row.classList.remove('swiped-left'); }
         }
         function handleTouchEnd(e, index) {
             let touchEndX = e.changedTouches[0].clientX;
             let row = document.getElementById(`row-${index}`);
             if (!row) return;
-            if (touchStartX - touchEndX < 40) {
-                row.classList.remove('swiped-left');
-            }
+            if (touchStartX - touchEndX < 40) { row.classList.remove('swiped-left'); }
         }
 
-        /**
-         * 專業修改：優化後的發音功能
-         * 自動偵測輸入內容長度，調整語速以適應短句
-         */
-        function speakFromList(text, lang) {
-            window.speechSynthesis.cancel(); // 先停止當前所有發音
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            
-            // 如果是句子（包含空格且長度較長），稍微調慢語速，讓發音更清晰
-            if (text.trim().split(/\s+/).length > 3) {
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-            }
-            
-            window.speechSynthesis.speak(utterance);
+        function speakFromList(word, lang) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = lang; window.speechSynthesis.speak(utterance);
         }
 
         function deleteItem(i) {
             if(confirm(`Remove "${stripMarkers(vocabData[i].word)}" from list?`)) {
-                vocabData.splice(i, 1);
-                saveData();
+                vocabData.splice(i, 1); saveData();
             } else {
                 const row = document.getElementById(`row-${i}`);
                 if(row) row.classList.remove('swiped-left');
             }
         }
 
-        function clearAllVocab() { if(confirm("Are you sure you want to WIPE the entire list?")) { vocabData = []; saveData(); } }
+        function clearAllVocab() { if(confirm("Wipe the entire list?")) { vocabData = []; saveData(); } }
         function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
         function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
 
@@ -676,15 +696,8 @@
             const item = rawTextData.find(r => r.id == select.value);
             const editor = document.getElementById('scopeRawEditor');
             const actions = document.getElementById('rawActions');
-            if (item) { 
-                editor.value = item.text; 
-                editor.style.display = 'block'; 
-                actions.style.display = 'flex'; 
-            }
-            else { 
-                editor.style.display = 'none'; 
-                actions.style.display = 'none'; 
-            }
+            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; }
+            else { editor.style.display = 'none'; actions.style.display = 'none'; }
         }
 
         function startSession(id) { currentIndex = 0; loadTask(id); }
@@ -698,49 +711,48 @@
         }
 
         function checkDictation() {
+            const item = vocabData[currentIndex];
             const input = document.getElementById('dictInput').value.trim().toLowerCase();
-            const correct = stripMarkers(vocabData[currentIndex].word).toLowerCase();
-            const res = document.getElementById('dictResult');
             
-            // 移除標點符號進行比較，對句子聽寫更友好
-            const cleanInput = input.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-            const cleanCorrect = correct.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-
-            if (cleanInput === cleanCorrect) {
+            // 判斷正確答案：如果原始詞是中文，答案應該是翻譯後的英文單詞的第一部分（去除詞性）
+            let correct;
+            if (hasChinese(item.word)) {
+                correct = cleanSpeechText(item.zh).split(' ')[0].toLowerCase();
+            } else {
+                correct = stripMarkers(item.word).toLowerCase();
+            }
+            
+            const res = document.getElementById('dictResult');
+            if (input === correct) {
                 res.innerText = "Correct! ✨"; res.style.color = "green";
                 setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation');}, 1000);
             } else {
-                res.innerText = `Incorrect. Correct: "${stripMarkers(vocabData[currentIndex].word)}"`; res.style.color = "red";
+                res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
             }
         }
 
         function speakTarget(lang) {
-            const targetText = stripMarkers(vocabData[currentIndex].word);
-            speakFromList(targetText, lang);
+            const item = vocabData[currentIndex];
+            // 聽寫模式下同樣判斷：中文輸入則發音英文翻譯結果
+            const targetText = hasChinese(item.word) ? item.zh : item.word;
+            const cleanText = cleanSpeechText(targetText);
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = lang; window.speechSynthesis.speak(utterance);
         }
 
         function manuallySaveToRaw() {
             const content = document.getElementById('ocrTextEditor').value.trim();
-            if(!content) { alert("Editor is empty!"); return; }
-            
-            rawTextData.push({ 
-                id: Date.now(), 
-                date: new Date().toLocaleString() + " (Scan)", 
-                text: content 
-            });
+            if(!content) { alert("Editor empty!"); return; }
+            rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content });
             saveRawData();
-            
             const toast = document.getElementById('scanToast');
-            toast.innerText = "✓ Archived to Scope";
-            toast.style.opacity = '1';
-            setTimeout(() => { 
-                toast.style.opacity = '0'; 
-                toast.innerText = "✓ Added";
-            }, 2000);
+            toast.innerText = "✓ Archived to Scope"; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; toast.innerText = "✓ Added"; }, 2000);
         }
 
         function clearEditor() { 
-            if(confirm("Discard current scan text?")) {
+            if(confirm("Discard current scan?")) {
                 document.getElementById('ocrTextEditor').value = ""; 
                 document.getElementById('editorSection').style.display = 'none'; 
                 document.getElementById('fileLabel').innerText = "📁 Click to Upload Image";
@@ -748,10 +760,9 @@
         }
         function deleteCurrentRaw() {
             const id = document.getElementById('rawTextSelect').value;
-            if(confirm("Permanently delete this archived scan?")) {
+            if(confirm("Delete this archived scan?")) {
                 rawTextData = rawTextData.filter(r => r.id != id);
-                saveRawData(); 
-                loadRawText();
+                saveRawData(); loadRawText();
             }
         }
         window.onload = () => { renderTable(); renderRawDropdown(); };
