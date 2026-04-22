@@ -273,7 +273,8 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
-            display: block; margin-top: 8px;
+            display: block;
+            margin-top: 8px;
         }
 
         .translated-ja {
@@ -713,26 +714,17 @@
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
-            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 使用強制的 HTTPS 安全路徑，避免觸發不安全警告
-            const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
+            // 使用強制 HTTPS 的標準英漢字典路徑
+            const secureWebUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
             if (isAndroid) {
-                // 優化 Android Intent：確保 package 正確並使用安全 fallback
-                const androidIntent = `intent://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}#Intent;scheme=https;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                // 透過 Intent 嘗試喚醒 App，失敗則跳轉到安全網頁
+                const androidIntent = `intent://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}#Intent;scheme=https;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(secureWebUrl)};end`;
                 window.location.href = androidIntent;
-            } else if (isiOS) {
-                // iOS 優先嘗試跳轉，iOS 10+ 會自動處理 Universal Links
-                window.location.href = webUrl;
-                // 延遲處理，若沒跳轉到 App 則開啟網頁
-                setTimeout(() => {
-                    if (document.hasFocus()) {
-                        window.open(webUrl, '_blank');
-                    }
-                }, 1000);
             } else {
-                window.open(webUrl, '_blank');
+                // iOS 或 PC 直接開啟安全加密網頁
+                window.open(secureWebUrl, '_blank');
             }
         }
 
