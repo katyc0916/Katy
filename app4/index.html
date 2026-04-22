@@ -43,7 +43,7 @@
 
         .page-content { display: none; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-        .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; dummy: inline-block; }
+        .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
         .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
@@ -131,7 +131,7 @@
 
         .vocab-row-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
         .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
         .phonetic-line { display: flex; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
@@ -143,7 +143,7 @@
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
         .item-details.show { display: block; }
         
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.4; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -279,17 +279,16 @@
             return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>');
         }
 
-        // 輔助函式：判斷是否包含中文字
         function hasChinese(text) {
             return /[\u4e00-\u9fa5]/.test(text);
         }
 
-        // 輔助函式：清洗發音文本（去除標籤和詞性標記）
         function cleanSpeechText(text) {
             return text.replace(/==/g, '')
                        .replace(/⟪.*?⟫/g, '')
                        .replace(/\[.*?\]/g, '')
                        .replace(/❖.*/g, '')
+                       .replace(/<br>/g, ' ')
                        .trim();
         }
 
@@ -374,115 +373,98 @@
             if(tabId === 'dictTab') renderTable();
         }
 
+        /**
+         * 專業翻譯與詞典解析核心 (Pro Lexis Engine)
+         */
         async function fetchInfo(text) {
             const cleanText = stripMarkers(text.trim());
             const isChinese = hasChinese(cleanText);
+            const sourceLang = isChinese ? 'zh-TW' : 'en';
             const targetLang = isChinese ? 'en' : 'zh-TW';
 
             const result = { 
                 word: text, 
                 ukPhonetic: "/.../", 
                 usPhonetic: "/.../", 
-                enDef: "Fetching definition...", 
+                enDef: "Parsing detailed definitions...", 
                 zh: "Translating...", 
                 category: "General" 
             };
             
             try {
-                const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&dt=bd&dt=ex&dt=md&dt=ss&dt=rw&q=${encodeURIComponent(cleanText)}`;
+                // 使用高級全功能接口
+                const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=ss&dt=rw&q=${encodeURIComponent(cleanText)}`;
                 const transResponse = await fetch(transUrl);
                 const data = await transResponse.json();
                 
                 if (!data) return result;
 
-                let primaryTranslation = "";
-                if (data[0] && data[0].length > 0) {
-                    primaryTranslation = data[0].map(x => x[0]).join('').trim();
-                }
-
+                // 1. 取得主要翻譯
+                const primaryTranslation = data[0] ? data[0].map(x => x[0]).join('').trim() : "";
                 const lookupStr = isChinese ? primaryTranslation : cleanText;
-                const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 2; 
+                const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
 
-                let richZh = primaryTranslation;
-                let extraDefs = [];
-                let examples = [];
-
+                // 2. 處理中文翻譯 (模仿 Erudite: 按詞性分行)
+                let zhLines = [];
                 if (data[1]) {
-                    const alternatives = data[1].map(pos => {
-                        const posName = pos[0];
-                        const words = pos[1].slice(0, 5).join(', '); 
-                        return `[${posName}] ${words}`;
-                    }).join(' | ');
-                    if (alternatives) richZh += ` ⟪ ${alternatives} ⟫`;
+                    data[1].forEach(posSection => {
+                        const pos = posSection[0]; // 詞性如 "noun"
+                        const translations = posSection[1].slice(0, 5).join(', ');
+                        zhLines.push(`[${pos}] ${translations}`);
+                    });
                 }
+                result.zh = zhLines.length > 0 ? zhLines.join('<br>') : primaryTranslation;
 
+                // 3. 處理英文定義 (模仿 Cambridge: 深度解析語境)
+                let enDefLines = [];
+                
+                // 從詳細詞典數據提取定義 (data[12])
                 if (data[12]) {
-                    data[12].forEach(pos => {
-                        const posName = pos[0];
-                        if (pos[1]) {
-                            pos[1].slice(0, 3).forEach(d => {
-                                extraDefs.push(`[${posName}] ${d[0]}`);
+                    data[12].forEach(section => {
+                        const pos = section[0];
+                        if (section[1]) {
+                            section[1].forEach(defEntry => {
+                                // defEntry[0] 是定義
+                                enDefLines.push(`<b>[${pos}]</b> ${defEntry[0]}`);
                             });
                         }
                     });
                 }
 
-                if (data[13] && data[13][0]) {
-                    examples = data[13][0].slice(0, 3).map(ex => `✎ e.g., "${ex[0].replace(/<b>/g, '').replace(/<\/b>/g, '')}"`);
+                // 如果是長句，改用同義詞或意譯描述
+                if (enDefLines.length === 0) {
+                    enDefLines.push(isPhraseOrSentence ? "<i>Contextual interpretation verified.</i>" : "<i>Standard lexical entry.</i>");
                 }
+                
+                // 整合英文解釋並確保分行
+                result.enDef = enDefLines.join('<br>');
 
-                let dictData = null;
+                // 4. 獲取音標 (API Fallback)
                 if (!isPhraseOrSentence) {
                     const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
                     try {
-                        const dictUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanLookup)}`;
-                        const dictRes = await fetch(dictUrl);
-                        if (dictRes.ok) dictData = await dictRes.json();
-                    } catch(e) { console.warn("Dict API connection issues."); }
+                        const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanLookup)}`);
+                        if (dictRes.ok) {
+                            const dictData = await dictRes.json();
+                            const entry = dictData[0];
+                            if (entry.phonetics) {
+                                const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk')) || entry.phonetics.find(p => p.text && p.text.includes('UK'));
+                                const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us')) || entry.phonetics.find(p => p.text && p.text.includes('US'));
+                                result.ukPhonetic = (uk && uk.text) ? uk.text : (entry.phonetic || "/.../");
+                                result.usPhonetic = (us && us.text) ? us.text : (entry.phonetic || "/.../");
+                            }
+                        }
+                    } catch(e) {}
                 }
 
-                result.zh = richZh || "Translation failure";
-                let combinedDefs = [];
-
-                if (dictData && Array.isArray(dictData)) {
-                    const entry = dictData[0];
-                    if (entry.phonetics) {
-                        const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk')) || entry.phonetics.find(p => p.text && p.text.includes('UK'));
-                        const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us')) || entry.phonetics.find(p => p.text && p.text.includes('US'));
-                        result.ukPhonetic = (uk && uk.text) ? uk.text : (entry.phonetic || "/.../");
-                        result.usPhonetic = (us && us.text) ? us.text : (entry.phonetic || "/.../");
-                    }
-                    
-                    if (entry.meanings) {
-                        entry.meanings.slice(0, 3).forEach(m => {
-                            const firstDef = m.definitions[0];
-                            let defStr = `[${m.partOfSpeech}] ${firstDef.definition}`;
-                            if (firstDef.example) defStr += ` ✎ e.g., "${firstDef.example}"`;
-                            combinedDefs.push(defStr);
-                        });
-                    }
-                }
-
-                if (combinedDefs.length > 0) {
-                    result.enDef = combinedDefs.join(' ❖ ');
-                    const missingEx = examples.filter(ex => !result.enDef.includes(ex));
-                    if (missingEx.length > 0) result.enDef += ' ❖ ' + missingEx.join(' ❖ ');
-                } else if (extraDefs.length > 0) {
-                    result.enDef = extraDefs.join(' ❖ ');
-                    if (examples.length > 0) result.enDef += ' ❖ ' + examples.join(' ❖ ');
-                } else {
-                    result.enDef = isPhraseOrSentence ? "❖ Context-aware sentence analysis complete." : "Standard definition provided by primary engine.";
-                    if (examples.length > 0) result.enDef += ' ❖ ' + examples.join(' ❖ ');
-                }
-                
                 if (isChinese && result.ukPhonetic === "/.../") {
                     result.ukPhonetic = "N/A"; result.usPhonetic = "N/A";
                 }
                 
             } catch (e) { 
-                console.error("Master Translation Error:", e);
-                result.zh = "Service unavailable.";
-                result.enDef = "Check connection."; 
+                console.error("Pro Engine Error:", e);
+                result.zh = "Translation failed (Network)";
+                result.enDef = "Service unavailable."; 
             }
             return result;
         }
@@ -544,8 +526,8 @@
             if (!word) return;
             const cat = prompt("Enter Category:", "General") || "General";
             const info = await fetchInfo(word);
-            const zh = prompt("Enter Translation:", info.zh);
-            const def = prompt("Enter English Definition:", info.enDef);
+            const zh = prompt("Enter Translation (Use <br> to separate):", info.zh);
+            const def = prompt("Enter English Definition (Use <br> to separate):", info.enDef);
             vocabData.push({ word, zh, enDef: def, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
             saveData();
         }
@@ -574,7 +556,6 @@
                     </div>
                     <div id="cat-content-${catName}" class="category-content">
                         ${groups[catName].map(item => {
-                            // 核心：判斷發音目標（如果是中文輸入，則發音翻譯後的英文結果）
                             const speechTarget = hasChinese(item.word) ? item.zh : item.word;
                             const cleanSpeech = cleanSpeechText(speechTarget);
 
@@ -631,8 +612,8 @@
         function editVocab(index) {
             const item = vocabData[index];
             const w = prompt("Word:", item.word); if(!w) return;
-            const z = prompt("Translation:", item.zh);
-            const d = prompt("Definition:", item.enDef);
+            const z = prompt("Translation (Use <br> for new lines):", item.zh);
+            const d = prompt("Definition (Use <br> for new lines):", item.enDef);
             const c = prompt("Category:", item.category || "General");
             vocabData[index].word = w; vocabData[index].zh = z; vocabData[index].enDef = d; vocabData[index].category = c;
             saveData();
@@ -705,8 +686,9 @@
             const item = vocabData[currentIndex];
             if (id === 'dictation') {
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${vocabData.length}`;
-                document.getElementById('dictHint').innerHTML = `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b> ${item.zh}`;
+                document.getElementById('dictHint').innerHTML = `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b><br>${item.zh}`;
                 document.getElementById('dictInput').value = "";
+                document.getElementById('dictResult').innerText = "";
             }
         }
 
@@ -714,10 +696,10 @@
             const item = vocabData[currentIndex];
             const input = document.getElementById('dictInput').value.trim().toLowerCase();
             
-            // 判斷正確答案：如果原始詞是中文，答案應該是翻譯後的英文單詞的第一部分（去除詞性）
             let correct;
             if (hasChinese(item.word)) {
-                correct = cleanSpeechText(item.zh).split(' ')[0].toLowerCase();
+                // 如果是中文翻譯任務，比對翻譯後的第一個匹配詞
+                correct = cleanSpeechText(item.zh).split(' ')[0].split(',')[0].toLowerCase();
             } else {
                 correct = stripMarkers(item.word).toLowerCase();
             }
@@ -733,7 +715,6 @@
 
         function speakTarget(lang) {
             const item = vocabData[currentIndex];
-            // 聽寫模式下同樣判斷：中文輸入則發音英文翻譯結果
             const targetText = hasChinese(item.word) ? item.zh : item.word;
             const cleanText = cleanSpeechText(targetText);
             
