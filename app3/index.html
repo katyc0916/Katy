@@ -710,30 +710,31 @@
             }
         }
 
-        // --- 優化後的 Erudite 跳轉與自動帶入功能 ---
+        // --- 優化後的 Erudite 專業字典功能 (與 DeepL 路徑機制對齊) ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 網頁搜尋路徑 (Fallback)
+            // 網頁搜尋路徑
             const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
             if (isAndroid) {
-                // 使用 Android Intent：嘗試開啟 App 並搜尋文字
+                // 使用 Intent 機制：嘗試開啟 App 並搜尋文字，若無 App 則轉往 Web
                 const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                 window.location.href = androidIntent;
             } else if (isiOS) {
-                // iOS 使用 URL Scheme 跳轉
+                // iOS 嘗試 URL Scheme 跳轉
                 const iosUrl = `erudite://search?text=${encodedText}`;
                 window.location.href = iosUrl;
-                // 1.5 秒後檢查是否還留在瀏覽器，若是則導向 Web 版
+                // 若 1.5 秒後頁面仍有焦點，代表跳轉失敗，打開網頁版
                 setTimeout(() => {
-                    if (!document.hidden) {
+                    if (document.hasFocus()) {
                         window.open(webUrl, '_blank');
                     }
                 }, 1500);
             } else {
+                // 電腦版或其他平台直接打開網頁
                 window.open(webUrl, '_blank');
             }
         }
