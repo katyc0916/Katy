@@ -204,7 +204,6 @@
             gap: 15px;
             background: rgba(255,255,255,0.3);
             -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
         }
 
         .chat-item-wrapper {
@@ -313,7 +312,7 @@
             color: var(--primary-color);
         }
 
-        .deepl-btn, .erudite-btn {
+        .deepl-btn {
             background: none;
             border: 1px solid var(--primary-color);
             color: var(--primary-color);
@@ -325,9 +324,8 @@
             margin-top: 8px;
             display: inline-block;
             transition: all 0.3s ease;
-            margin-left: 4px;
         }
-        .deepl-btn:hover, .erudite-btn:hover {
+        .deepl-btn:hover {
             background: var(--user-bubble-bg);
             transform: translateY(-1px);
         }
@@ -712,27 +710,6 @@
             }
         }
 
-        // 新增：連結 Erudite Dictionary App
-        function launchEruditeApp(text) {
-            const encodedText = encodeURIComponent(text);
-            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            
-            // 嘗試透過 URL Scheme 直接開啟 App 並搜尋，若未安裝則跳轉至對應商店/網頁版
-            const iosUrl = `erudite://search?text=${encodedText}`;
-            const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;end`;
-            const webUrl = `https://erudite.hk/english-chinese-dictionary/${encodedText}`;
-
-            if (isiOS) {
-                window.location.href = iosUrl;
-                setTimeout(() => { window.open(webUrl, '_blank'); }, 2000);
-            } else if (isAndroid) {
-                window.location.href = androidIntent;
-            } else {
-                window.open(webUrl, '_blank');
-            }
-        }
-
         let recognition;
         let isRecording = false;
         let currentSceneType = '';
@@ -769,12 +746,6 @@
                     if(id === 'text-input-field') handleTextInput(id, 'text-chat');
                     else if (id === 'scene-category-input-field') handleSceneCategoryInput();
                 }
-            });
-            el.addEventListener('focus', () => {
-                setTimeout(() => {
-                    const container = el.closest('.interface-layer').querySelector('.chat-container');
-                    if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-                }, 300);
             });
         }
 
@@ -821,7 +792,6 @@
                     addMessage(item.origin, true, null, chatID, false, index);
                     addMessage(null, false, item, chatID, false, index);
                 });
-                setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'instant' }); }, 50);
             }
         }
 
@@ -849,15 +819,8 @@
         }
 
         function toggleCategoryUI(headerEl, catId) {
-            const isOpen = headerEl.classList.toggle('open');
-            const content = document.getElementById(`cat-box-${catId}`);
-            content.classList.toggle('active');
-            
-            if(isOpen) {
-                setTimeout(() => {
-                    headerEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 300);
-            }
+            headerEl.classList.toggle('open');
+            document.getElementById(`cat-box-${catId}`).classList.toggle('active');
         }
 
         function renderCategoryItems(catId) {
@@ -899,7 +862,6 @@
                     <div class="translation-sub"><span class="check-text">└ ${escapeHTML(item.slang_check)}</span></div>
 
                     <div style="text-align: right;">
-                        <button class="erudite-btn" onclick="event.stopPropagation(); launchEruditeApp('${cleanForJS(item.origin)}')">📖 Erudite 專業字典</button>
                         <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${cleanForJS(item.origin)}')">🔍 DeepL 強力校對</button>
                     </div>
                 `;
@@ -929,11 +891,7 @@
                 const box = document.getElementById(`cat-box-${catId}`);
                 box.classList.add('active'); box.previousElementSibling.classList.add('open');
                 renderCategoryItems(catId);
-                
-                setTimeout(() => {
-                    const lastMsg = box.lastElementChild;
-                    if(lastMsg) lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }, 100);
+                setTimeout(() => box.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
             } catch (e) { alert("翻譯失敗，請檢查網路連線。"); }
         }
 
@@ -965,8 +923,6 @@
 
         async function processTranslation(userInput, chatID) {
             try {
-                const key = chatID === 'voice-chat' ? 'voice' : 'text';
-                
                 let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
                 formal = cleanTranslation(formal);
                 const formalCheck = await translate(formal, 'zh-TW', 'en');
@@ -975,6 +931,7 @@
                 const slangCheck = await translate(slang, 'zh-TW', 'en');
 
                 const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
+                const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 appData[key].push(translationData);
                 saveData();
                 renderHistory(chatID);
@@ -1014,19 +971,32 @@
             }
         }
 
+        // 修改後的 playSpeech 函式：實現再次點擊停止功能
         function playSpeech(text) {
             if(!text) return;
+            
+            // 如果當前正在播放，且點擊的是同一段文字，則停止播放
             if (window.speechSynthesis.speaking && currentSpeakingText === text) {
                 window.speechSynthesis.cancel();
                 currentSpeakingText = "";
                 return;
             }
+
+            // 如果正在播放其他內容，先取消
             window.speechSynthesis.cancel();
+            
             const u = new SpeechSynthesisUtterance(text); 
             u.lang = 'en-US';
             u.rate = 0.9;
-            u.onstart = () => { currentSpeakingText = text; };
-            u.onend = () => { currentSpeakingText = ""; };
+            
+            u.onstart = () => {
+                currentSpeakingText = text;
+            };
+
+            u.onend = () => {
+                currentSpeakingText = "";
+            };
+
             window.speechSynthesis.speak(u);
         }
 
@@ -1085,20 +1055,12 @@
                     <span class="speak-icon" onclick="event.stopPropagation(); playSpeech('${cleanForJS(data.slang)}')">🔊</span>
                     <span class="expand-icon" onclick="event.stopPropagation(); forceLandscapePresentation('${cleanForJS(data.slang)}', '${cleanForJS(data.origin)}')">📱</span>
                     <div class="translation-sub"><span class="check-text">└ ${escapeHTML(data.slang_check)}</span></div>
-                    <div style="text-align: right;">
-                        <button class="erudite-btn" onclick="event.stopPropagation(); launchEruditeApp('${cleanForJS(data.origin)}')">📖 Erudite 專業字典</button>
-                        <button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${cleanForJS(data.origin)}')">🔍 DeepL 強力校對</button>
-                    </div>
+                    <div style="text-align: right;"><button class="deepl-btn" onclick="event.stopPropagation(); launchDeepLApp('${cleanForJS(data.origin)}')">🔍 DeepL 強力校對</button></div>
                 `;
             }
             setupSwipe(wrapper, chatBox);
             wrapper.append(del, bubble); chatBox.appendChild(wrapper);
-            
-            if(isNew) {
-                requestAnimationFrame(() => {
-                    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-                });
-            }
+            if(isNew) setTimeout(() => { chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
         function clearChat(id) { 
