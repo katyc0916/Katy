@@ -710,37 +710,30 @@
             }
         }
 
-        // --- 優化後的 Erudite 專業字典跳轉功能 (對齊 DeepL 自動帶入文字機制) ---
+        // --- 優化後的 Erudite 跳轉與自動帶入功能 ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 備援網頁搜尋路徑 (Web Fallback)
+            // 網頁搜尋路徑 (Fallback)
             const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
-            // 將查詢文字複製到剪貼簿，增加使用者在 App 內貼上的便利性 (選配，視系統權限而定)
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).catch(err => console.log('Clipboard access denied'));
-            }
-
             if (isAndroid) {
-                // Android Intent: 嘗試開啟 Erudite App 並進行搜尋，若無 App 則轉往 Web
+                // 使用 Android Intent：嘗試開啟 App 並搜尋文字
                 const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                 window.location.href = androidIntent;
             } else if (isiOS) {
-                // iOS URL Scheme 跳轉
+                // iOS 使用 URL Scheme 跳轉
                 const iosUrl = `erudite://search?text=${encodedText}`;
                 window.location.href = iosUrl;
-                
-                // 延遲檢測：若 1.5 秒後頁面仍有焦點，代表跳轉 App 失敗，改開網頁
+                // 1.5 秒後檢查是否還留在瀏覽器，若是則導向 Web 版
                 setTimeout(() => {
-                    if (document.hasFocus()) {
+                    if (!document.hidden) {
                         window.open(webUrl, '_blank');
                     }
                 }, 1500);
             } else {
-                // 電腦版或其他平台直接打開網頁
                 window.open(webUrl, '_blank');
             }
         }
@@ -926,7 +919,7 @@
                 ]);
 
                 appData[currentSceneType][catId].push({ 
-                    origin: text, formal, formal_check: formalCheck, slang, slang_check: slang_check 
+                    origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck 
                 });
                 saveData();
                 const box = document.getElementById(`cat-box-${catId}`);
