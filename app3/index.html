@@ -710,32 +710,31 @@
             }
         }
 
-        // --- 修正後的 Erudite 專業字典功能 ---
+        // --- 優化後的 Erudite 專業字典功能 (與 DeepL 路徑機制對齊) ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
-            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 正確的網頁搜尋路徑 (中英字典)
+            // 網頁搜尋路徑
             const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
-            // 定義 App 跳轉協議
-            const iosUrl = `erudite://search?text=${encodedText}`;
-            const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
-
-            if (isiOS) {
-                // iOS 嘗試開啟 App，若無回應則轉往網頁
+            if (isAndroid) {
+                // 使用 Intent 機制：嘗試開啟 App 並搜尋文字，若無 App 則轉往 Web
+                const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                window.location.href = androidIntent;
+            } else if (isiOS) {
+                // iOS 嘗試 URL Scheme 跳轉
+                const iosUrl = `erudite://search?text=${encodedText}`;
                 window.location.href = iosUrl;
+                // 若 1.5 秒後頁面仍有焦點，代表跳轉失敗，打開網頁版
                 setTimeout(() => {
                     if (document.hasFocus()) {
                         window.open(webUrl, '_blank');
                     }
                 }, 1500);
-            } else if (isAndroid) {
-                // Android 使用 Intent 機制，會自動處理 Fallback URL
-                window.location.href = androidIntent;
             } else {
-                // 電腦版直接開啟網頁
+                // 電腦版或其他平台直接打開網頁
                 window.open(webUrl, '_blank');
             }
         }
