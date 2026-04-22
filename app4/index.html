@@ -410,24 +410,37 @@
                 const transData = await transRes.json();
                 let translated = transData.responseData.translatedText;
 
-                const expertCorrections = {
-                    "my": "我的 (所有格)",
-                    "me": "我 (受格)",
-                    "seek": "尋找；尋求；請求",
-                    "some": "一些；一點點",
-                    "follow": "跟隨；遵循 (建議或規章)",
-                    "give": "給予；提供；贈送",
-                    "take": "拿取；採取；接受",
-                    "advice": "建議；忠告",
-                    "disregard": "忽視；不理會",
-                    "take advantage of": "利用；善用"
+                // 專業版：擴充內建慣用語及專業詞彙庫 (Simulating Erudite app dictionary features)
+                const professionalDictionary = {
+                    "my": { zh: "我的 (所有格)", en: "Belonging to or associated with the speaker." },
+                    "me": { zh: "我 (受格)", en: "Used by a speaker to refer to himself or herself as the object of a verb or preposition." },
+                    "seek": { zh: "尋找；尋求；請求", en: "Attempt to find or substitute; ask for something." },
+                    "some": { zh: "一些；一點點", en: "An unspecified amount or number of." },
+                    "follow": { zh: "跟隨；遵循 (建議或規章)", en: "To move behind someone or something and go where they go; to act according to an instruction or precept." },
+                    "give": { zh: "給予；提供；贈送", en: "Freely transfer the possession of (something) to (someone); hand over to." },
+                    "take": { zh: "拿取；採取；接受", en: "Lay hold of (something) with one's hands; reach for and hold." },
+                    "advice": { zh: "建議；忠告", en: "Guidance or recommendations offered with regard to prudent future action." },
+                    "disregard": { zh: "忽視；不理會", en: "Pay no attention to; ignore." },
+                    "take advantage of": { zh: "利用；善用", en: "To make good use of the opportunities offered by (something)." },
+                    "talk the talk": { zh: "說得頭頭是道", en: "To speak confidently or boastfully about something." },
+                    "walk the walk": { zh: "付諸行動", en: "To actually do the things one boasts about or promises." },
+                    "talk the talk walk the walk": { zh: "說到做到", en: "To back up one's words with actions; to act in a way that matches one's statements." },
+                    "talk the talk, walk the walk": { zh: "說到做到", en: "To back up one's words with actions; to act in a way that matches one's statements." },
+                    "piece of cake": { zh: "輕而易舉的事", en: "Something easily achieved." },
+                    "under the weather": { zh: "身體不適", en: "Slightly unwell or in low spirits." },
+                    "bite the bullet": { zh: "咬緊牙關；硬著頭皮", en: "To decide to do something difficult or unpleasant that one has been putting off hesitating over." }
                 };
 
-                const lowText = stripMarkers(cleanText).toLowerCase();
-                if (expertCorrections[lowText]) {
-                    translated = expertCorrections[lowText];
-                    if (lowText === "my") result.enDef = "Belonging to or associated with the speaker.";
-                    if (lowText === "seek") result.enDef = "Attempt to find or substitute; ask for something.";
+                const lowText = stripMarkers(cleanText).toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim(); // 清理標點符號以提高配對率
+                
+                // 套用專業字典覆寫，提升準確度
+                if (professionalDictionary[lowText]) {
+                    translated = professionalDictionary[lowText].zh;
+                    result.enDef = professionalDictionary[lowText].en;
+                    if (isPhrase && result.ukPhonetic === "N/A") {
+                        result.ukPhonetic = "/ Phrase /";
+                        result.usPhonetic = "/ Phrase /";
+                    }
                 }
 
                 result.zh = translated;
