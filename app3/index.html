@@ -909,7 +909,6 @@
             });
         }
 
-        // --- 優化後的場景輸入處理 ---
         async function handleSceneCategoryInput() {
             const select = document.getElementById('scene-category-select');
             const field = document.getElementById('scene-category-input-field');
@@ -917,26 +916,15 @@
             const catId = select.value;
             if(!text) return;
             field.value = ''; field.style.height = '40px'; field.blur();
-            
             try {
-                // 並行執行 Formal 與 Slang 翻譯
-                const [rawFormal, rawSlang] = await Promise.all([
-                    translate(`Formal English: ${text}`, 'en'),
-                    translate(`Casual slang English: ${text}`, 'en')
-                ]);
+                let formal = await translate(`Formal English: ${text}`, 'en');
+                formal = cleanTranslation(formal);
+                const formalCheck = await translate(formal, 'zh-TW', 'en');
+                let slang = await translate(`Casual slang English: ${text}`, 'en');
+                slang = cleanTranslation(slang);
+                const slangCheck = await translate(slang, 'zh-TW', 'en');
 
-                const formal = cleanTranslation(rawFormal);
-                const slang = cleanTranslation(rawSlang);
-
-                // 並行執行兩者的回譯校對
-                const [formalCheck, slangCheck] = await Promise.all([
-                    translate(formal, 'zh-TW', 'en'),
-                    translate(slang, 'zh-TW', 'en')
-                ]);
-
-                appData[currentSceneType][catId].push({ 
-                    origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck 
-                });
+                appData[currentSceneType][catId].push({ origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck });
                 saveData();
                 const box = document.getElementById(`cat-box-${catId}`);
                 box.classList.add('active'); box.previousElementSibling.classList.add('open');
@@ -975,29 +963,18 @@
         recordBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if(!isRecording){startRecordingUI(); recognition.start();} });
         recordBtn.addEventListener('touchend', (e) => { e.preventDefault(); recognition.stop(); });
 
-        // --- 優化後的語音/文字翻譯處理 ---
         async function processTranslation(userInput, chatID) {
             try {
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 
-                // 並行發送 Formal 與 Slang 翻譯請求
-                const [rawFormal, rawSlang] = await Promise.all([
-                    translate(`Translate to formal English: ${userInput}`, 'en'),
-                    translate(`Translate to casual slang English: ${userInput}`, 'en')
-                ]);
+                let formal = await translate(`Translate to formal English: ${userInput}`, 'en');
+                formal = cleanTranslation(formal);
+                const formalCheck = await translate(formal, 'zh-TW', 'en');
+                let slang = await translate(`Translate to casual slang English: ${userInput}`, 'en');
+                slang = cleanTranslation(slang);
+                const slangCheck = await translate(slang, 'zh-TW', 'en');
 
-                const formal = cleanTranslation(rawFormal);
-                const slang = cleanTranslation(rawSlang);
-
-                // 並行發送兩者的回譯校對請求
-                const [formalCheck, slangCheck] = await Promise.all([
-                    translate(formal, 'zh-TW', 'en'),
-                    translate(slang, 'zh-TW', 'en')
-                ]);
-
-                const translationData = { 
-                    origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck 
-                };
+                const translationData = { origin: userInput, formal, formal_check: formalCheck, slang, slang_check: slangCheck };
                 appData[key].push(translationData);
                 saveData();
                 renderHistory(chatID);
