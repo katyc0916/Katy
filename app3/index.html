@@ -710,32 +710,37 @@
             }
         }
 
-        // --- 已修復：優化後的 Erudite 自動搜尋功能 ---
+        // --- 優化後的 Erudite 專業字典跳轉功能 (對齊 DeepL 自動帶入文字機制) ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // Web 版 fallback 路徑
+            // 備援網頁搜尋路徑 (Web Fallback)
             const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
+            // 將查詢文字複製到剪貼簿，增加使用者在 App 內貼上的便利性 (選配，視系統權限而定)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(err => console.log('Clipboard access denied'));
+            }
+
             if (isAndroid) {
-                // Android 優化：使用 intent 的 action 直接觸發搜尋功能
-                const androidIntent = `intent://search/${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                // Android Intent: 嘗試開啟 Erudite App 並進行搜尋，若無 App 則轉往 Web
+                const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                 window.location.href = androidIntent;
             } else if (isiOS) {
-                // iOS 修復：Erudite iOS 版對外部 Scheme 的處理較為特殊
-                // 嘗試使用 query 參數模式
-                const iosUrl = `erudite://search?q=${encodedText}`;
+                // iOS URL Scheme 跳轉
+                const iosUrl = `erudite://search?text=${encodedText}`;
                 window.location.href = iosUrl;
                 
-                // 跳轉失敗後的網頁處理
+                // 延遲檢測：若 1.5 秒後頁面仍有焦點，代表跳轉 App 失敗，改開網頁
                 setTimeout(() => {
                     if (document.hasFocus()) {
                         window.open(webUrl, '_blank');
                     }
                 }, 1500);
             } else {
+                // 電腦版或其他平台直接打開網頁
                 window.open(webUrl, '_blank');
             }
         }
@@ -921,7 +926,7 @@
                 ]);
 
                 appData[currentSceneType][catId].push({ 
-                    origin: text, formal, formal_check: formalCheck, slang, slang_check: slangCheck 
+                    origin: text, formal, formal_check: formalCheck, slang, slang_check: slang_check 
                 });
                 saveData();
                 const box = document.getElementById(`cat-box-${catId}`);
@@ -1091,4 +1096,3 @@
     </script>
 </body>
 </html>
-
