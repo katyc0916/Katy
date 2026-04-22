@@ -273,8 +273,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
-            display: block;
-            margin-top: 8px;
+            display: block; margin-top: 8px;
         }
 
         .translated-ja {
@@ -710,28 +709,28 @@
             }
         }
 
-        // --- 優化後的 Erudite 專業字典功能 (改進自動帶入翻譯文字邏輯) ---
+        // --- 修正後的 Erudite 專業字典功能 ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 使用「路徑式」網址，確保無論網頁還是 App 跳轉都能自動讀取該單字/句子
+            // 使用強制的 HTTPS 安全路徑，避免觸發不安全警告
             const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
             if (isAndroid) {
-                // 優化 Android Intent：直接使用路徑跳轉，提高 App 自動識別率
-                const androidIntent = `intent://${webUrl.replace('https://', '')}#Intent;scheme=https;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                // 優化 Android Intent：確保 package 正確並使用安全 fallback
+                const androidIntent = `intent://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}#Intent;scheme=https;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                 window.location.href = androidIntent;
             } else if (isiOS) {
-                // iOS 優先嘗試直接打開 WebUrl，這在 iOS 系統會觸發 Universal Links (若 App 支援) 或跳轉
+                // iOS 優先嘗試跳轉，iOS 10+ 會自動處理 Universal Links
                 window.location.href = webUrl;
-                // 若 1.2 秒後還在原頁面，則嘗試強制開啟網頁版
+                // 延遲處理，若沒跳轉到 App 則開啟網頁
                 setTimeout(() => {
                     if (document.hasFocus()) {
                         window.open(webUrl, '_blank');
                     }
-                }, 1200);
+                }, 1000);
             } else {
                 window.open(webUrl, '_blank');
             }
