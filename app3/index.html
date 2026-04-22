@@ -710,21 +710,33 @@
             }
         }
 
-        // --- 修正後的 Erudite 專業字典功能 ---
+        // --- 已修復：優化後的 Erudite 自動搜尋功能 ---
         function launchEruditeApp(text) {
             const encodedText = encodeURIComponent(text);
             const isAndroid = /Android/i.test(navigator.userAgent);
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // 使用強制 HTTPS 的標準英漢字典路徑
-            const secureWebUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
+            // Web 版 fallback 路徑
+            const webUrl = `https://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}`;
             
             if (isAndroid) {
-                // 透過 Intent 嘗試喚醒 App，失敗則跳轉到安全網頁
-                const androidIntent = `intent://erudite.hk/zh-hant/dictionaries/english-chinese/${encodedText}#Intent;scheme=https;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(secureWebUrl)};end`;
+                // Android 優化：使用 intent 的 action 直接觸發搜尋功能
+                const androidIntent = `intent://search/${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                 window.location.href = androidIntent;
+            } else if (isiOS) {
+                // iOS 修復：Erudite iOS 版對外部 Scheme 的處理較為特殊
+                // 嘗試使用 query 參數模式
+                const iosUrl = `erudite://search?q=${encodedText}`;
+                window.location.href = iosUrl;
+                
+                // 跳轉失敗後的網頁處理
+                setTimeout(() => {
+                    if (document.hasFocus()) {
+                        window.open(webUrl, '_blank');
+                    }
+                }, 1500);
             } else {
-                // iOS 或 PC 直接開啟安全加密網頁
-                window.open(secureWebUrl, '_blank');
+                window.open(webUrl, '_blank');
             }
         }
 
@@ -1079,3 +1091,4 @@
     </script>
 </body>
 </html>
+
