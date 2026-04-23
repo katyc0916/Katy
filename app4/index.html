@@ -129,14 +129,14 @@
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        .vocab-row-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
+        .vocab-row-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; position: relative; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; padding-right: 80px; }
         .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
         .phonetic-line { display: flex; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
         
-        .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+        .header-actions { position: absolute; right: 0; top: 0; display: flex; gap: 8px; align-items: center; }
         .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
         .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
         
@@ -525,7 +525,7 @@
             resultBox.style.display = 'block';
             resultBox.innerHTML = `
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
-                    <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
+                    <span class="vocab-target" style="font-size: 24px; padding-right: 0;">${formatDisplay(info.word)}</span>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
@@ -784,7 +784,10 @@
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
                                         <span class="vocab-zh">${item.zh}</span>
-                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                        <div class="header-actions">
+                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                            <button class="edit-icon" onclick="event.stopPropagation(); editFavorite(${item.originalIndex})">✎</button>
+                                        </div>
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
@@ -808,6 +811,7 @@
         function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
         function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
         function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
+        
         function editVocab(i) {
             const item = vocabData[i];
             const w = prompt("Word:", item.word); if(!w) return;
@@ -815,6 +819,15 @@
             vocabData[i].zh = prompt("Translation:", item.zh);
             vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
+        }
+
+        function editFavorite(i) {
+            const item = favoritesData[i];
+            const w = prompt("Word:", item.word); if(!w) return;
+            favoritesData[i].word = w;
+            favoritesData[i].zh = prompt("Translation:", item.zh);
+            favoritesData[i].enDef = prompt("Definition:", item.enDef);
+            saveFavoritesData();
         }
 
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
