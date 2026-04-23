@@ -561,7 +561,6 @@
         function openDeepL(text) {
             const cleanText = stripMarkers(text.trim());
             const isZh = hasChinese(cleanText);
-            // 修正為 英文->繁體中文(zh-Hant)，繁體中文->英文(en-US)
             const sl = isZh ? 'zh' : 'en';
             const tl = isZh ? 'en-US' : 'zh-Hant';
             const url = `https://www.deepl.com/translator#${sl}/${tl}/${encodeURIComponent(cleanText)}`;
@@ -593,7 +592,7 @@
                         <span>${info.usPhonetic}</span>
                     </div>
                     <button class="erudite-btn" onclick="openErudite('${info.word.replace(/'/g, "\\'")}')">Erudite</button>
-                    <button class="deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL Translate</button>
+                    <button class="deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL</button>
                 </div>
                 <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
                     <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
@@ -811,7 +810,7 @@
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
                                             <button class="erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
-                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL Translate</button>
+                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -851,7 +850,7 @@
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
                                             <button class="erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
-                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL Translate</button>
+                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -931,7 +930,8 @@
             const item = vocabData[currentIndex];
             if (id === 'dictation') {
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${vocabData.length}`;
-                document.getElementById('dictHint').innerHTML = `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b><br>${item.zh}`;
+                document.getElementById('dictHint').innerHTML 
+= `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b><br>${item.zh}`;
                 document.getElementById('dictInput').value = "";
                 document.getElementById('dictResult').innerText = "";
             } else if (id === 'cloze') {
