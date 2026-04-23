@@ -545,6 +545,7 @@
                     </div>
                     <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite">Erudite</a>
                     <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl">DeepL</a>
+                    <button class="app-link-btn" style="background: #78909c;" onclick="copyText(this, '${encodedWord}')">📋</button>
                 </div>
                 <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
                     <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
@@ -765,6 +766,7 @@
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
+                                            <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -810,6 +812,7 @@
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
+                                            <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -943,6 +946,18 @@
             const item = vocabData[currentIndex];
             const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word));
             u.lang = lang; window.speechSynthesis.speak(u);
+        }
+
+        function copyText(btn, encodedText) {
+            const text = decodeURIComponent(encodedText);
+            navigator.clipboard.writeText(text).then(() => {
+                btn.innerText = '✅';
+                setTimeout(() => {
+                    btn.innerText = '📋';
+                }, 1000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
         }
 
         function manuallySaveToRaw() {
