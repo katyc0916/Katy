@@ -46,8 +46,8 @@
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: var(--primary-blue); transform: translateY(-3px); }
+        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; border-width: 3px; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .card i { font-size: 30px; display: block; margin-bottom: 10px; }
 
         #ocrTextEditor, #scopeRawEditor {
@@ -164,11 +164,44 @@
 
         <div id="homePage" class="page-content active">
             <div class="portal-grid">
-                <div class="card" onclick="switchPage('scan')"><i>📸</i><h3>Smart Scan</h3><p>Photo to Text</p></div>
-                <div class="card" onclick="switchPage('scope')"><i>📋</i><h3>Scope</h3><p>Manage List</p></div>
-                <div class="card" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
-                <div class="card" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
+                <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Pro Dictionary</h3><p>Lookup & Learn</p></div>
+                <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Collections</h3><p>Saved Words</p></div>
+                <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Smart Scan</h3><p>Photo to Text</p></div>
+                <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Scope</h3><p>Manage List</p></div>
+                <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
+                <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
             </div>
+        </div>
+
+        <div id="dictionaryPage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <h2>📖 Pro Dictionary</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                <button class="btn-action" onclick="performLookup()">Search</button>
+            </div>
+            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                </div>
+            <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
+                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Collections</button>
+                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Scope</button>
+            </div>
+
+            <div id="searchHistoryContainer" style="margin-top: 30px;">
+                <h3 style="font-size: 18px; color: #546e7a; border-bottom: 2px solid #eee; padding-bottom: 5px;">Recent Searches</h3>
+                <div style="font-size: 12px; color: #90a4ae; margin-bottom: 10px;">💡 Tip: Swipe left to delete. Tap to view.</div>
+                <div id="searchHistoryList"></div>
+            </div>
+        </div>
+
+        <div id="favoritesPage" class="page-content">
+            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <h2>⭐ My Collections (收藏庫)</h2>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Wipe All</button>
+            </div>
+            <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Tip: Tap headers to expand/collapse. Swipe left on items to delete.</div>
+            <div id="favoritesList"></div>
         </div>
 
         <div id="scanPage" class="page-content">
@@ -268,8 +301,12 @@
     <script>
         let vocabData = JSON.parse(localStorage.getItem('masterVocab')) || [];
         let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
+        let favoritesData = JSON.parse(localStorage.getItem('masterFavorites')) || [];
+        let searchHistory = JSON.parse(localStorage.getItem('masterHistory')) || []; 
+        
         let currentIndex = 0;
         let touchStartX = 0;
+        let currentLookupData = null;
 
         function stripMarkers(str) {
             return str.replace(/==/g, '');
@@ -290,6 +327,13 @@
                        .replace(/❖.*/g, '')
                        .replace(/<br>/g, ' ')
                        .trim();
+        }
+
+        function showToast(id) {
+            const toast = document.getElementById(id);
+            if (!toast) return;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
 
         function handleFileSelect(input) {
@@ -359,6 +403,8 @@
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById(`${id}Page`).classList.add('active');
             if (id === 'scope') renderTable();
+            if (id === 'favorites') renderFavoritesTable(); 
+            if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation' || id === 'cloze') startSession(id);
             window.scrollTo(0,0);
         }
@@ -374,72 +420,95 @@
         }
 
         /**
-         * 專業翻譯與詞典解析核心 (Pro Lexis Engine)
+         * Lexis Pro Engine - 專業過濾與生僻字屏蔽算法
          */
         async function fetchInfo(text) {
             const cleanText = stripMarkers(text.trim());
             const isChinese = hasChinese(cleanText);
-            const sourceLang = isChinese ? 'zh-TW' : 'en';
+            const sourceLang = isChinese ? 'zh-CN' : 'en';
             const targetLang = isChinese ? 'en' : 'zh-TW';
 
             const result = { 
                 word: text, 
                 ukPhonetic: "/.../", 
                 usPhonetic: "/.../", 
-                enDef: "Parsing detailed definitions...", 
+                enDef: "Parsing definitions...", 
                 zh: "Translating...", 
                 category: "General" 
             };
             
             try {
-                // 使用高級全功能接口
-                const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=ss&dt=rw&q=${encodeURIComponent(cleanText)}`;
+                const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=bd&dt=md&q=${encodeURIComponent(cleanText)}`;
                 const transResponse = await fetch(transUrl);
                 const data = await transResponse.json();
                 
                 if (!data) return result;
 
-                // 1. 取得主要翻譯
+                // 獲取第一順位最準確的翻譯
                 const primaryTranslation = data[0] ? data[0].map(x => x[0]).join('').trim() : "";
                 const lookupStr = isChinese ? primaryTranslation : cleanText;
                 const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
 
-                // 2. 處理中文翻譯 (模仿 Erudite: 按詞性分行)
+                // --- 專業淨化算法 (Anti-Archaic Filtering) ---
                 let zhLines = [];
                 if (data[1]) {
+                    const posMap = {
+                        "noun": "名", "verb": "動", "adjective": "形", "adverb": "副",
+                        "pronoun": "代", "preposition": "介", "conjunction": "連", "interjection": "嘆"
+                    };
+                    
                     data[1].forEach(posSection => {
-                        const pos = posSection[0]; // 詞性如 "noun"
-                        const translations = posSection[1].slice(0, 5).join(', ');
-                        zhLines.push(`[${pos}] ${translations}`);
-                    });
-                }
-                result.zh = zhLines.length > 0 ? zhLines.join('<br>') : primaryTranslation;
+                        const posRaw = posSection[0].toLowerCase();
+                        const posLabel = posMap[posRaw] || posSection[0]; 
+                        let candidates = [];
 
-                // 3. 處理英文定義 (模仿 Cambridge: 深度解析語境)
-                let enDefLines = [];
-                
-                // 從詳細詞典數據提取定義 (data[12])
-                if (data[12]) {
-                    data[12].forEach(section => {
-                        const pos = section[0];
-                        if (section[1]) {
-                            section[1].forEach(defEntry => {
-                                // defEntry[0] 是定義
-                                enDefLines.push(`<b>[${pos}]</b> ${defEntry[0]}`);
+                        if (posSection.length > 2 && Array.isArray(posSection[2])) {
+                            candidates = posSection[2].map(item => {
+                                let score = 0;
+                                for(let i=2; i<item.length; i++) if (typeof item[i] === 'number') { score = item[i]; break; }
+                                return { word: item[0], score: score };
+                            }).filter(w => {
+                                // 1. 硬性黑名單：過濾掉字典API常見的古語垃圾字
+                                const blackList = /[朕翫覿邴廋疏敝竊羿糗]/;
+                                if (blackList.test(w.word)) return false;
+                                
+                                // 2. 罕見漢字過濾 (利用Unicode範圍過濾擴展區漢字)
+                                // 只允許基本漢字區 (4E00-9FFF)，排除掉極生僻的擴展區
+                                if (!/^[\u4E00-\u9FA5]+$/.test(w.word)) return false;
+
+                                // 3. 權重過濾：如果是單字解釋，其權重必須極高
+                                // API 返回的生僻解釋通常 score 低於 0.1
+                                if (w.word.length === 1 && w.score < 0.15) return false;
+                                if (w.word.length >= 2 && w.score < 0.05) return false;
+                                
+                                return true;
                             });
+
+                            candidates.sort((a, b) => b.score - a.score);
+                        } else if (posSection[1]) {
+                            candidates = posSection[1].map(w => ({ word: w, score: 1 }));
                         }
+
+                        // 只取前 3 個最高質量的現代漢語翻譯
+                        const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join('、');
+                        if (finalPicks) zhLines.push(`[${posLabel}] ${finalPicks}`);
                     });
                 }
-
-                // 如果是長句，改用同義詞或意譯描述
-                if (enDefLines.length === 0) {
-                    enDefLines.push(isPhraseOrSentence ? "<i>Contextual interpretation verified.</i>" : "<i>Standard lexical entry.</i>");
-                }
                 
-                // 整合英文解釋並確保分行
+                // 如果詳細詞典過濾後沒東西，則使用第一翻譯
+                result.zh = zhLines.length > 0 ? zhLines.join('<br>') : (primaryTranslation || "無匹配結果");
+
+                // 處理英英定義
+                let enDefLines = [];
+                if (data[12]) {
+                    data[12].forEach(sec => {
+                        if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`));
+                    });
+                }
+                if (enDefLines.length === 0) enDefLines.push(isPhraseOrSentence ? "<i>Contextual verified entry.</i>" : "<i>Standard entry.</i>");
                 result.enDef = enDefLines.join('<br>');
 
-                // 4. 獲取音標 (API Fallback)
+                // --- 音標獲取 ---
                 if (!isPhraseOrSentence) {
                     const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
                     try {
@@ -448,118 +517,196 @@
                             const dictData = await dictRes.json();
                             const entry = dictData[0];
                             if (entry.phonetics) {
-                                const uk = entry.phonetics.find(p => p.audio && p.audio.includes('-uk')) || entry.phonetics.find(p => p.text && p.text.includes('UK'));
-                                const us = entry.phonetics.find(p => p.audio && p.audio.includes('-us')) || entry.phonetics.find(p => p.text && p.text.includes('US'));
-                                result.ukPhonetic = (uk && uk.text) ? uk.text : (entry.phonetic || "/.../");
-                                result.usPhonetic = (us && us.text) ? us.text : (entry.phonetic || "/.../");
+                                const uk = entry.phonetics.find(p => p.audio?.includes('-uk') || p.text?.includes('UK'));
+                                const us = entry.phonetics.find(p => p.audio?.includes('-us') || p.text?.includes('US'));
+                                result.ukPhonetic = uk?.text || entry.phonetic || "/.../";
+                                result.usPhonetic = us?.text || entry.phonetic || "/.../";
+                            }
+                            if (entry.meanings) {
+                                let proDefs = [];
+                                entry.meanings.slice(0, 2).forEach(m => proDefs.push(`<b>[${m.partOfSpeech}]</b> ${m.definitions[0].definition}`));
+                                result.enDef = proDefs.join('<br>');
                             }
                         }
                     } catch(e) {}
                 }
-
-                if (isChinese && result.ukPhonetic === "/.../") {
-                    result.ukPhonetic = "N/A"; result.usPhonetic = "N/A";
-                }
-                
-            } catch (e) { 
-                console.error("Pro Engine Error:", e);
-                result.zh = "Translation failed (Network)";
-                result.enDef = "Service unavailable."; 
-            }
+                if (isChinese && result.ukPhonetic === "/.../") { result.ukPhonetic = "N/A"; result.usPhonetic = "N/A"; }
+            } catch (e) { result.zh = "查詢服務暫時不可用"; }
             return result;
+        }
+
+        function renderLookupResultUI(info) {
+            const resultBox = document.getElementById('lookupResult');
+            const actionsBox = document.getElementById('lookupActions');
+            const cleanSpeech = cleanSpeechText(hasChinese(info.word) ? info.zh : info.word);
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
+                    <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
+                </div>
+                <div class="phonetic-line" style="margin-bottom: 15px;">
+                    <div class="phonetic-item">
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
+                        <span>${info.ukPhonetic}</span>
+                    </div>
+                    <div class="phonetic-item">
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
+                        <span>${info.usPhonetic}</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
+                    <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
+                </div>
+                <div class="definition-en-line" style="font-size: 15px;">
+                    <strong style="color: var(--primary-blue); font-style: normal;">Definition:</strong><br>${info.enDef}
+                </div>`;
+            actionsBox.style.display = 'flex';
+        }
+
+        async function performLookup() {
+            const input = document.getElementById('dictLookupInput').value.trim();
+            if (!input) return;
+            const resultBox = document.getElementById('lookupResult');
+            const actionsBox = document.getElementById('lookupActions');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = '<div style="color:var(--primary-blue); font-weight:bold;">Pro Engine Analyzing...</div>';
+            actionsBox.style.display = 'none';
+            const info = await fetchInfo(input);
+            info.word = input;
+            currentLookupData = info;
+            renderLookupResultUI(info);
+            addToHistory(info);
+        }
+
+        function saveLookupToFavorites() {
+            if (!currentLookupData) return;
+            const cat = prompt("Assign a collection category (自訂收藏標題):", "My Words") || "My Words";
+            currentLookupData.category = cat;
+            favoritesData.push({...currentLookupData});
+            saveFavoritesData();
+            alert("✓ Successfully Added to Collections!");
+        }
+
+        function saveLookupToScope() {
+            if (!currentLookupData) return;
+            const cat = prompt("Assign a category for Dictation Scope:", "General") || "General";
+            currentLookupData.category = cat;
+            vocabData.push({...currentLookupData});
+            saveData();
+            alert("✓ Successfully Added to Scope!");
+        }
+
+        function addToHistory(info) {
+            searchHistory = searchHistory.filter(item => item.word.toLowerCase() !== info.word.toLowerCase());
+            searchHistory.unshift(info);
+            if (searchHistory.length > 10) searchHistory.pop();
+            saveHistoryData();
+        }
+
+        function saveHistoryData() {
+            localStorage.setItem('masterHistory', JSON.stringify(searchHistory));
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            const list = document.getElementById('searchHistoryList');
+            if (searchHistory.length === 0) {
+                list.innerHTML = "<div style='color:#90a4ae; font-size:14px; padding: 10px;'>No recent searches.</div>";
+                return;
+            }
+            list.innerHTML = searchHistory.map((item, index) => `
+                <div class="list-item-row" id="hist-row-${index}" ontouchstart="handleHistTouchStart(event)" ontouchmove="handleHistTouchMove(event, ${index})" ontouchend="handleHistTouchEnd(event, ${index})">
+                    <div class="delete-btn-overlay" onclick="event.stopPropagation(); deleteHistItem(${index})">DELETE</div>
+                    <div class="item-main-content" onclick="viewHistoryItem(${index})" style="cursor:pointer; padding: 12px;">
+                        <div class="vocab-row-header" style="margin-bottom:0;">
+                            <span class="vocab-target" style="font-size:16px;">${formatDisplay(item.word)}</span>
+                            <span class="vocab-zh" style="font-size:14px; color:#78909c;">${item.zh.replace(/<br>/g, ' ').substring(0, 30)}...</span>
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function handleHistTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleHistTouchMove(e, index) {
+            let moveX = e.touches[0].clientX;
+            let diff = touchStartX - moveX;
+            let row = document.getElementById(`hist-row-${index}`);
+            if (!row) return;
+            if (diff > 20 && diff < 100) row.classList.add('swiped-left');
+            else if (diff < -20) row.classList.remove('swiped-left');
+        }
+        function handleHistTouchEnd(e, index) {
+            let touchEndX = e.changedTouches[0].clientX;
+            let row = document.getElementById(`hist-row-${index}`);
+            if (!row && touchStartX - touchEndX < 40) row.classList.remove('swiped-left');
+        }
+
+        function deleteHistItem(i) { searchHistory.splice(i, 1); saveHistoryData(); }
+        function viewHistoryItem(index) {
+            const info = searchHistory[index];
+            currentLookupData = info;
+            document.getElementById('dictLookupInput').value = info.word;
+            renderLookupResultUI(info);
+            addToHistory(info);
+            window.scrollTo(0,0);
         }
 
         async function extractTextToDictation(areaId) {
             const area = document.getElementById(areaId);
             const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            if (!selectedText) { alert("Please highlight text first!"); return; }
-            const cat = prompt("Assign a category for this selection:", "General") || "General";
+            if (!selectedText) { alert("Please highlight text!"); return; }
+            const cat = prompt("Assign category:", "General") || "General";
             const info = await fetchInfo(selectedText);
-            info.word = selectedText;
-            info.category = cat;
+            info.word = selectedText; info.category = cat;
             vocabData.push(info);
             saveData();
-            const toastId = areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast';
-            const toast = document.getElementById(toastId);
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
         async function addAllToDictation(areaId) {
             const area = document.getElementById(areaId);
             const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length === 0) { alert("No valid text found in editor!"); return; }
-            const cat = prompt("Assign a category for these items:", "General") || "General";
-
-            const btnId = areaId === 'ocrTextEditor' ? 'btnAddAllScan' : 'btnAddAllRaw';
-            const btn = document.getElementById(btnId);
-            const originalText = btn.innerText;
-            btn.innerText = "•••"; 
-            btn.disabled = true;
-
+            if (lines.length === 0) return;
+            const cat = prompt("Assign category:", "General") || "General";
+            const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnAddAllScan' : 'btnAddAllRaw');
+            btn.innerText = "•••"; btn.disabled = true;
             try {
                 for (const line of lines) {
                     const info = await fetchInfo(line);
-                    info.word = line;
-                    info.category = cat;
+                    info.word = line; info.category = cat;
                     vocabData.push(info);
                 }
                 saveData();
-                const toastId = areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast';
-                const toast = document.getElementById(toastId);
-                toast.innerText = "✓ Batch Added";
-                toast.style.opacity = '1';
-                setTimeout(() => { 
-                    toast.style.opacity = '0'; 
-                    toast.innerText = "✓ Added";
-                }, 2000);
-            } catch (err) {
-                alert("Error during batch processing.");
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+            } finally { btn.innerText = "➕ Add All"; btn.disabled = false; }
         }
 
         async function addNewManualVocab() {
-            const word = prompt("Enter English Word/Phrase (Use ==word== to highlight):");
+            const word = prompt("Enter English Word/Phrase:");
             if (!word) return;
             const cat = prompt("Enter Category:", "General") || "General";
             const info = await fetchInfo(word);
-            const zh = prompt("Enter Translation (Use <br> to separate):", info.zh);
-            const def = prompt("Enter English Definition (Use <br> to separate):", info.enDef);
-            vocabData.push({ word, zh, enDef: def, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
+            vocabData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
             saveData();
         }
 
         function renderTable() {
             const list = document.getElementById('vocabList');
             if (vocabData.length === 0) { list.innerHTML = ""; return; }
-
             const groups = vocabData.reduce((acc, item, index) => {
                 const cat = item.category || "Uncategorized";
                 if (!acc[cat]) acc[cat] = [];
                 acc[cat].push({ ...item, originalIndex: index });
                 return acc;
             }, {});
-
             list.innerHTML = Object.keys(groups).map(catName => `
                 <div class="category-group">
                     <div class="category-header" onclick="toggleCategory('${catName}')">
-                        <div style="display: flex; align-items: center;">
-                            <span>📁 ${catName}</span>
-                            <span class="cat-count" style="margin-left: 10px;">${groups[catName].length}</span>
-                        </div>
-                        <div style="display: flex; align-items: center;">
-                            <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCategory('${catName}')">🗑️ Delete Group</button>
-                        </div>
+                        <div>📁 ${catName} <span class="cat-count">${groups[catName].length}</span></div>
+                        <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCategory('${catName}')">🗑️</button>
                     </div>
                     <div id="cat-content-${catName}" class="category-content">
-                        ${groups[catName].map(item => {
-                            const speechTarget = hasChinese(item.word) ? item.zh : item.word;
-                            const cleanSpeech = cleanSpeechText(speechTarget);
-
-                            return `
+                        ${groups[catName].map(item => `
                             <div class="list-item-row" id="row-${item.originalIndex}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${item.originalIndex})" ontouchend="handleTouchEnd(event, ${item.originalIndex})">
                                 <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
@@ -568,90 +715,99 @@
                                         <span class="vocab-zh">${item.zh}</span>
                                         <div class="header-actions">
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
-                                            <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎ Edit</button>
+                                            <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎</button>
                                         </div>
                                     </div>
                                     <div id="details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
-                                                <span>${item.ukPhonetic}</span>
-                                            </div>
-                                            <div class="phonetic-item">
-                                                <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
-                                                <span>${item.usPhonetic}</span>
-                                            </div>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
                                 </div>
-                            </div>
-                        `}).join('')}
+                            </div>`).join('')}
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
-        function toggleCategory(catName) {
-            const content = document.getElementById(`cat-content-${catName}`);
-            content.classList.toggle('collapsed');
+        function renderFavoritesTable() {
+            const list = document.getElementById('favoritesList');
+            if (favoritesData.length === 0) { list.innerHTML = "<div style='text-align:center; padding: 20px; color:#78909c;'>Empty.</div>"; return; }
+            const groups = favoritesData.reduce((acc, item, index) => {
+                const cat = item.category || "Uncategorized";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push({ ...item, originalIndex: index });
+                return acc;
+            }, {});
+            list.innerHTML = Object.keys(groups).map(catName => `
+                <div class="category-group">
+                    <div class="category-header" onclick="toggleFavCategory('${catName}')">
+                        <div>📁 ${catName} <span class="cat-count">${groups[catName].length}</span></div>
+                        <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteFavCategory('${catName}')">🗑️</button>
+                    </div>
+                    <div id="fav-cat-content-${catName}" class="category-content collapsed">
+                        ${groups[catName].map(item => `
+                            <div class="list-item-row" id="fav-row-${item.originalIndex}" ontouchstart="handleFavTouchStart(event)" ontouchmove="handleFavTouchMove(event, ${item.originalIndex})" ontouchend="handleFavTouchEnd(event, ${item.originalIndex})">
+                                <div class="delete-btn-overlay" onclick="deleteFavItem(${item.originalIndex})">DELETE</div>
+                                <div class="item-main-content">
+                                    <div class="vocab-row-header">
+                                        <span class="vocab-target">${formatDisplay(item.word)}</span>
+                                        <span class="vocab-zh">${item.zh}</span>
+                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                    </div>
+                                    <div id="fav-details-${item.originalIndex}" class="item-details">
+                                        <div class="phonetic-line">
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
+                                        </div>
+                                        <div class="definition-en-line">${item.enDef}</div>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>`).join('');
         }
 
-        function deleteCategory(catName) {
-            if(confirm(`Permanently delete the group "${catName}" and all its contents?`)) {
-                vocabData = vocabData.filter(item => item.category !== catName);
-                saveData();
-            }
-        }
+        function toggleCategory(c) { document.getElementById(`cat-content-${c}`).classList.toggle('collapsed'); }
+        function toggleFavCategory(c) { document.getElementById(`fav-cat-content-${c}`).classList.toggle('collapsed'); }
+        function toggleDetails(i) { document.getElementById(`details-${i}`).classList.toggle('show'); }
+        function toggleFavDetails(i) { document.getElementById(`fav-details-${i}`).classList.toggle('show'); }
 
-        function toggleDetails(index) {
-            const details = document.getElementById(`details-${index}`);
-            details.classList.toggle('show');
-        }
-
-        function editVocab(index) {
-            const item = vocabData[index];
+        function deleteCategory(c) { if(confirm("Delete group?")) { vocabData = vocabData.filter(i => i.category !== c); saveData(); } }
+        function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
+        function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
+        function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
+        function editVocab(i) {
+            const item = vocabData[i];
             const w = prompt("Word:", item.word); if(!w) return;
-            const z = prompt("Translation (Use <br> for new lines):", item.zh);
-            const d = prompt("Definition (Use <br> for new lines):", item.enDef);
-            const c = prompt("Category:", item.category || "General");
-            vocabData[index].word = w; vocabData[index].zh = z; vocabData[index].enDef = d; vocabData[index].category = c;
+            vocabData[i].word = w;
+            vocabData[i].zh = prompt("Translation:", item.zh);
+            vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
         }
 
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
-        function handleTouchMove(e, index) {
-            let moveX = e.touches[0].clientX;
-            let diff = touchStartX - moveX;
-            let row = document.getElementById(`row-${index}`);
-            if (!row) return;
-            if (diff > 20 && diff < 100) { row.classList.add('swiped-left'); } 
-            else if (diff < -20) { row.classList.remove('swiped-left'); }
+        function handleTouchMove(e, i) {
+            let row = document.getElementById(`row-${i}`);
+            let diff = touchStartX - e.touches[0].clientX;
+            if (diff > 20) row.classList.add('swiped-left');
+            else if (diff < -20) row.classList.remove('swiped-left');
         }
-        function handleTouchEnd(e, index) {
-            let touchEndX = e.changedTouches[0].clientX;
-            let row = document.getElementById(`row-${index}`);
-            if (!row) return;
-            if (touchStartX - touchEndX < 40) { row.classList.remove('swiped-left'); }
-        }
+        function handleTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`row-${i}`).classList.remove('swiped-left'); }
 
-        function speakFromList(word, lang) {
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+        function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleFavTouchMove(e, i) {
+            let row = document.getElementById(`fav-row-${i}`);
+            let diff = touchStartX - e.touches[0].clientX;
+            if (diff > 20) row.classList.add('swiped-left');
+            else if (diff < -20) row.classList.remove('swiped-left');
         }
+        function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
 
-        function deleteItem(i) {
-            if(confirm(`Remove "${stripMarkers(vocabData[i].word)}" from list?`)) {
-                vocabData.splice(i, 1); saveData();
-            } else {
-                const row = document.getElementById(`row-${i}`);
-                if(row) row.classList.remove('swiped-left');
-            }
-        }
-
-        function clearAllVocab() { if(confirm("Wipe the entire list?")) { vocabData = []; saveData(); } }
+        function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
         function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
         function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
+        function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
 
         function saveRawChanges() {
             const id = document.getElementById('rawTextSelect').value;
@@ -659,9 +815,6 @@
             if (index !== -1) {
                 rawTextData[index].text = document.getElementById('scopeRawEditor').value;
                 saveRawData();
-                const toast = document.getElementById('rawToast');
-                toast.innerText = "✓ Changes Saved"; toast.style.opacity = '1';
-                setTimeout(() => { toast.style.opacity = '0'; toast.innerText = "✓ Added"; }, 1500);
             }
         }
 
@@ -673,8 +826,7 @@
         }
 
         function loadRawText() {
-            const select = document.getElementById('rawTextSelect');
-            const item = rawTextData.find(r => r.id == select.value);
+            const item = rawTextData.find(r => r.id == document.getElementById('rawTextSelect').value);
             const editor = document.getElementById('scopeRawEditor');
             const actions = document.getElementById('rawActions');
             if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; }
@@ -695,19 +847,11 @@
         function checkDictation() {
             const item = vocabData[currentIndex];
             const input = document.getElementById('dictInput').value.trim().toLowerCase();
-            
-            let correct;
-            if (hasChinese(item.word)) {
-                // 如果是中文翻譯任務，比對翻譯後的第一個匹配詞
-                correct = cleanSpeechText(item.zh).split(' ')[0].split(',')[0].toLowerCase();
-            } else {
-                correct = stripMarkers(item.word).toLowerCase();
-            }
-            
+            const correct = stripMarkers(item.word).toLowerCase();
             const res = document.getElementById('dictResult');
             if (input === correct) {
                 res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation');}, 1000);
+                setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation'); }, 1000);
             } else {
                 res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
             }
@@ -715,38 +859,28 @@
 
         function speakTarget(lang) {
             const item = vocabData[currentIndex];
-            const targetText = hasChinese(item.word) ? item.zh : item.word;
-            const cleanText = cleanSpeechText(targetText);
-            
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = lang; window.speechSynthesis.speak(utterance);
+            const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word));
+            u.lang = lang; window.speechSynthesis.speak(u);
         }
 
         function manuallySaveToRaw() {
             const content = document.getElementById('ocrTextEditor').value.trim();
-            if(!content) { alert("Editor empty!"); return; }
+            if(!content) return;
             rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content });
             saveRawData();
-            const toast = document.getElementById('scanToast');
-            toast.innerText = "✓ Archived to Scope"; toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; toast.innerText = "✓ Added"; }, 2000);
+            showToast('scanToast');
         }
 
-        function clearEditor() { 
-            if(confirm("Discard current scan?")) {
-                document.getElementById('ocrTextEditor').value = ""; 
-                document.getElementById('editorSection').style.display = 'none'; 
-                document.getElementById('fileLabel').innerText = "📁 Click to Upload Image";
-            }
-        }
+        function clearEditor() { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; }
         function deleteCurrentRaw() {
             const id = document.getElementById('rawTextSelect').value;
-            if(confirm("Delete this archived scan?")) {
-                rawTextData = rawTextData.filter(r => r.id != id);
-                saveRawData(); loadRawText();
-            }
+            rawTextData = rawTextData.filter(r => r.id != id);
+            saveRawData(); loadRawText();
         }
-        window.onload = () => { renderTable(); renderRawDropdown(); };
+        function clearAllVocab() { vocabData = []; saveData(); }
+        function clearAllFavorites() { favoritesData = []; saveFavoritesData(); }
+        
+        window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
     </script>
 </body>
 </html>
