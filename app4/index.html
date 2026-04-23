@@ -428,7 +428,7 @@
                 goHome();
             } else {
                 const target = previousPageId;
-                previousPageId = 'home'; // 重置為首頁，防止循環
+                previousPageId = 'home'; 
                 switchPage(target);
             }
         }
@@ -438,7 +438,6 @@
                 alert("Please add items to Study Scope first!"); return;
             }
             
-            // 記錄當前頁面為「上一個頁面」，除非當前就是首頁
             if(currentPageId !== 'home') {
                 previousPageId = currentPageId;
             } else {
@@ -562,15 +561,15 @@
         function openDeepL(text) {
             const cleanText = stripMarkers(text.trim());
             const isZh = hasChinese(cleanText);
+            // 修正為 英文->繁體中文(zh-Hant)，繁體中文->英文(en-US)
             const sl = isZh ? 'zh' : 'en';
-            const tl = isZh ? 'en' : 'zh';
+            const tl = isZh ? 'en-US' : 'zh-Hant';
             const url = `https://www.deepl.com/translator#${sl}/${tl}/${encodeURIComponent(cleanText)}`;
             window.open(url, '_blank');
         }
 
         function openErudite(text) {
             const cleanText = stripMarkers(text.trim());
-            // 使用 Erudite 的 URL Scheme。如果未安裝會報錯，可視需求加 timeout 回退到網頁版
             const url = `erudite://search?word=${encodeURIComponent(cleanText)}`;
             window.location.href = url;
         }
@@ -1006,4 +1005,3 @@
     </script>
 </body>
 </html>
-
