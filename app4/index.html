@@ -136,7 +136,7 @@
 
         .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; box-sizing: border-box; }
         .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: break-all; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: break-all; display: flex; align-items: flex-start; gap: 6px; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: break-all; }
         .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; box-sizing: border-box; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         
@@ -254,7 +254,7 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
+                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -376,7 +376,7 @@
             try {
                 await navigator.clipboard.writeText(cleanText);
                 const originalHtml = btnElement.innerHTML;
-                btnElement.innerHTML = '✓ Copied!';
+                btnElement.innerHTML = '✓';
                 btnElement.style.background = "#4caf50";
                 setTimeout(() => {
                     btnElement.innerHTML = originalHtml;
@@ -606,6 +606,7 @@
             resultBox.style.display = 'block';
             resultBox.innerHTML = `
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
+                    <button class="tool-btn copy-btn" style="padding: 4px 6px;" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}', this)">📋</button>
                     <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
@@ -621,11 +622,7 @@
                     <button class="tool-btn deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL</button>
                 </div>
                 <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
-                    <strong style="color: var(--primary-blue);">Translation:</strong><br>
-                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 4px;">
-                        <button class="tool-btn copy-btn" style="padding: 4px 8px;" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}', this)">📋 Copy</button>
-                        <span>${info.zh}</span>
-                    </div>
+                    <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
                 </div>
                 <div class="definition-en-line" style="font-size: 15px;">
                     <strong style="color: var(--primary-blue); font-style: normal;">Definition:</strong><br>${info.enDef}
@@ -828,11 +825,9 @@
                                 <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
+                                        <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋</button>
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">
-                                            <button class="tool-btn copy-btn" style="padding: 2px 5px; font-size: 8px;" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋</button>
-                                            ${item.zh}
-                                        </span>
+                                        <span class="vocab-zh">${item.zh}</span>
                                         <div class="header-actions">
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
                                             <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎</button>
@@ -874,11 +869,9 @@
                                 <div class="delete-btn-overlay" onclick="deleteFavItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
+                                        <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋</button>
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">
-                                            <button class="tool-btn copy-btn" style="padding: 2px 5px; font-size: 8px;" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋</button>
-                                            ${item.zh}
-                                        </span>
+                                        <span class="vocab-zh">${item.zh}</span>
                                         <div class="header-actions">
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
                                         </div>
