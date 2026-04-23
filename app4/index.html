@@ -63,7 +63,7 @@
 
         .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
         .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
-        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-danger { background: #e53935; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; box-sizing: border-box; }
 
         .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; box-sizing: border-box; overflow: hidden; }
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
@@ -134,10 +134,11 @@
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        /* Modified: Improved word wrapping to prevent breaking mid-word */
+        /* Modified for better line wrap */
         .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; box-sizing: border-box; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: keep-all; overflow-wrap: break-word; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: keep-all; overflow-wrap: break-word; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; overflow-wrap: anywhere; word-wrap: break-word; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; word-wrap: break-word; }
+        
         .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; box-sizing: border-box; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         
@@ -162,8 +163,7 @@
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; box-sizing: border-box; }
         .item-details.show { display: block; }
         
-        /* Modified: Improved word wrapping for English definitions */
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-break: keep-all; overflow-wrap: break-word; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; overflow-wrap: anywhere; word-wrap: break-word; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -285,8 +285,10 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
                         <span id="rawToast" class="toast-added">✓ Added</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -477,10 +479,7 @@
             const targetPage = document.getElementById(`${id}Page`);
             if(targetPage) targetPage.classList.add('active');
             
-            if (id === 'scope') {
-                renderTable();
-                renderRawDropdown();
-            }
+            if (id === 'scope') renderTable();
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation' || id === 'cloze') startSession(id);
@@ -495,7 +494,6 @@
             document.getElementById(tabId === 'rawTab' ? 'btnRawTab' : 'btnDictTab').classList.add('active');
             document.getElementById(tabId).classList.add('active');
             if(tabId === 'dictTab') renderTable();
-            if(tabId === 'rawTab') renderRawDropdown();
         }
 
         async function fetchInfo(text) {
@@ -930,14 +928,14 @@
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${i}`);
+            let row = document.getElementById(`fav-row-${item.originalIndex}`);
             if (!row) return;
             let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left');
             else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleFavTouchEnd(e, i) { 
-            let row = document.getElementById(`fav-row-${i}`);
+            let row = document.getElementById(`fav-row-${item.originalIndex}`);
             if (row && touchStartX - e.changedTouches[0].clientX < 40) row.classList.remove('swiped-left'); 
         }
 
@@ -952,7 +950,7 @@
             if (index !== -1) {
                 rawTextData[index].text = document.getElementById('scopeRawEditor').value;
                 saveRawData();
-                alert("✓ Saved Successfully");
+                alert("Changes saved!");
             }
         }
 
