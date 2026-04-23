@@ -14,7 +14,7 @@
             --bg-gradient: linear-gradient(135deg, #f5fbf9 0%, #e3f2fd 100%);
             --highlight-yellow: #fff59d;
             --deepl-blue: #0f2d37;
-            --erudite-green: #2e7d32; /* 修改為綠色 */
+            --erudite-green: #2e7d32;
         }
 
         body {
@@ -39,16 +39,18 @@
             padding: 30px;
             border-top: 12px solid var(--accent-green);
             position: relative;
+            box-sizing: border-box;
+            word-wrap: break-word;
         }
 
         h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
 
-        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        .page-content { display: none; animation: fadeIn 0.3s ease; width: 100%; box-sizing: border-box; }
         .page-content.active { display: block; }
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; border-width: 3px; }
+        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; border-width: 3px; box-sizing: border-box; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .card i { font-size: 30px; display: block; margin-bottom: 10px; }
 
@@ -57,16 +59,16 @@
             font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
             margin-top: 10px; resize: vertical; box-sizing: border-box;
         }
-        .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; }
+        .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; box-sizing: border-box; }
 
-        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
-        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
+        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
+        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; box-sizing: border-box; }
 
-        .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; box-sizing: border-box; overflow: hidden; }
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
         .file-upload-wrapper input[type="file"] { display: none; }
-        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); }
+        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); word-break: break-all; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         
@@ -109,63 +111,57 @@
             transform: translateX(-80px);
         }
         
-        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-sizing: border-box; }
         .category-header { 
             background: #f8f9fa; padding: 12px 15px; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center;
             font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid #eee;
+            box-sizing: border-box;
         }
-        .category-content { display: block; padding: 10px; background: #fff; }
+        .category-content { display: block; padding: 10px; background: #fff; box-sizing: border-box; }
         .category-content.collapsed { display: none; }
         .cat-count { background: var(--primary-blue); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
-        .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
         .cat-delete-btn:hover { background: #ef9a9a; color: white; }
 
-        .cloze-box { font-size: 1.2rem; background: #fafafa; padding: 25px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .cloze-box { font-size: 1.2rem; background: #fafafa; padding: 25px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; box-sizing: border-box; overflow-wrap: break-word; }
         .status-msg { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
 
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; box-sizing: border-box; }
         .tab-btn.active { background: var(--light-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; box-sizing: border-box; }
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
-        .phonetic-line { display: flex; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+        .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; box-sizing: border-box; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: break-all; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: break-all; }
+        .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; box-sizing: border-box; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
-        .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
         
-        .copy-icon-btn {
-            background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px; 
-            color: #90a4ae; transition: 0.2s; display: inline-flex; align-items: center;
+        .tool-btn {
+            cursor: pointer; border: none; border-radius: 4px; padding: 5px 8px; 
+            font-size: 10px; font-weight: bold; display: flex; align-items: center; 
+            gap: 4px; transition: 0.2s; color: white; white-space: nowrap;
         }
-        .copy-icon-btn:hover { color: var(--primary-blue); }
 
-        .deepl-btn { 
-            cursor: pointer; background: var(--deepl-blue); color: white; border: none; 
-            border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: bold; 
-            display: flex; align-items: center; gap: 4px; transition: 0.2s;
-        }
+        .copy-btn { background: #78909c; }
+        .copy-btn:hover { background: #546e7a; }
+        .pron-icon { background: #eceff1; color: var(--primary-blue); border: none; border-radius: 4px; padding: 5px 8px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .deepl-btn { background: var(--deepl-blue); }
         .deepl-btn:hover { background: #1a4a5a; }
+        .erudite-btn { background: var(--erudite-green); }
+        .erudite-btn:hover { background: #1b5e20; }
 
-        .erudite-btn {
-            cursor: pointer; background: var(--erudite-green); color: white; border: none; 
-            border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: bold; 
-            display: flex; align-items: center; gap: 4px; transition: 0.2s;
-        }
-        .erudite-btn:hover { opacity: 0.9; }
-
-        .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-        .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
-        .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
+        .header-actions { margin-left: auto; display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+        .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
+        .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
         
-        .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
+        .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; box-sizing: border-box; }
         .item-details.show { display: block; }
         
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-break: break-all; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -177,6 +173,14 @@
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .portal-grid { grid-template-columns: repeat(2, 1fr); }
+            .btn-action { padding: 10px 15px; font-size: 14px; }
+            .vocab-target { font-size: 16px; }
+            .vocab-zh { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -199,10 +203,10 @@
             <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px; min-width: 0;" onkeypress="if(event.key === 'Enter') performLookup()">
                 <button class="btn-action" onclick="performLookup()">Search</button>
             </div>
-            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-sizing: border-box;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
                 <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
@@ -222,7 +226,7 @@
         <div id="favoritesPage" class="page-content">
             <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>⭐ My Library</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                 <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
                 <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
@@ -242,15 +246,15 @@
                 <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
                 <textarea id="ocrTextEditor"></textarea>
                 <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('ocrTextEditor')">➕ Add Selected</button>
                         <button id="btnAddAllScan" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ Add All</button>
                         <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
+                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -271,12 +275,12 @@
                 </select>
                 <textarea id="scopeRawEditor" style="display:none;"></textarea>
                 <div id="rawActions" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
                         <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
                         <button class="btn-action" style="background:#4db6ac; padding: 12px 15px;" onclick="saveRawChanges()">💾 Save Changes</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
                         <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
@@ -286,7 +290,7 @@
             </div>
 
             <div id="dictTab" class="tab-content">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                     <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word/Phrase</button>
                     <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Delete All</button>
                 </div>
@@ -306,8 +310,8 @@
                     <button class="btn-action" onclick="speakTarget('en-GB')">🔊 UK</button>
                     <button class="btn-action" onclick="speakTarget('en-US')" style="background:#455a64;">🔊 US</button>
                 </div>
-                <p id="dictHint" style="padding: 0 10px; min-height: 40px;"></p>
-                <input type="text" id="dictInput" placeholder="Type your answer..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <p id="dictHint" style="padding: 0 10px; min-height: 40px; word-break: break-word;"></p>
+                <input type="text" id="dictInput" placeholder="Type your answer..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;">
                 <br><br>
                 <button class="btn-action" onclick="checkDictation()" style="width:100%">Check Answer</button>
                 <div id="dictResult" class="status-msg"></div>
@@ -319,7 +323,7 @@
             <div style="text-align:center">
                 <h3 id="clozeProgress">0 / 0</h3>
                 <div id="clozeDisplay" class="cloze-box"></div>
-                <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;">
                 <br><br>
                 <button class="btn-action" onclick="checkCloze()" style="width:100%">Check Answer</button>
                 <div id="clozeResult" class="status-msg"></div>
@@ -367,13 +371,20 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
 
-        function copyToClipboard(text) {
+        async function copyToClipboard(text, btnElement) {
             const cleanText = stripMarkers(text).trim();
-            navigator.clipboard.writeText(cleanText).then(() => {
-                alert("Copied: " + cleanText);
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
-            });
+            try {
+                await navigator.clipboard.writeText(cleanText);
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '✓ Copied!';
+                btnElement.style.background = "#4caf50";
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.style.background = "";
+                }, 1500);
+            } catch (err) {
+                alert('Copy failed');
+            }
         }
 
         function handleFileSelect(input) {
@@ -596,7 +607,7 @@
             resultBox.innerHTML = `
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
                     <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
-                    <button class="copy-icon-btn" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}')" title="Copy to clipboard">📋</button>
+                    <button class="tool-btn copy-btn" style="padding: 4px 10px;" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}', this)">📋 Copy</button>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
@@ -607,11 +618,14 @@
                         <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
                         <span>${info.usPhonetic}</span>
                     </div>
-                    <button class="erudite-btn" onclick="openErudite('${info.word.replace(/'/g, "\\'")}')">Erudite</button>
-                    <button class="deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL</button>
+                    <button class="tool-btn erudite-btn" onclick="openErudite('${info.word.replace(/'/g, "\\'")}')">Erudite</button>
+                    <button class="tool-btn deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL</button>
                 </div>
-                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
-                    <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
+                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;">
+                    <div style="flex: 1;">
+                        <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
+                    </div>
+                    <button class="tool-btn copy-btn" style="margin-top: 5px; flex-shrink: 0;" onclick="copyToClipboard('${stripMarkers(info.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
                 </div>
                 <div class="definition-en-line" style="font-size: 15px;">
                     <strong style="color: var(--primary-blue); font-style: normal;">Definition:</strong><br>${info.enDef}
@@ -815,9 +829,9 @@
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <button class="copy-icon-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}')">📋</button>
                                         <span class="vocab-zh">${item.zh}</span>
                                         <div class="header-actions">
+                                            <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${stripMarkers(item.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
                                             <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎</button>
                                         </div>
@@ -826,8 +840,8 @@
                                         <div class="phonetic-line">
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
-                                            <button class="erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
-                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
+                                            <button class="tool-btn erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
+                                            <button class="tool-btn deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -859,16 +873,18 @@
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <button class="copy-icon-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}')">📋</button>
                                         <span class="vocab-zh">${item.zh}</span>
-                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                        <div class="header-actions">
+                                            <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${stripMarkers(item.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
+                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                        </div>
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
                                             <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
-                                            <button class="erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
-                                            <button class="deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
+                                            <button class="tool-btn erudite-btn" onclick="event.stopPropagation(); openErudite('${item.word.replace(/'/g, "\\'")}')">Erudite</button>
+                                            <button class="tool-btn deepl-btn" onclick="event.stopPropagation(); openDeepL('${item.word.replace(/'/g, "\\'")}')">DeepL</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -899,20 +915,28 @@
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleTouchMove(e, i) {
             let row = document.getElementById(`row-${i}`);
+            if (!row) return;
             let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left');
             else if (diff < -20) row.classList.remove('swiped-left');
         }
-        function handleTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`row-${i}`).classList.remove('swiped-left'); }
+        function handleTouchEnd(e, i) { 
+            let row = document.getElementById(`row-${i}`);
+            if (row && touchStartX - e.changedTouches[0].clientX < 40) row.classList.remove('swiped-left'); 
+        }
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
             let row = document.getElementById(`fav-row-${i}`);
+            if (!row) return;
             let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left');
             else if (diff < -20) row.classList.remove('swiped-left');
         }
-        function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
+        function handleFavTouchEnd(e, i) { 
+            let row = document.getElementById(`fav-row-${i}`);
+            if (row && touchStartX - e.changedTouches[0].clientX < 40) row.classList.remove('swiped-left'); 
+        }
 
         function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
         function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
