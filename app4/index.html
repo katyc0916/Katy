@@ -182,7 +182,7 @@
         </div>
 
         <div id="dictionaryPage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
@@ -206,7 +206,7 @@
         </div>
 
         <div id="favoritesPage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>⭐ My Library</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
@@ -217,7 +217,7 @@
         </div>
 
         <div id="scanPage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>Text Scanner</h2>
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
                 <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
@@ -244,7 +244,7 @@
         </div>
 
         <div id="scopePage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <h2>📋 Study Scope Management</h2>
             <div class="tab-container">
                 <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Source Texts</div>
@@ -285,7 +285,7 @@
         </div>
 
         <div id="dictationPage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <div style="text-align:center">
                 <h3 id="dictProgress">0 / 0</h3>
                 <div style="margin-bottom: 20px;">
@@ -301,7 +301,7 @@
         </div>
 
         <div id="clozePage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
+            <div class="back-btn" onclick="goBack()">← Back</div>
             <div style="text-align:center">
                 <h3 id="clozeProgress">0 / 0</h3>
                 <div id="clozeDisplay" class="cloze-box"></div>
@@ -322,6 +322,8 @@
         let currentIndex = 0;
         let touchStartX = 0;
         let currentLookupData = null;
+        let currentPageId = 'home';
+        let previousPageId = 'home';
 
         function stripMarkers(str) {
             return str.replace(/==/g, '');
@@ -406,17 +408,40 @@
         document.getElementById('dictInput').addEventListener('focus', focusHandler);
 
         function goHome() {
+            previousPageId = currentPageId;
+            currentPageId = 'home';
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById('homePage').classList.add('active');
             window.scrollTo(0,0);
+        }
+
+        function goBack() {
+            if (previousPageId === 'home' || !previousPageId) {
+                goHome();
+            } else {
+                const target = previousPageId;
+                previousPageId = 'home'; // 重置為首頁，防止循環
+                switchPage(target);
+            }
         }
 
         function switchPage(id) {
             if ((id === 'dictation' || id === 'cloze') && vocabData.length === 0) {
                 alert("Please add items to Study Scope first!"); return;
             }
+            
+            // 記錄當前頁面為「上一個頁面」，除非當前就是首頁
+            if(currentPageId !== 'home') {
+                previousPageId = currentPageId;
+            } else {
+                previousPageId = 'home';
+            }
+            currentPageId = id;
+
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.getElementById(`${id}Page`).classList.add('active');
+            const targetPage = document.getElementById(`${id}Page`);
+            if(targetPage) targetPage.classList.add('active');
+            
             if (id === 'scope') renderTable();
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
