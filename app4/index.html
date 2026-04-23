@@ -63,7 +63,7 @@
 
         .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
         .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
-        .btn-danger { background: #e53935; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; box-sizing: border-box; }
 
         .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; box-sizing: border-box; overflow: hidden; }
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
@@ -134,18 +134,16 @@
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        /* Modified for better line wrap */
-        .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; box-sizing: border-box; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; overflow-wrap: anywhere; word-wrap: break-word; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; word-wrap: break-word; }
-        
+        .vocab-row-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; box-sizing: border-box; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: break-all; flex: 1; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: break-all; flex: 1; }
         .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; box-sizing: border-box; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         
         .tool-btn {
             cursor: pointer; border: none; border-radius: 4px; padding: 5px 8px; 
             font-size: 10px; font-weight: bold; display: flex; align-items: center; 
-            gap: 4px; transition: 0.2s; color: white; white-space: nowrap;
+            gap: 4px; transition: 0.2s; color: white; white-space: nowrap; flex-shrink: 0;
         }
 
         .copy-btn { background: #78909c; }
@@ -163,7 +161,7 @@
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; box-sizing: border-box; }
         .item-details.show { display: block; }
         
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; overflow-wrap: anywhere; word-wrap: break-word; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-break: break-all; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -285,10 +283,10 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
-                        <span id="rawToast" class="toast-added">✓ Added</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
+                        <span id="rawToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
             </div>
@@ -928,14 +926,14 @@
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${item.originalIndex}`);
+            let row = document.getElementById(`fav-row-${i}`);
             if (!row) return;
             let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left');
             else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleFavTouchEnd(e, i) { 
-            let row = document.getElementById(`fav-row-${item.originalIndex}`);
+            let row = document.getElementById(`fav-row-${i}`);
             if (row && touchStartX - e.changedTouches[0].clientX < 40) row.classList.remove('swiped-left'); 
         }
 
@@ -950,7 +948,7 @@
             if (index !== -1) {
                 rawTextData[index].text = document.getElementById('scopeRawEditor').value;
                 saveRawData();
-                alert("Changes saved!");
+                alert("✓ Changes Saved!");
             }
         }
 
