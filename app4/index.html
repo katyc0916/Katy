@@ -134,9 +134,10 @@
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
+        /* Modified: Improved word wrapping to prevent breaking mid-word */
         .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; box-sizing: border-box; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: break-all; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: break-all; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; word-break: keep-all; overflow-wrap: break-word; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-break: keep-all; overflow-wrap: break-word; }
         .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; box-sizing: border-box; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         
@@ -161,7 +162,8 @@
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; box-sizing: border-box; }
         .item-details.show { display: block; }
         
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-break: break-all; }
+        /* Modified: Improved word wrapping for English definitions */
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-break: keep-all; overflow-wrap: break-word; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -278,12 +280,12 @@
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
                         <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
-                        <button class="btn-action" style="background:#4db6ac; padding: 12px 15px;" onclick="saveRawChanges()">💾 Save Changes</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
+                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
                         <span id="rawToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -475,7 +477,10 @@
             const targetPage = document.getElementById(`${id}Page`);
             if(targetPage) targetPage.classList.add('active');
             
-            if (id === 'scope') renderTable();
+            if (id === 'scope') {
+                renderTable();
+                renderRawDropdown();
+            }
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation' || id === 'cloze') startSession(id);
@@ -490,6 +495,7 @@
             document.getElementById(tabId === 'rawTab' ? 'btnRawTab' : 'btnDictTab').classList.add('active');
             document.getElementById(tabId).classList.add('active');
             if(tabId === 'dictTab') renderTable();
+            if(tabId === 'rawTab') renderRawDropdown();
         }
 
         async function fetchInfo(text) {
@@ -946,6 +952,7 @@
             if (index !== -1) {
                 rawTextData[index].text = document.getElementById('scopeRawEditor').value;
                 saveRawData();
+                alert("✓ Saved Successfully");
             }
         }
 
