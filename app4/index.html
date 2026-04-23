@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Dictation Pro | Edition</title>
+    <title>Lexicon Master | Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -160,13 +160,13 @@
 <body>
 
     <div class="container">
-        <h1>Smart Dictation Pro</h1>
+        <h1>Lexicon Master</h1>
 
         <div id="homePage" class="page-content active">
             <div class="portal-grid">
                 <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Smart Lookup</h3><p>Lookup & Learn</p></div>
                 <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Library</h3><p>Saved Words</p></div>
-                <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Smart Text Scanner</h3><p>Photo to Text</p></div>
+                <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Text Scanner</h3><p>Photo to Text</p></div>
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
@@ -210,7 +210,7 @@
 
         <div id="scanPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>Smart Text Scanner</h2>
+            <h2>Text Scanner</h2>
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
                 <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
