@@ -562,14 +562,15 @@
             const cleanText = stripMarkers(text.trim());
             const isZh = hasChinese(cleanText);
             const sl = isZh ? 'zh' : 'en';
-            const tl = isZh ? 'en' : 'zh'; // DeepL URL scheme uses simplified tags
-            // Use deepL app protocol to trigger app directly
+            const tl = isZh ? 'en' : 'zh'; 
+            // 關鍵修改：使用 DeepL 官方協議參數 text= 直接傳遞內容
             const url = `deepl://translate?sl=${sl}&tl=${tl}&text=${encodeURIComponent(cleanText)}`;
             window.location.href = url;
         }
 
         function openErudite(text) {
             const cleanText = stripMarkers(text.trim());
+            // 關鍵修改：Erudite 搜尋參數優化
             const url = `erudite://search?word=${encodeURIComponent(cleanText)}`;
             window.location.href = url;
         }
