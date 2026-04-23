@@ -254,7 +254,7 @@
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
+                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -372,11 +372,27 @@
         }
 
         async function copyToClipboard(text, btnElement) {
-            const cleanText = stripMarkers(text).trim();
+            const cleanText = stripMarkers(text.trim());
             try {
                 await navigator.clipboard.writeText(cleanText);
                 const originalHtml = btnElement.innerHTML;
                 btnElement.innerHTML = '✓ Copied!';
+                btnElement.style.background = "#4caf50";
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.style.background = "";
+                }, 1500);
+            } catch (err) {
+                alert('Copy failed');
+            }
+        }
+
+        async function copyTranslation(text, btnElement) {
+            const cleanText = text.replace(/<br>/g, '\n').replace(/\[.*?\]/g, '').trim();
+            try {
+                await navigator.clipboard.writeText(cleanText);
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '✓ Copied';
                 btnElement.style.background = "#4caf50";
                 setTimeout(() => {
                     btnElement.innerHTML = originalHtml;
@@ -607,7 +623,7 @@
             resultBox.innerHTML = `
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
                     <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
-                    <button class="tool-btn copy-btn" style="padding: 4px 10px;" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}', this)">📋 Copy</button>
+                    <button class="tool-btn copy-btn" style="padding: 4px 10px;" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}', this)">📋 Copy Word</button>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
@@ -621,11 +637,12 @@
                     <button class="tool-btn erudite-btn" onclick="openErudite('${info.word.replace(/'/g, "\\'")}')">Erudite</button>
                     <button class="tool-btn deepl-btn" onclick="openDeepL('${info.word.replace(/'/g, "\\'")}')">DeepL</button>
                 </div>
-                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;">
-                    <div style="flex: 1;">
-                        <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
+                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <strong style="color: var(--primary-blue);">Translation:</strong>
+                        <button class="tool-btn copy-btn" style="background:#cfd8dc; color:#37474f; font-size:9px;" onclick="copyTranslation('${info.zh.replace(/'/g, "\\'")}', this)">📋 Copy</button>
                     </div>
-                    <button class="tool-btn copy-btn" style="margin-top: 5px; flex-shrink: 0;" onclick="copyToClipboard('${stripMarkers(info.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
+                    <div style="margin-top:4px;">${info.zh}</div>
                 </div>
                 <div class="definition-en-line" style="font-size: 15px;">
                     <strong style="color: var(--primary-blue); font-style: normal;">Definition:</strong><br>${info.enDef}
@@ -827,11 +844,14 @@
                             <div class="list-item-row" id="row-${item.originalIndex}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${item.originalIndex})" ontouchend="handleTouchEnd(event, ${item.originalIndex})">
                                 <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
-                                    <div class="vocab-row-header">
+                                    <div class="vocab-row-header" style="align-items: center; gap: 6px;">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">${item.zh}</span>
+                                        <span class="vocab-zh" style="display:flex; align-items:center; gap:5px;">
+                                            ${item.zh}
+                                            <button class="tool-btn copy-btn" style="background:#f1f3f4; color:#5f6368; padding:2px 4px; border:1px solid #ddd; height:18px;" onclick="event.stopPropagation(); copyTranslation('${item.zh.replace(/'/g, "\\'")}', this)">📋</button>
+                                        </span>
                                         <div class="header-actions">
-                                            <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${stripMarkers(item.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
+                                            <button class="tool-btn copy-btn" title="Copy Word" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋W</button>
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
                                             <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎</button>
                                         </div>
@@ -871,11 +891,14 @@
                             <div class="list-item-row" id="fav-row-${item.originalIndex}" ontouchstart="handleFavTouchStart(event)" ontouchmove="handleFavTouchMove(event, ${item.originalIndex})" ontouchend="handleFavTouchEnd(event, ${item.originalIndex})">
                                 <div class="delete-btn-overlay" onclick="deleteFavItem(${item.originalIndex})">DELETE</div>
                                 <div class="item-main-content">
-                                    <div class="vocab-row-header">
+                                    <div class="vocab-row-header" style="align-items: center; gap: 6px;">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">${item.zh}</span>
+                                        <span class="vocab-zh" style="display:flex; align-items:center; gap:5px;">
+                                            ${item.zh}
+                                            <button class="tool-btn copy-btn" style="background:#f1f3f4; color:#5f6368; padding:2px 4px; border:1px solid #ddd; height:18px;" onclick="event.stopPropagation(); copyTranslation('${item.zh.replace(/'/g, "\\'")}', this)">📋</button>
+                                        </span>
                                         <div class="header-actions">
-                                            <button class="tool-btn copy-btn" onclick="event.stopPropagation(); copyToClipboard('${stripMarkers(item.zh).replace(/<br>/g, ' ').replace(/'/g, "\\'")}', this)">📋</button>
+                                            <button class="tool-btn copy-btn" title="Copy Word" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}', this)">📋W</button>
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
                                         </div>
                                     </div>
