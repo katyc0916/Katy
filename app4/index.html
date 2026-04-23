@@ -201,7 +201,7 @@
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>⭐ My Library</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word</button>
+                <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
                 <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
             <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
@@ -226,7 +226,9 @@
                         <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="btn-action" style="background:#4db6ac; width: 100%;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
+                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
+                        <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
+                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -246,22 +248,24 @@
                     <option value="">-- Select a saved scan --</option>
                 </select>
                 <textarea id="scopeRawEditor" style="display:none;"></textarea>
-                <div id="rawActions" style="margin-top:15px; display:none; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                <div id="rawActions" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
                         <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
                         <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
                         <button class="btn-action" style="background:#4db6ac; padding: 12px 15px;" onclick="saveRawChanges()">💾 Save Changes</button>
-                        <span id="rawToast" class="toast-added">✓ Added</span>
                     </div>
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button class="btn-action" style="background: #e53935; padding: 10px 20px; font-size: 14px;" onclick="deleteCurrentRaw()">🗑️ Delete</button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
+                        <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
+                        <span id="rawToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
             </div>
 
             <div id="dictTab" class="tab-content">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word</button>
+                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word/Phrase</button>
                     <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Delete All</button>
                 </div>
                 <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; margin-bottom: 15px;">
@@ -649,6 +653,18 @@
             showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
+        async function extractTextToLibrary(areaId) {
+            const area = document.getElementById(areaId);
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            if (!selectedText) { alert("Please highlight text!"); return; }
+            const cat = prompt("Assign collection category:", "My Words") || "My Words";
+            const info = await fetchInfo(selectedText);
+            info.word = selectedText; info.category = cat;
+            favoritesData.push(info);
+            saveFavoritesData();
+            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+        }
+
         async function addAllToDictation(areaId) {
             const area = document.getElementById(areaId);
             const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -667,6 +683,25 @@
             } finally { btn.innerText = "➕ Add All"; btn.disabled = false; }
         }
 
+        async function addAllToLibrary(areaId) {
+            const area = document.getElementById(areaId);
+            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length === 0) return;
+            const cat = prompt("Assign collection category:", "My Words") || "My Words";
+            const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnLibAllScan' : 'btnLibAllRaw');
+            const originalText = btn.innerText;
+            btn.innerText = "•••"; btn.disabled = true;
+            try {
+                for (const line of lines) {
+                    const info = await fetchInfo(line);
+                    info.word = line; info.category = cat;
+                    favoritesData.push(info);
+                }
+                saveFavoritesData();
+                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+            } finally { btn.innerText = originalText; btn.disabled = false; }
+        }
+
         async function addNewManualVocab() {
             const word = prompt("Enter English Word/Phrase:");
             if (!word) return;
@@ -677,9 +712,9 @@
         }
 
         async function addNewManualFavorite() {
-            const word = prompt("Enter Word/Phrase to Save:");
+            const word = prompt("Enter English Word/Phrase:");
             if (!word) return;
-            const cat = prompt("Enter Library Category:", "My Words") || "My Words";
+            const cat = prompt("Enter Collection Category:", "My Words") || "My Words";
             const info = await fetchInfo(word);
             favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
             saveFavoritesData();
@@ -749,14 +784,12 @@
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
                                         <span class="vocab-zh">${item.zh}</span>
-                                        <div class="header-actions">
-                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
-                                            <button class="edit-icon" onclick="event.stopPropagation(); editFavorite(${item.originalIndex})">✎</button>
-                                        </div>
+                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
                                         </div>
                                         <div class="definition-en-line">${item.enDef}</div>
                                     </div>
@@ -775,7 +808,6 @@
         function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
         function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
         function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
-        
         function editVocab(i) {
             const item = vocabData[i];
             const w = prompt("Word:", item.word); if(!w) return;
@@ -783,15 +815,6 @@
             vocabData[i].zh = prompt("Translation:", item.zh);
             vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
-        }
-
-        function editFavorite(i) {
-            const item = favoritesData[i];
-            const w = prompt("Word:", item.word); if(!w) return;
-            favoritesData[i].word = w;
-            favoritesData[i].zh = prompt("Translation:", item.zh);
-            favoritesData[i].enDef = prompt("Definition:", item.enDef);
-            saveFavoritesData();
         }
 
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
@@ -907,12 +930,14 @@
             }
         }
         function deleteCurrentRaw() {
-            const id = document.getElementById('rawTextSelect').value;
-            rawTextData = rawTextData.filter(r => r.id != id);
-            saveRawData(); loadRawText();
+            if(confirm("Delete all text in this source?")) {
+                const id = document.getElementById('rawTextSelect').value;
+                rawTextData = rawTextData.filter(r => r.id != id);
+                saveRawData(); loadRawText();
+            }
         }
-        function clearAllVocab() { vocabData = []; saveData(); }
-        function clearAllFavorites() { favoritesData = []; saveFavoritesData(); }
+        function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
+        function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
         
         window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
     </script>
