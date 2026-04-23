@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart English Dictation Master | Pro Edition</title>
+    <title>Smart Dictation Pro | Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -160,14 +160,14 @@
 <body>
 
     <div class="container">
-        <h1>Advanced Dictation Master</h1>
+        <h1>Smart Dictation Pro</h1>
 
         <div id="homePage" class="page-content active">
             <div class="portal-grid">
-                <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Pro Dictionary</h3><p>Lookup & Learn</p></div>
-                <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Collections</h3><p>Saved Words</p></div>
-                <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Smart Scan</h3><p>Photo to Text</p></div>
-                <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Scope</h3><p>Manage List</p></div>
+                <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Smart Lookup</h3><p>Lookup & Learn</p></div>
+                <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Library</h3><p>Saved Words</p></div>
+                <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Smart Text Scanner</h3><p>Photo to Text</p></div>
+                <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
             </div>
@@ -175,7 +175,7 @@
 
         <div id="dictionaryPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>📖 Pro Dictionary</h2>
+            <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
                 <button class="btn-action" onclick="performLookup()">Search</button>
@@ -183,30 +183,34 @@
             <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
-                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Collections</button>
-                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Scope</button>
+                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
+                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Study Scope</button>
             </div>
 
             <div id="searchHistoryContainer" style="margin-top: 30px;">
-                <h3 style="font-size: 18px; color: #546e7a; border-bottom: 2px solid #eee; padding-bottom: 5px;">Recent Searches</h3>
-                <div style="font-size: 12px; color: #90a4ae; margin-bottom: 10px;">💡 Tip: Swipe left to delete. Tap to view.</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                    <h3 style="font-size: 18px; color: #546e7a; margin: 0;">Recent Searches</h3>
+                    <button class="btn-danger" style="margin: 0; padding: 4px 8px; font-size: 12px;" onclick="clearAllHistory()">🗑️ Delete All</button>
+                </div>
+                <div style="font-size: 12px; color: #90a4ae; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap to view.</div>
                 <div id="searchHistoryList"></div>
             </div>
         </div>
 
         <div id="favoritesPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>⭐ My Collections (收藏庫)</h2>
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-                <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Wipe All</button>
+            <h2>⭐ My Library</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word</button>
+                <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
-            <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Tip: Tap headers to expand/collapse. Swipe left on items to delete.</div>
+            <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
             <div id="favoritesList"></div>
         </div>
 
         <div id="scanPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>Step 1: Layout-Aware Scan</h2>
+            <h2>Smart Text Scanner</h2>
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
                 <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
@@ -219,10 +223,10 @@
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
                         <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('ocrTextEditor')">➕ Add Selected</button>
                         <button id="btnAddAllScan" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ Add All</button>
-                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🧹 Clear All</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="btn-action" style="background:#4db6ac; width: 100%;" onclick="manuallySaveToRaw()">💾 Archive to Raw Texts</button>
+                        <button class="btn-action" style="background:#4db6ac; width: 100%;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -231,9 +235,9 @@
 
         <div id="scopePage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>📋 Scope Management</h2>
+            <h2>📋 Study Scope Management</h2>
             <div class="tab-container">
-                <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Raw Texts</div>
+                <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Source Texts</div>
                 <div id="btnDictTab" class="tab-btn" onclick="switchScopeTab('dictTab')">🎯 Dictation Scope</div>
             </div>
 
@@ -257,14 +261,13 @@
 
             <div id="dictTab" class="tab-content">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Vocab</button>
-                    <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Wipe All</button>
+                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word</button>
+                    <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Delete All</button>
                 </div>
                 <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; margin-bottom: 15px;">
-                    💡 <b>Highlighter Tip:</b> Wrap word with <code>==</code> to highlight. <br>
-                    Example: <i>Take <b>==advantage==</b> of</i>
+                    💡 <b>Advanced Tip:</b> Use double equals (==word==) to define fill-in-the-blank targets.
                 </div>
-                <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Tip: Tap headers to expand/collapse. Swipe left on items to delete.</div>
+                <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
                 <div id="vocabList"></div>
             </div>
         </div>
@@ -278,9 +281,9 @@
                     <button class="btn-action" onclick="speakTarget('en-US')" style="background:#455a64;">🔊 US</button>
                 </div>
                 <p id="dictHint" style="padding: 0 10px; min-height: 40px;"></p>
-                <input type="text" id="dictInput" placeholder="Enter spelling..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="text" id="dictInput" placeholder="Type your answer..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
                 <br><br>
-                <button class="btn-action" onclick="checkDictation()" style="width:100%">Submit Answer</button>
+                <button class="btn-action" onclick="checkDictation()" style="width:100%">Check Answer</button>
                 <div id="dictResult" class="status-msg"></div>
             </div>
         </div>
@@ -290,9 +293,9 @@
             <div style="text-align:center">
                 <h3 id="clozeProgress">0 / 0</h3>
                 <div id="clozeDisplay" class="cloze-box"></div>
-                <input type="text" id="clozeInput" placeholder="Correct form..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
                 <br><br>
-                <button class="btn-action" onclick="checkCloze()" style="width:100%">Verify Form</button>
+                <button class="btn-action" onclick="checkCloze()" style="width:100%">Check Answer</button>
                 <div id="clozeResult" class="status-msg"></div>
             </div>
         </div>
@@ -398,7 +401,7 @@
 
         function switchPage(id) {
             if ((id === 'dictation' || id === 'cloze') && vocabData.length === 0) {
-                alert("Please add items to Scope first!"); return;
+                alert("Please add items to Study Scope first!"); return;
             }
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById(`${id}Page`).classList.add('active');
@@ -419,9 +422,6 @@
             if(tabId === 'dictTab') renderTable();
         }
 
-        /**
-         * Lexis Pro Engine - 專業過濾與生僻字屏蔽算法
-         */
         async function fetchInfo(text) {
             const cleanText = stripMarkers(text.trim());
             const isChinese = hasChinese(cleanText);
@@ -444,17 +444,15 @@
                 
                 if (!data) return result;
 
-                // 獲取第一順位最準確的翻譯
                 const primaryTranslation = data[0] ? data[0].map(x => x[0]).join('').trim() : "";
                 const lookupStr = isChinese ? primaryTranslation : cleanText;
                 const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
 
-                // --- 專業淨化算法 (Anti-Archaic Filtering) ---
                 let zhLines = [];
                 if (data[1]) {
                     const posMap = {
-                        "noun": "名", "verb": "動", "adjective": "形", "adverb": "副",
-                        "pronoun": "代", "preposition": "介", "conjunction": "連", "interjection": "嘆"
+                        "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "adv.",
+                        "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int."
                     };
                     
                     data[1].forEach(posSection => {
@@ -468,37 +466,24 @@
                                 for(let i=2; i<item.length; i++) if (typeof item[i] === 'number') { score = item[i]; break; }
                                 return { word: item[0], score: score };
                             }).filter(w => {
-                                // 1. 硬性黑名單：過濾掉字典API常見的古語垃圾字
                                 const blackList = /[朕翫覿邴廋疏敝竊羿糗]/;
                                 if (blackList.test(w.word)) return false;
-                                
-                                // 2. 罕見漢字過濾 (利用Unicode範圍過濾擴展區漢字)
-                                // 只允許基本漢字區 (4E00-9FFF)，排除掉極生僻的擴展區
                                 if (!/^[\u4E00-\u9FA5]+$/.test(w.word)) return false;
-
-                                // 3. 權重過濾：如果是單字解釋，其權重必須極高
-                                // API 返回的生僻解釋通常 score 低於 0.1
                                 if (w.word.length === 1 && w.score < 0.15) return false;
-                                if (w.word.length >= 2 && w.score < 0.05) return false;
-                                
                                 return true;
                             });
-
                             candidates.sort((a, b) => b.score - a.score);
                         } else if (posSection[1]) {
                             candidates = posSection[1].map(w => ({ word: w, score: 1 }));
                         }
 
-                        // 只取前 3 個最高質量的現代漢語翻譯
-                        const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join('、');
+                        const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join(', ');
                         if (finalPicks) zhLines.push(`[${posLabel}] ${finalPicks}`);
                     });
                 }
                 
-                // 如果詳細詞典過濾後沒東西，則使用第一翻譯
-                result.zh = zhLines.length > 0 ? zhLines.join('<br>') : (primaryTranslation || "無匹配結果");
+                result.zh = zhLines.length > 0 ? zhLines.slice(0, 3).join('<br>') : (primaryTranslation || "No match found");
 
-                // 處理英英定義
                 let enDefLines = [];
                 if (data[12]) {
                     data[12].forEach(sec => {
@@ -508,7 +493,6 @@
                 if (enDefLines.length === 0) enDefLines.push(isPhraseOrSentence ? "<i>Contextual verified entry.</i>" : "<i>Standard entry.</i>");
                 result.enDef = enDefLines.join('<br>');
 
-                // --- 音標獲取 ---
                 if (!isPhraseOrSentence) {
                     const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
                     try {
@@ -522,16 +506,11 @@
                                 result.ukPhonetic = uk?.text || entry.phonetic || "/.../";
                                 result.usPhonetic = us?.text || entry.phonetic || "/.../";
                             }
-                            if (entry.meanings) {
-                                let proDefs = [];
-                                entry.meanings.slice(0, 2).forEach(m => proDefs.push(`<b>[${m.partOfSpeech}]</b> ${m.definitions[0].definition}`));
-                                result.enDef = proDefs.join('<br>');
-                            }
                         }
                     } catch(e) {}
                 }
                 if (isChinese && result.ukPhonetic === "/.../") { result.ukPhonetic = "N/A"; result.usPhonetic = "N/A"; }
-            } catch (e) { result.zh = "查詢服務暫時不可用"; }
+            } catch (e) { result.zh = "Query service unavailable"; }
             return result;
         }
 
@@ -580,20 +559,20 @@
 
         function saveLookupToFavorites() {
             if (!currentLookupData) return;
-            const cat = prompt("Assign a collection category (自訂收藏標題):", "My Words") || "My Words";
+            const cat = prompt("Assign a collection category (Category Name):", "My Words") || "My Words";
             currentLookupData.category = cat;
             favoritesData.push({...currentLookupData});
             saveFavoritesData();
-            alert("✓ Successfully Added to Collections!");
+            alert("✓ Successfully Added to Library!");
         }
 
         function saveLookupToScope() {
             if (!currentLookupData) return;
-            const cat = prompt("Assign a category for Dictation Scope:", "General") || "General";
+            const cat = prompt("Assign a category for Study Scope:", "General") || "General";
             currentLookupData.category = cat;
             vocabData.push({...currentLookupData});
             saveData();
-            alert("✓ Successfully Added to Scope!");
+            alert("✓ Successfully Added to Study Scope!");
         }
 
         function addToHistory(info) {
@@ -601,6 +580,13 @@
             searchHistory.unshift(info);
             if (searchHistory.length > 10) searchHistory.pop();
             saveHistoryData();
+        }
+
+        function clearAllHistory() {
+            if(confirm("Clear all search history?")) {
+                searchHistory = [];
+                saveHistoryData();
+            }
         }
 
         function saveHistoryData() {
@@ -638,7 +624,7 @@
         function handleHistTouchEnd(e, index) {
             let touchEndX = e.changedTouches[0].clientX;
             let row = document.getElementById(`hist-row-${index}`);
-            if (!row && touchStartX - touchEndX < 40) row.classList.remove('swiped-left');
+            if (row && touchStartX - touchEndX < 40) row.classList.remove('swiped-left');
         }
 
         function deleteHistItem(i) { searchHistory.splice(i, 1); saveHistoryData(); }
@@ -688,6 +674,15 @@
             const info = await fetchInfo(word);
             vocabData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
             saveData();
+        }
+
+        async function addNewManualFavorite() {
+            const word = prompt("Enter Word/Phrase to Save:");
+            if (!word) return;
+            const cat = prompt("Enter Library Category:", "My Words") || "My Words";
+            const info = await fetchInfo(word);
+            favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
+            saveFavoritesData();
         }
 
         function renderTable() {
@@ -754,7 +749,10 @@
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
                                         <span class="vocab-zh">${item.zh}</span>
-                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                        <div class="header-actions">
+                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
+                                            <button class="edit-icon" onclick="event.stopPropagation(); editFavorite(${item.originalIndex})">✎</button>
+                                        </div>
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
@@ -777,6 +775,7 @@
         function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
         function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
         function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
+        
         function editVocab(i) {
             const item = vocabData[i];
             const w = prompt("Word:", item.word); if(!w) return;
@@ -784,6 +783,15 @@
             vocabData[i].zh = prompt("Translation:", item.zh);
             vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
+        }
+
+        function editFavorite(i) {
+            const item = favoritesData[i];
+            const w = prompt("Word:", item.word); if(!w) return;
+            favoritesData[i].word = w;
+            favoritesData[i].zh = prompt("Translation:", item.zh);
+            favoritesData[i].enDef = prompt("Definition:", item.enDef);
+            saveFavoritesData();
         }
 
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
@@ -841,6 +849,13 @@
                 document.getElementById('dictHint').innerHTML = `<b>Category:</b> [${item.category || "General"}]<br><b>Meaning:</b><br>${item.zh}`;
                 document.getElementById('dictInput').value = "";
                 document.getElementById('dictResult').innerText = "";
+            } else if (id === 'cloze') {
+                document.getElementById('clozeProgress').innerText = `${currentIndex + 1} / ${vocabData.length}`;
+                const text = item.word;
+                const clozeText = text.replace(/==(.+?)==/g, '<span style="border-bottom:2px solid var(--primary-blue); color:transparent; padding:0 15px;">_____</span>');
+                document.getElementById('clozeDisplay').innerHTML = `<b>Context:</b><br>${clozeText}<br><br><b>Meaning:</b><br>${item.zh}`;
+                document.getElementById('clozeInput').value = "";
+                document.getElementById('clozeResult').innerText = "";
             }
         }
 
@@ -852,6 +867,20 @@
             if (input === correct) {
                 res.innerText = "Correct! ✨"; res.style.color = "green";
                 setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('dictation'); }, 1000);
+            } else {
+                res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
+            }
+        }
+
+        function checkCloze() {
+            const item = vocabData[currentIndex];
+            const input = document.getElementById('clozeInput').value.trim().toLowerCase();
+            const match = item.word.match(/==(.+?)==/);
+            const correct = match ? match[1].toLowerCase() : stripMarkers(item.word).toLowerCase();
+            const res = document.getElementById('clozeResult');
+            if (input === correct) {
+                res.innerText = "Correct! ✨"; res.style.color = "green";
+                setTimeout(() => { currentIndex = (currentIndex + 1) % vocabData.length; loadTask('cloze'); }, 1000);
             } else {
                 res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
             }
@@ -871,7 +900,12 @@
             showToast('scanToast');
         }
 
-        function clearEditor() { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; }
+        function clearEditor() { 
+            if(confirm("Delete all text in editor?")) {
+                document.getElementById('ocrTextEditor').value = ""; 
+                document.getElementById('editorSection').style.display = 'none'; 
+            }
+        }
         function deleteCurrentRaw() {
             const id = document.getElementById('rawTextSelect').value;
             rawTextData = rawTextData.filter(r => r.id != id);
@@ -884,3 +918,9 @@
     </script>
 </body>
 </html>
+
+在my library 和study scope內頁中的 add new word 修改為 Add New Word/Phrase。
+
+另外，我想再加強現有的翻譯及功能。令中文和英文無論詞語、句子或者短句，都能翻譯得更專業和更準確，像集合deepL 和 erudite dictionary translator和Cambridge dictionary 的翻譯功能般強大。
+
+請幫我作出專業的修改後，完整整合在HTML給我，其餘所有的文字格式設計等都不能修改！
