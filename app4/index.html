@@ -14,7 +14,7 @@
             --bg-gradient: linear-gradient(135deg, #f5fbf9 0%, #e3f2fd 100%);
             --highlight-yellow: #fff59d;
             --deepl-blue: #0f2d37;
-            --erudite-red: #d32f2f;
+            --erudite-green: #2e7d32; /* 修改為綠色 */
         }
 
         body {
@@ -131,13 +131,19 @@
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        .vocab-row-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; }
+        .vocab-row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
         .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; }
         .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
         .phonetic-line { display: flex; gap: 15px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
         
+        .copy-icon-btn {
+            background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px; 
+            color: #90a4ae; transition: 0.2s; display: inline-flex; align-items: center;
+        }
+        .copy-icon-btn:hover { color: var(--primary-blue); }
+
         .deepl-btn { 
             cursor: pointer; background: var(--deepl-blue); color: white; border: none; 
             border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: bold; 
@@ -146,11 +152,11 @@
         .deepl-btn:hover { background: #1a4a5a; }
 
         .erudite-btn {
-            cursor: pointer; background: var(--erudite-red); color: white; border: none; 
+            cursor: pointer; background: var(--erudite-green); color: white; border: none; 
             border-radius: 4px; padding: 3px 10px; font-size: 10px; font-weight: bold; 
             display: flex; align-items: center; gap: 4px; transition: 0.2s;
         }
-        .erudite-btn:hover { background: #b71c1c; }
+        .erudite-btn:hover { opacity: 0.9; }
 
         .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
         .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
@@ -244,7 +250,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
+                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Source Texts</button>
                         <span id="scanToast" class="toast-added">✓ Added</span>
                     </div>
                 </div>
@@ -359,6 +365,15 @@
             if (!toast) return;
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        }
+
+        function copyToClipboard(text) {
+            const cleanText = stripMarkers(text).trim();
+            navigator.clipboard.writeText(cleanText).then(() => {
+                alert("Copied: " + cleanText);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
         }
 
         function handleFileSelect(input) {
@@ -562,15 +577,13 @@
             const cleanText = stripMarkers(text.trim());
             const isZh = hasChinese(cleanText);
             const sl = isZh ? 'zh' : 'en';
-            const tl = isZh ? 'en' : 'zh'; 
-            // 關鍵修改：使用 DeepL 官方協議參數 text= 直接傳遞內容
+            const tl = isZh ? 'en' : 'zh';
             const url = `deepl://translate?sl=${sl}&tl=${tl}&text=${encodeURIComponent(cleanText)}`;
             window.location.href = url;
         }
 
         function openErudite(text) {
             const cleanText = stripMarkers(text.trim());
-            // 關鍵修改：Erudite 搜尋參數優化
             const url = `erudite://search?word=${encodeURIComponent(cleanText)}`;
             window.location.href = url;
         }
@@ -583,6 +596,7 @@
             resultBox.innerHTML = `
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
                     <span class="vocab-target" style="font-size: 24px;">${formatDisplay(info.word)}</span>
+                    <button class="copy-icon-btn" onclick="copyToClipboard('${info.word.replace(/'/g, "\\'")}')" title="Copy to clipboard">📋</button>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
@@ -801,6 +815,7 @@
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
+                                        <button class="copy-icon-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}')">📋</button>
                                         <span class="vocab-zh">${item.zh}</span>
                                         <div class="header-actions">
                                             <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
@@ -844,6 +859,7 @@
                                 <div class="item-main-content">
                                     <div class="vocab-row-header">
                                         <span class="vocab-target">${formatDisplay(item.word)}</span>
+                                        <button class="copy-icon-btn" onclick="event.stopPropagation(); copyToClipboard('${item.word.replace(/'/g, "\\'")}')">📋</button>
                                         <span class="vocab-zh">${item.zh}</span>
                                         <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
                                     </div>
