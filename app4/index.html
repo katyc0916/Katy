@@ -788,7 +788,7 @@
                         <div>📁 ${catName} <span class="cat-count">${groups[catName].length}</span></div>
                         <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCategory('${catName}')">🗑️</button>
                     </div>
-                    <div id="cat-content-${catName}" class="category-content">
+                    <div id="cat-content-${catName}" class="category-content collapsed">
                         ${groups[catName].map(item => {
                             const encodedWord = encodeURIComponent(stripMarkers(item.word));
                             return `
