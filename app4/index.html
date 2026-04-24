@@ -165,6 +165,20 @@
         .category-chip.selected { border-color: var(--primary-blue); background: var(--light-blue); }
         .category-chip input { transform: scale(1.2); }
 
+        /* Dictation Textarea Style */
+        #dictInput {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: none;
+            min-height: 80px;
+            overflow-y: auto;
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -309,10 +323,10 @@
             <div id="dictPlayUI" style="display:none; text-align:center;">
                 <h3 id="dictProgress">0 / 0</h3>
                 <div style="margin-bottom: 30px;">
-                    <button class="btn-action" onclick="speakTarget('en-GB')" style="padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
-                    <button class="btn-action" onclick="speakTarget('en-US')" style="background:#455a64; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
+                    <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
+                    <button class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
                 </div>
-                <input type="text" id="dictInput" placeholder="Type what you hear..." style="width:100%; padding:18px; font-size:20px; border: 2px solid #ddd; border-radius: 12px;" onkeypress="if(event.key === 'Enter') checkDictation()">
+                <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="if(event.key === 'Enter') { event.preventDefault(); checkDictation(); }"></textarea>
                 <br><br>
                 <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
                 <div id="dictResult" class="status-msg"></div>
@@ -344,6 +358,7 @@
 
         // Session Variables
         let activeSessionData = [];
+        let dictationScore = 0;
 
         function stripMarkers(str) {
             return str.replace(/==/g, '');
@@ -965,6 +980,7 @@
                 }
             }
 
+            dictationScore = 0; // Reset Score
             document.getElementById('dictConfigUI').style.display = 'none';
             document.getElementById('dictPlayUI').style.display = 'block';
             loadTask('dictation');
@@ -992,12 +1008,14 @@
             const input = document.getElementById('dictInput').value.trim().toLowerCase();
             const correct = stripMarkers(item.word).toLowerCase();
             const res = document.getElementById('dictResult');
+            
             if (input === correct) {
+                dictationScore++;
                 res.innerText = "Correct! ✨"; res.style.color = "green";
                 setTimeout(() => { 
                     currentIndex++;
                     if(currentIndex >= activeSessionData.length) {
-                        alert("Dictation Session Finished!");
+                        alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
                         goHome();
                     } else {
                         loadTask('dictation');
@@ -1005,6 +1023,8 @@
                 }, 800);
             } else {
                 res.innerText = `Incorrect. The answer is: "${correct}"`; res.style.color = "red";
+                // Even if wrong, we proceed to next after user acknowledges or wait for next enter
+                // To keep it simple, we let them retry until correct, or you can add a "Skip" button.
             }
         }
 
