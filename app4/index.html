@@ -321,7 +321,10 @@
             </div>
 
             <div id="dictPlayUI" style="display:none; text-align:center;">
-                <h3 id="dictProgress">0 / 0</h3>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <h3 id="dictProgress" style="margin: 0;">0 / 0</h3>
+                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏭️ Next</button>
+                </div>
                 <div style="margin-bottom: 30px;">
                     <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
                     <button class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
@@ -1028,6 +1031,16 @@
             }
         }
 
+        function skipDictation() {
+            currentIndex++;
+            if(currentIndex >= activeSessionData.length) {
+                alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
+                goHome();
+            } else {
+                loadTask('dictation');
+            }
+        }
+
         function checkCloze() {
             const item = activeSessionData[currentIndex];
             const input = document.getElementById('clozeInput').value.trim().toLowerCase();
@@ -1091,3 +1104,4 @@
     </script>
 </body>
 </html>
+
