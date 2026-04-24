@@ -1035,21 +1035,29 @@
             let expectedDisplay = "";
 
             if (markers && markers.length > 0) {
-                const correctAnswers = markers.map(m => m.replace(/==/g, '').toLowerCase());
-                const userAnswers = inputRaw.split(/[\s,]+/).filter(w => w.length > 0);
+                const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
+                const correctAnswers = originalAnswers.map(m => m.toLowerCase());
                 
-                if (correctAnswers.length === userAnswers.length && correctAnswers.every((val, index) => val === userAnswers[index])) {
+                const fullSentence = stripMarkers(item.word).toLowerCase().trim();
+                const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
+                
+                if (inputRaw === fullSentence) {
+                    isCorrect = true;
+                } else if (correctAnswers.length === 1 && inputRaw === correctAnswers[0]) {
+                    isCorrect = true;
+                } else if (correctAnswers.length === userAnswersComma.length && correctAnswers.every((val, index) => val === userAnswersComma[index])) {
                     isCorrect = true;
                 }
-                expectedDisplay = correctAnswers.length > 1 
-                    ? correctAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
-                    : correctAnswers[0];
+                
+                expectedDisplay = originalAnswers.length > 1 
+                    ? originalAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
+                    : originalAnswers[0];
             } else {
-                const correct = stripMarkers(item.word).toLowerCase();
-                if (inputRaw === correct) {
+                const correctCheck = stripMarkers(item.word).toLowerCase().trim();
+                if (inputRaw === correctCheck) {
                     isCorrect = true;
                 }
-                expectedDisplay = correct;
+                expectedDisplay = stripMarkers(item.word).trim();
             }
             
             if (isCorrect) {
@@ -1071,7 +1079,7 @@
 
         function skipDictation() {
             currentIndex++;
-            if(currentIndex >= activeSessionData.length) {
+            if(currentIndex >= activeSessionData.length){
                 alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
                 goHome();
             } else {
