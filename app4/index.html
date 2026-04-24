@@ -201,9 +201,10 @@
                 <h3 style="margin-top: 0; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportAllData()">📤 Export Data</button>
-                    <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="importAllData()">📥 Import Data</button>
+                    <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
+                    <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
                 </div>
-                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Copy code to send via WhatsApp. <br> Import: Paste code from other devices.</p>
+                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
             </div>
         </div>
 
@@ -776,9 +777,9 @@
         async function addNewManualFavorite() {
             const word = prompt("Enter English Word/Phrase:");
             if (!word) return;
-            const cat = prompt("Enter Collection Category:", "My Words") || "My Words";
+            const Granary = prompt("Enter Collection Category:", "My Words") || "My Words";
             const info = await fetchInfo(word);
-            favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
+            favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: Granary });
             saveFavoritesData();
         }
 
@@ -1146,8 +1147,7 @@
         function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
         function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
         
-        // --- 資料匯出/匯入邏輯 (方案一) ---
-        async function exportAllData() {
+        function exportAllData() {
             const bundle = {
                 vocab: vocabData,
                 raw: rawTextData,
@@ -1155,38 +1155,49 @@
                 hist: searchHistory,
                 ver: "1.0"
             };
-            const dataStr = JSON.stringify(bundle);
-            try {
-                await navigator.clipboard.writeText(dataStr);
-                alert("✅ 資料代碼已成功複製！\n現在您可以前往 WhatsApp 貼上傳送給他人。");
-            } catch (err) {
-                // 回退方案：手動選取
-                const tempInput = document.createElement("textarea");
-                tempInput.value = dataStr;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
-                alert("✅ 資料代碼已複製到剪貼簿。");
-            }
+            const dataStr = JSON.stringify(bundle, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "LexiconMaster_Backup.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        function importAllData() {
-            const dataStr = prompt("請貼上匯入代碼 (JSON)：");
-            if (!dataStr) return;
-            try {
-                const bundle = JSON.parse(dataStr);
-                if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
-                    localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
-                    localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
-                    localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
-                    localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-                    alert("✨ 資料匯入成功！系統即將重新載入。");
-                    location.reload();
+        function importAllData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const bundle = JSON.parse(e.target.result);
+                    if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
+                        // 同步寫入 localStorage
+                        localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
+                        localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
+                        localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
+                        localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
+
+                        // 核心修復：同步更新運行中的全域變數
+                        vocabData = bundle.vocab || [];
+                        rawTextData = bundle.raw || [];
+                        favoritesData = bundle.fav || [];
+                        searchHistory = bundle.hist || [];
+
+                        alert("✨ 資料匯入成功！系統即將重新載入。");
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert("❌ 檔案解析失敗，請確保選擇的是正確的備份檔案。");
                 }
-            } catch (e) {
-                alert("❌ 代碼無效，請確保貼上的是完整的正確代碼。");
-            }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
         }
 
         window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
