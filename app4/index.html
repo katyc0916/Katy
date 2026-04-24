@@ -332,6 +332,7 @@
                 <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="if(event.key === 'Enter') { event.preventDefault(); checkDictation(); }"></textarea>
                 <br><br>
                 <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
+                <div id="dictHintDisplay" style="margin-top: 15px; font-size: 16px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
                 <div id="dictResult" class="status-msg"></div>
             </div>
         </div>
@@ -995,6 +996,15 @@
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
                 document.getElementById('dictInput').value = "";
                 document.getElementById('dictResult').innerText = "";
+                
+                const hintDisplay = document.getElementById('dictHintDisplay');
+                const hasMarkers = /==(.+?)==/.test(item.word);
+                if (hasMarkers) {
+                    hintDisplay.innerText = item.word.replace(/==(.+?)==/g, '_____');
+                } else {
+                    hintDisplay.innerText = "";
+                }
+                
                 document.getElementById('dictInput').focus();
             } else if (id === 'cloze') {
                 document.getElementById('clozeProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
@@ -1008,11 +1018,30 @@
 
         function checkDictation() {
             const item = activeSessionData[currentIndex];
-            const input = document.getElementById('dictInput').value.trim().toLowerCase();
-            const correct = stripMarkers(item.word).toLowerCase();
+            const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase();
             const res = document.getElementById('dictResult');
             
-            if (input === correct) {
+            const markers = item.word.match(/==(.+?)==/g);
+            let isCorrect = false;
+            let expectedDisplay = "";
+
+            if (markers && markers.length > 0) {
+                const correctAnswers = markers.map(m => m.replace(/==/g, '').toLowerCase());
+                const userAnswers = inputRaw.split(/[\s,]+/).filter(w => w.length > 0);
+                
+                if (correctAnswers.length === userAnswers.length && correctAnswers.every((val, index) => val === userAnswers[index])) {
+                    isCorrect = true;
+                }
+                expectedDisplay = correctAnswers.join(' ');
+            } else {
+                const correct = stripMarkers(item.word).toLowerCase();
+                if (inputRaw === correct) {
+                    isCorrect = true;
+                }
+                expectedDisplay = correct;
+            }
+            
+            if (isCorrect) {
                 dictationScore++;
                 res.innerText = "Correct! ✨"; res.style.color = "green";
                 setTimeout(() => { 
@@ -1025,7 +1054,7 @@
                     }
                 }, 800);
             } else {
-                res.innerText = `Incorrect. The answer is: "${correct}"`; res.style.color = "red";
+                res.innerText = `Incorrect. The answer is: "${expectedDisplay}"`; res.style.color = "red";
                 // Even if wrong, we proceed to next after user acknowledges or wait for next enter
                 // To keep it simple, we let them retry until correct, or you can add a "Skip" button.
             }
@@ -1104,4 +1133,3 @@
     </script>
 </body>
 </html>
-
