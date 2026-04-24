@@ -196,6 +196,15 @@
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
             </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
+                <h3 style="margin-top: 0; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportAllData()">📤 Export Data</button>
+                    <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="importAllData()">📥 Import Data</button>
+                </div>
+                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Copy code to send via WhatsApp. <br> Import: Paste code from other devices.</p>
+            </div>
         </div>
 
         <div id="dictionaryPage" class="page-content">
@@ -1032,7 +1041,6 @@
                 if (correctAnswers.length === userAnswers.length && correctAnswers.every((val, index) => val === userAnswers[index])) {
                     isCorrect = true;
                 }
-                // 修改處：如果有多個答案，使用數字標號分隔
                 expectedDisplay = correctAnswers.length > 1 
                     ? correctAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
                     : correctAnswers[0];
@@ -1130,6 +1138,49 @@
         function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
         function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
         
+        // --- 資料匯出/匯入邏輯 (方案一) ---
+        async function exportAllData() {
+            const bundle = {
+                vocab: vocabData,
+                raw: rawTextData,
+                fav: favoritesData,
+                hist: searchHistory,
+                ver: "1.0"
+            };
+            const dataStr = JSON.stringify(bundle);
+            try {
+                await navigator.clipboard.writeText(dataStr);
+                alert("✅ 資料代碼已成功複製！\n現在您可以前往 WhatsApp 貼上傳送給他人。");
+            } catch (err) {
+                // 回退方案：手動選取
+                const tempInput = document.createElement("textarea");
+                tempInput.value = dataStr;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                alert("✅ 資料代碼已複製到剪貼簿。");
+            }
+        }
+
+        function importAllData() {
+            const dataStr = prompt("請貼上匯入代碼 (JSON)：");
+            if (!dataStr) return;
+            try {
+                const bundle = JSON.parse(dataStr);
+                if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
+                    localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
+                    localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
+                    localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
+                    localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
+                    alert("✨ 資料匯入成功！系統即將重新載入。");
+                    location.reload();
+                }
+            } catch (e) {
+                alert("❌ 代碼無效，請確保貼上的是完整的正確代碼。");
+            }
+        }
+
         window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
     </script>
 </body>
