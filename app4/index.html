@@ -1032,7 +1032,10 @@
                 if (correctAnswers.length === userAnswers.length && correctAnswers.every((val, index) => val === userAnswers[index])) {
                     isCorrect = true;
                 }
-                expectedDisplay = correctAnswers.join(' ');
+                // 修改處：如果有多個答案，使用數字標號分隔
+                expectedDisplay = correctAnswers.length > 1 
+                    ? correctAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
+                    : correctAnswers[0];
             } else {
                 const correct = stripMarkers(item.word).toLowerCase();
                 if (inputRaw === correct) {
@@ -1055,8 +1058,6 @@
                 }, 800);
             } else {
                 res.innerText = `Incorrect. The answer is: "${expectedDisplay}"`; res.style.color = "red";
-                // Even if wrong, we proceed to next after user acknowledges or wait for next enter
-                // To keep it simple, we let them retry until correct, or you can add a "Skip" button.
             }
         }
 
