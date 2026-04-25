@@ -179,6 +179,36 @@
             overflow-y: auto;
         }
 
+        /* Autocomplete Specific */
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #cfd8dc;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item:hover {
+            background-color: var(--light-blue);
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -213,8 +243,9 @@
             <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <div style="position: relative; flex: 1;">
-                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
-                    <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
+                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') { closeAutocomplete(); performLookup(); }" oninput="handleAutocomplete(this.value)">
+                    <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus(); closeAutocomplete();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
+                    <div id="autocomplete-suggestions" class="autocomplete-list"></div>
                 </div>
                 <button class="btn-action" onclick="performLookup()">Search</button>
             </div>
@@ -404,6 +435,61 @@
             toast.style.opacity = '1';
             setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
+
+        // Generate Checksum utility
+        function generateChecksum(str) {
+            let hash = 0;
+            if (str.length === 0) return hash.toString(16);
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0; 
+            }
+            return hash.toString(16);
+        }
+
+        // Autocomplete Logic
+        let autocompleteTimeout;
+        async function handleAutocomplete(query) {
+            const list = document.getElementById('autocomplete-suggestions');
+            if (!query.trim()) { list.style.display = 'none'; return; }
+            
+            clearTimeout(autocompleteTimeout);
+            autocompleteTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://api.datamuse.com/sug?s=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        list.innerHTML = data.slice(0, 5).map(item => 
+                            `<div class="autocomplete-item" onclick="selectAutocomplete('${item.word.replace(/'/g, "\\'")}')">${item.word}</div>`
+                        ).join('');
+                        list.style.display = 'block';
+                    } else {
+                        list.style.display = 'none';
+                    }
+                } catch (e) {
+                    list.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        function selectAutocomplete(word) {
+            const input = document.getElementById('dictLookupInput');
+            input.value = word;
+            closeAutocomplete();
+            performLookup();
+        }
+
+        function closeAutocomplete() {
+            document.getElementById('autocomplete-suggestions').style.display = 'none';
+        }
+
+        // Global click listener to close autocomplete
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#dictLookupInput') && !e.target.closest('#autocomplete-suggestions')) {
+                closeAutocomplete();
+            }
+        });
 
         function handleFileSelect(input) {
             const fileLabel = document.getElementById('fileLabel');
@@ -613,6 +699,7 @@
         }
 
         async function performLookup() {
+            closeAutocomplete();
             const input = document.getElementById('dictLookupInput').value.trim();
             if (!input) return;
             const resultBox = document.getElementById('lookupResult');
@@ -1158,8 +1245,14 @@
                 hist: searchHistory,
                 ver: "1.0"
             };
-            const dataStr = JSON.stringify(bundle, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
+            
+            // 加入 Checksum 驗證碼邏輯
+            const dataStr = JSON.stringify(bundle);
+            const checksum = generateChecksum(dataStr);
+            const finalBundle = { data: bundle, checksum: checksum };
+
+            const finalStr = JSON.stringify(finalBundle, null, 2);
+            const blob = new Blob([finalStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             
             const a = document.createElement("a");
@@ -1178,7 +1271,23 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const bundle = JSON.parse(e.target.result);
+                    const parsed = JSON.parse(e.target.result);
+                    let bundle;
+
+                    // 檢查是否含有校驗碼結構
+                    if (parsed.checksum && parsed.data) {
+                        const currentChecksum = generateChecksum(JSON.stringify(parsed.data));
+                        if (currentChecksum !== parsed.checksum) {
+                            alert("❌ 資料校驗失敗！檔案可能已損壞或被手動修改，為確保系統穩定，已停止匯入。");
+                            event.target.value = '';
+                            return;
+                        }
+                        bundle = parsed.data;
+                    } else {
+                        // 兼容舊版備份檔案
+                        bundle = parsed; 
+                    }
+
                     if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
                         // 同步寫入 localStorage
                         localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
