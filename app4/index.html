@@ -218,7 +218,7 @@
                 </div>
                 <button class="btn-action" onclick="performLookup()">Search</button>
             </div>
-            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
                 <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
@@ -587,6 +587,7 @@
             const encodedWord = encodeURIComponent(stripMarkers(info.word));
             resultBox.style.display = 'block';
             resultBox.innerHTML = `
+                <button onclick="document.getElementById('lookupResult').style.display='none'; document.getElementById('lookupActions').style.display='none';" style="position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #e53935; padding: 5px;">🗑️</button>
                 <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
                     <span class="vocab-target" style="font-size: 24px; padding-right: 0;">${formatDisplay(info.word)}</span>
                 </div>
