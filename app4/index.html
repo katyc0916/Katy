@@ -151,7 +151,7 @@
         
         .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
 
-        .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
+        .toast-added { color: #2e7d32; font-size: 20px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
         mark.highlighter {
             background-color: var(--highlight-yellow);
@@ -374,7 +374,7 @@
     </div>
 
     <script>
-        let vocabData = JSON.parse(localStorage.getItem('masterVocab')) || [];
+        let vocabData = JSON.parse(localStorage.getItem('masterVococab')) || [];
         let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
         let favoritesData = JSON.parse(localStorage.getItem('masterFavorites')) || [];
         let searchHistory = JSON.parse(localStorage.getItem('masterHistory')) || []; 
@@ -604,11 +604,11 @@
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK</button>
                         <span>${info.ukPhonetic}</span>
                     </div>
                     <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US</button>
                         <span>${info.usPhonetic}</span>
                     </div>
                     <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite">Erudite</a>
@@ -830,8 +830,8 @@
                                     </div>
                                     <div id="details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK ${item.ukPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US ${item.usPhonetic}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
                                             <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
@@ -876,8 +876,8 @@
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
                                             <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
@@ -937,7 +937,7 @@
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
 
         function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
-        function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
+        function saveData() { localStorage.setItem('masterVococab', JSON.stringify(vocabData)); renderTable(); }
         function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
         function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
 
@@ -1043,7 +1043,6 @@
 
         function checkDictation() {
             const item = activeSessionData[currentIndex];
-            // 修正：核對時將輸入的斜槓轉為空格，並正規化空格（避免雙空格導致不匹配）
             const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
             const res = document.getElementById('dictResult');
             
@@ -1053,10 +1052,7 @@
 
             if (markers && markers.length > 0) {
                 const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
-                // 修正：標籤內的正確答案也進行斜槓轉空格正規化處理
                 const correctAnswers = originalAnswers.map(m => m.toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' '));
-                
-                // 修正：整句核對時同樣將斜槓轉為空格
                 const fullSentence = stripMarkers(item.word).toLowerCase().trim().replace(/\//g, ' ').replace(/\s+/g, ' ');
                 const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
                 
@@ -1072,7 +1068,6 @@
                     ? originalAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
                     : originalAnswers[0];
             } else {
-                // 修正：無標籤模式，同樣進行斜槓轉空格正規化比對
                 const correctCheck = stripMarkers(item.word).toLowerCase().trim().replace(/\//g, ' ').replace(/\s+/g, ' ');
                 if (inputRaw === correctCheck) {
                     isCorrect = true;
@@ -1126,17 +1121,12 @@
 
         // Updated for Speech Speed & Pause Control
         function speakTarget(lang) {
-            window.speechSynthesis.cancel(); // 確保停止先前的發音
+            window.speechSynthesis.cancel(); 
             const item = activeSessionData[currentIndex];
             const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word));
             u.lang = lang;
-            
-            // 讀取滑桿數值
             u.rate = parseFloat(document.getElementById('dictSpeechRate').value) || 1.0;
-            
             window.speechSynthesis.speak(u);
-            
-            // 重置暫停按鈕狀態
             const pb = document.getElementById('dictPauseBtn');
             pb.innerText = "⏸️ Pause";
             pb.style.background = "#ffb300";
@@ -1223,13 +1213,11 @@
                 try {
                     const bundle = JSON.parse(e.target.result);
                     if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
-                        // 同步寫入 localStorage
-                        localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
+                        localStorage.setItem('masterVococab', JSON.stringify(bundle.vocab || []));
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
 
-                        // 核心修復：同步更新運行中的全域變數
                         vocabData = bundle.vocab || [];
                         rawTextData = bundle.raw || [];
                         favoritesData = bundle.fav || [];
