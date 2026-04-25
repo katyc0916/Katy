@@ -212,7 +212,10 @@
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                <div style="position: relative; flex: 1;">
+                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                    <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
+                </div>
                 <button class="btn-action" onclick="performLookup()">Search</button>
             </div>
             <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
