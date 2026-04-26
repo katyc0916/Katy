@@ -40,7 +40,6 @@
             border-top: 12px solid var(--accent-green);
             position: relative;
             min-height: 80vh;
-            box-sizing: border-box; /* 確保 padding 不影響闊度計算 */
         }
 
         h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
@@ -49,7 +48,6 @@
             display: none; 
             animation: fadeIn 0.3s ease; 
             min-height: 70vh; 
-            width: 100%; /* 強制填滿容器闊度 */
             box-sizing: border-box;
         }
         .page-content.active { display: block; }
@@ -68,18 +66,12 @@
         .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; }
 
         .btn-action { 
-            background: var(--primary-blue); 
-            color: white; 
-            border: none; 
-            padding: 12px 10px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 14px; /* 微調字體確保在大按鈕內顯示 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            background: var(--primary-blue); color: white; border: none; padding: 12px 10px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; 
+            font-size: clamp(10px, 2.8vw, 14px); /* 關鍵：文字大小隨螢幕調整 */
+            text-align: center; display: flex; align-items: center; justify-content: center;
+            min-width: 0; /* 允許縮小 */
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
         .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
@@ -88,6 +80,25 @@
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
         .file-upload-wrapper input[type="file"] { display: none; }
         .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); }
+
+        /* 修改：確保操作按鈕行的容器佈局與闊度 */
+        .action-row-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            box-sizing: border-box;
+        }
+        .action-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .action-row .btn-action {
+            flex: 1; /* 平分闊度 */
+        }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         
@@ -218,18 +229,6 @@
             z-index: 5;
         }
 
-        /* 專業修改：操作按鈕行的彈性排版 */
-        .action-row {
-            display: flex;
-            align-items: stretch;
-            gap: 10px;
-            width: 100%;
-        }
-        .action-row > .btn-action {
-            flex: 1; /* 均分闊度 */
-            min-width: 0; /* 允許縮小以防止溢出 */
-        }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -267,13 +266,13 @@
                     <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
                     <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
                 </div>
-                <button class="btn-action" onclick="performLookup()">Search</button>
+                <button class="btn-action" style="padding: 12px 24px; font-size: 16px;" onclick="performLookup()">Search</button>
             </div>
             <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
-                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
-                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Study Scope</button>
+                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333; padding: 12px;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
+                <button class="btn-action" style="flex: 1; background: #0288d1; padding: 12px;" onclick="saveLookupToScope()">➕ Add to Study Scope</button>
             </div>
 
             <div id="searchHistoryContainer" style="margin-top: 30px;">
@@ -290,7 +289,7 @@
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>⭐ My Library</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
+                <button class="btn-action" style="flex: 1; padding: 12px;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
                 <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
             <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
@@ -308,18 +307,19 @@
             <div id="editorSection" style="display:none; margin-top: 20px;">
                 <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
                 <textarea id="ocrTextEditor"></textarea>
-                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                
+                <div class="action-row-container">
                     <div class="action-row">
                         <button class="btn-action" onclick="extractTextToDictation('ocrTextEditor')">➕ Add Selected</button>
                         <button id="btnAddAllScan" class="btn-action" style="background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ Add All</button>
-                        <button class="btn-action" style="background:#4db6ac; flex: 0.8;" onclick="manuallySaveToRaw()">💾 Save Texts</button>
+                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Texts</button>
                     </div>
                     <div class="action-row">
                         <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllScan" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="background: #e53935; flex: 0.6;" onclick="clearEditor()">🗑️ Delete All</button>
-                        <span id="scanToast" class="toast-added">✓ Added</span>
+                        <button class="btn-action" style="background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
                     </div>
+                    <div style="text-align: center;"><span id="scanToast" class="toast-added">✓ Added</span></div>
                 </div>
             </div>
         </div>
@@ -337,24 +337,25 @@
                     <option value="">-- Select a saved scan --</option>
                 </select>
                 <textarea id="scopeRawEditor" style="display:none;"></textarea>
-                <div id="rawActions" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                
+                <div id="rawActions" class="action-row-container" style="display:none;">
                     <div class="action-row">
                         <button class="btn-action" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
                         <button id="btnAddAllRaw" class="btn-action" style="background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
-                        <button class="btn-action" style="background:#4db6ac; flex: 0.8;" onclick="saveRawChanges()">💾 Save Changes</button>
+                        <button class="btn-action" style="background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
                     </div>
                     <div class="action-row">
                         <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
                         <button id="btnLibAllRaw" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="background: #e53935; flex: 0.6;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
-                        <span id="rawToast" class="toast-added">✓ Added</span>
+                        <button class="btn-action" style="background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
                     </div>
+                    <div style="text-align: center;"><span id="rawToast" class="toast-added">✓ Added</span></div>
                 </div>
             </div>
 
             <div id="dictTab" class="tab-content">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word/Phrase</button>
+                    <button class="btn-action" style="flex: 1; padding: 12px;" onclick="addNewManualVocab()">➕ Add New Word/Phrase</button>
                     <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Delete All</button>
                 </div>
                 <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; margin-bottom: 15px;">
@@ -367,21 +368,17 @@
 
         <div id="dictationPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            
             <div id="dictConfigUI">
                 <h2 style="text-align:center;">🎧 Dictation Setup</h2>
                 <div class="instruction-tip">Select categories for practice. No hints will be displayed during the session.</div>
-                
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">1. Choose Scope:</div>
                 <div id="dictCategoryChecklist" style="margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
-                
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">2. Preferences:</div>
                 <div class="category-chip" onclick="this.querySelector('input').click()">
                     <input type="checkbox" id="dictShuffleMode" onclick="event.stopPropagation()">
                     <span style="font-weight: 500;">Randomize Order</span>
                 </div>
-                
-                <button class="btn-action" onclick="initDictationSession()" style="width:100%; margin-top: 15px; background: var(--erudite-green);">Start Session</button>
+                <button class="btn-action" onclick="initDictationSession()" style="width:100%; margin-top: 15px; background: var(--erudite-green); padding: 15px; font-size: 16px;">Start Session</button>
             </div>
 
             <div id="dictPlayUI" style="display:none; text-align:center;">
@@ -409,7 +406,7 @@
                     <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus();">🗑️</div>
                 </div>
                 <br><br>
-                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
+                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px; font-size: 18px;">Check Answer</button>
                 <div id="dictHintDisplay" style="margin-top: 15px; font-size: 16px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
                 <div id="dictResult" class="status-msg"></div>
             </div>
@@ -422,7 +419,7 @@
                 <div id="clozeDisplay" class="cloze-box"></div>
                 <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
                 <br><br>
-                <button class="btn-action" onclick="checkCloze()" style="width:100%">Check Answer</button>
+                <button class="btn-action" onclick="checkCloze()" style="width:100%; padding: 15px; font-size: 18px;">Check Answer</button>
                 <div id="clozeResult" class="status-msg"></div>
             </div>
         </div>
@@ -437,38 +434,14 @@
         let currentIndex = 0;
         let touchStartX = 0;
         let currentLookupData = null;
-
         let activeSessionData = [];
         let dictationScore = 0;
 
-        function stripMarkers(str) {
-            return str.replace(/==/g, '');
-        }
-
-        function formatDisplay(str) {
-            return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>');
-        }
-
-        function hasChinese(text) {
-            return /[\u4e00-\u9fa5]/.test(text);
-        }
-
-        function cleanSpeechText(text) {
-            return text.replace(/==/g, '')
-                       .replace(/⟪.*?⟫/g, '')
-                       .replace(/\[.*?\]/g, '')
-                       .replace(/❖.*/g, '')
-                       .replace(/<br>/g, ' ')
-                       .replace(/\//g, ' ') 
-                       .trim();
-        }
-
-        function showToast(id) {
-            const toast = document.getElementById(id);
-            if (!toast) return;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-        }
+        function stripMarkers(str) { return str.replace(/==/g, ''); }
+        function formatDisplay(str) { return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>'); }
+        function hasChinese(text) { return /[\u4e00-\u9fa5]/.test(text); }
+        function cleanSpeechText(text) { return text.replace(/==/g, '').replace(/⟪.*?⟫/g, '').replace(/\[.*?\]/g, '').replace(/❖.*/g, '').replace(/<br>/g, ' ').replace(/\//g, ' ').trim(); }
+        function showToast(id) { const toast = document.getElementById(id); if (!toast) return; toast.style.opacity = '1'; setTimeout(() => { toast.style.opacity = '0'; }, 2000); }
 
         function handleFileSelect(input) {
             const fileLabel = document.getElementById('fileLabel');
@@ -483,13 +456,9 @@
         async function processOCR(file) {
             const loader = document.getElementById('ocrLoading');
             loader.style.display = 'block';
-
             try {
                 const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
-                await worker.setParameters({
-                    preserve_interword_spaces: '1',
-                    tessedit_pageseg_mode: '3', 
-                });
+                await worker.setParameters({ preserve_interword_spaces: '1', tessedit_pageseg_mode: '3' });
                 const { data } = await worker.recognize(file);
                 const img = new Image();
                 img.src = URL.createObjectURL(file);
@@ -504,10 +473,7 @@
                 const sortTopDown = (a, b) => a.bbox.y0 - b.bbox.y0;
                 leftBlocks.sort(sortTopDown);
                 rightBlocks.sort(sortTopDown);
-                const orderedText = [...leftBlocks, ...rightBlocks]
-                    .map(b => b.text.trim())
-                    .filter(t => t.length > 0)
-                    .join('\n\n');
+                const orderedText = [...leftBlocks, ...rightBlocks].map(b => b.text.trim()).filter(t => t.length > 0).join('\n\n');
                 await worker.terminate();
                 document.getElementById('ocrTextEditor').value = orderedText;
                 document.getElementById('editorSection').style.display = 'block';
@@ -519,10 +485,9 @@
             }
         }
 
-        const focusHandler = (e) => {
+        document.getElementById('dictInput').addEventListener('focus', (e) => {
             setTimeout(() => { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
-        };
-        document.getElementById('dictInput').addEventListener('focus', focusHandler);
+        });
 
         function goHome() {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
@@ -558,39 +523,22 @@
             const isChinese = hasChinese(cleanText);
             const sourceLang = isChinese ? 'zh-CN' : 'en';
             const targetLang = isChinese ? 'en' : 'zh-TW';
-
-            const result = { 
-                word: text, 
-                ukPhonetic: "/.../", 
-                usPhonetic: "/.../", 
-                enDef: "Parsing definitions...", 
-                zh: "Translating...", 
-                category: "General" 
-            };
-            
+            const result = { word: text, ukPhonetic: "/.../", usPhonetic: "/.../", enDef: "Parsing definitions...", zh: "Translating...", category: "General" };
             try {
                 const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=bd&dt=md&q=${encodeURIComponent(cleanText)}`;
                 const transResponse = await fetch(transUrl);
                 const data = await transResponse.json();
-                
                 if (!data) return result;
-
                 const primaryTranslation = data[0] ? data[0].map(x => x[0]).join('').trim() : "";
                 const lookupStr = isChinese ? primaryTranslation : cleanText;
                 const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
-
                 let zhLines = [];
                 if (data[1]) {
-                    const posMap = {
-                        "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "adv.",
-                        "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int."
-                    };
-                    
+                    const posMap = { "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "adv.", "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int." };
                     data[1].forEach(posSection => {
                         const posRaw = posSection[0].toLowerCase();
                         const posLabel = posMap[posRaw] || posSection[0]; 
                         let candidates = [];
-
                         if (posSection.length > 2 && Array.isArray(posSection[2])) {
                             candidates = posSection[2].map(item => {
                                 let score = 0;
@@ -607,23 +555,17 @@
                         } else if (posSection[1]) {
                             candidates = posSection[1].map(w => ({ word: w, score: 1 }));
                         }
-
                         const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join(', ');
                         if (finalPicks) zhLines.push(`[${posLabel}] ${finalPicks}`);
                     });
                 }
-                
                 result.zh = zhLines.length > 0 ? zhLines.slice(0, 3).join('<br>') : (primaryTranslation || "No match found");
-
                 let enDefLines = [];
                 if (data[12]) {
-                    data[12].forEach(sec => {
-                        if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`));
-                    });
+                    data[12].forEach(sec => { if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`)); });
                 }
                 if (enDefLines.length === 0) enDefLines.push(isPhraseOrSentence ? "<i>Contextual verified entry.</i>" : "<i>Standard entry.</i>");
                 result.enDef = enDefLines.join('<br>');
-
                 if (!isPhraseOrSentence) {
                     const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
                     try {
@@ -640,7 +582,6 @@
                         }
                     } catch(e) {}
                 }
-                if (isChinese && result.ukPhonetic === "/.../") { result.ukPhonetic = "N/A"; result.usPhonetic = "N/A"; }
             } catch (e) { result.zh = "Query service unavailable"; }
             return result;
         }
@@ -718,24 +659,12 @@
             saveHistoryData();
         }
 
-        function clearAllHistory() {
-            if(confirm("Clear all search history?")) {
-                searchHistory = [];
-                saveHistoryData();
-            }
-        }
-
-        function saveHistoryData() {
-            localStorage.setItem('masterHistory', JSON.stringify(searchHistory));
-            renderHistoryList();
-        }
+        function clearAllHistory() { if(confirm("Clear all search history?")) { searchHistory = []; saveHistoryData(); } }
+        function saveHistoryData() { localStorage.setItem('masterHistory', JSON.stringify(searchHistory)); renderHistoryList(); }
 
         function renderHistoryList() {
             const list = document.getElementById('searchHistoryList');
-            if (searchHistory.length === 0) {
-                list.innerHTML = "<div style='color:#90a4ae; font-size:14px; padding: 10px;'>No recent searches.</div>";
-                return;
-            }
+            if (searchHistory.length === 0) { list.innerHTML = "<div style='color:#90a4ae; font-size:14px; padding: 10px;'>No recent searches.</div>"; return; }
             list.innerHTML = searchHistory.map((item, index) => `
                 <div class="list-item-row" id="hist-row-${index}" ontouchstart="handleHistTouchStart(event)" ontouchmove="handleHistTouchMove(event, ${index})" ontouchend="handleHistTouchEnd(event, ${index})">
                     <div class="delete-btn-overlay" onclick="event.stopPropagation(); deleteHistItem(${index})">DELETE</div>
@@ -750,28 +679,14 @@
 
         function handleHistTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleHistTouchMove(e, index) {
-            let moveX = e.touches[0].clientX;
-            let diff = touchStartX - moveX;
+            let diff = touchStartX - e.touches[0].clientX;
             let row = document.getElementById(`hist-row-${index}`);
-            if (!row) return;
             if (diff > 20 && diff < 100) row.classList.add('swiped-left');
             else if (diff < -20) row.classList.remove('swiped-left');
         }
-        function handleHistTouchEnd(e, index) {
-            let touchEndX = e.changedTouches[0].clientX;
-            let row = document.getElementById(`hist-row-${index}`);
-            if (row && touchStartX - touchEndX < 40) row.classList.remove('swiped-left');
-        }
-
+        function handleHistTouchEnd(e, index) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`hist-row-${index}`).classList.remove('swiped-left'); }
         function deleteHistItem(i) { searchHistory.splice(i, 1); saveHistoryData(); }
-        function viewHistoryItem(index) {
-            const info = searchHistory[index];
-            currentLookupData = info;
-            document.getElementById('dictLookupInput').value = info.word;
-            renderLookupResultUI(info);
-            addToHistory(info);
-            window.scrollTo(0,0);
-        }
+        function viewHistoryItem(index) { const info = searchHistory[index]; currentLookupData = info; document.getElementById('dictLookupInput').value = info.word; renderLookupResultUI(info); addToHistory(info); window.scrollTo(0,0); }
 
         async function extractTextToDictation(areaId) {
             const area = document.getElementById(areaId);
@@ -780,9 +695,7 @@
             const cat = prompt("Assign category:", "General") || "General";
             const info = await fetchInfo(selectedText);
             info.word = selectedText; info.category = cat;
-            vocabData.push(info);
-            saveData();
-            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+            vocabData.push(info); saveData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
         async function extractTextToLibrary(areaId) {
@@ -792,9 +705,7 @@
             const cat = prompt("Assign collection category:", "My Words") || "My Words";
             const info = await fetchInfo(selectedText);
             info.word = selectedText; info.category = cat;
-            favoritesData.push(info);
-            saveFavoritesData();
-            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+            favoritesData.push(info); saveFavoritesData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
         async function addAllToDictation(areaId) {
@@ -803,16 +714,11 @@
             if (lines.length === 0) return;
             const cat = prompt("Assign category:", "General") || "General";
             const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnAddAllScan' : 'btnAddAllRaw');
-            btn.innerText = "•••"; btn.disabled = true;
+            const originalText = btn.innerText; btn.innerText = "•••"; btn.disabled = true;
             try {
-                for (const line of lines) {
-                    const info = await fetchInfo(line);
-                    info.word = line; info.category = cat;
-                    vocabData.push(info);
-                }
-                saveData();
-                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
-            } finally { btn.innerText = "➕ Add All"; btn.disabled = false; }
+                for (const line of lines) { const info = await fetchInfo(line); info.word = line; info.category = cat; vocabData.push(info); }
+                saveData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+            } finally { btn.innerText = originalText; btn.disabled = false; }
         }
 
         async function addAllToLibrary(areaId) {
@@ -821,22 +727,15 @@
             if (lines.length === 0) return;
             const cat = prompt("Assign collection category:", "My Words") || "My Words";
             const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnLibAllScan' : 'btnLibAllRaw');
-            const originalText = btn.innerText;
-            btn.innerText = "•••"; btn.disabled = true;
+            const originalText = btn.innerText; btn.innerText = "•••"; btn.disabled = true;
             try {
-                for (const line of lines) {
-                    const info = await fetchInfo(line);
-                    info.word = line; info.category = cat;
-                    favoritesData.push(info);
-                }
-                saveFavoritesData();
-                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+                for (const line of lines) { const info = await fetchInfo(line); info.word = line; info.category = cat; favoritesData.push(info); }
+                saveFavoritesData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
             } finally { btn.innerText = originalText; btn.disabled = false; }
         }
 
         async function addNewManualVocab() {
-            const word = prompt("Enter English Word/Phrase:");
-            if (!word) return;
+            const word = prompt("Enter English Word/Phrase:"); if (!word) return;
             const cat = prompt("Enter Category:", "General") || "General";
             const info = await fetchInfo(word);
             vocabData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
@@ -844,8 +743,7 @@
         }
 
         async function addNewManualFavorite() {
-            const word = prompt("Enter English Word/Phrase:");
-            if (!word) return;
+            const word = prompt("Enter English Word/Phrase:"); if (!word) return;
             const Granary = prompt("Enter Collection Category:", "My Words") || "My Words";
             const info = await fetchInfo(word);
             favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: Granary });
@@ -948,7 +846,6 @@
         function toggleFavCategory(c) { document.getElementById(`fav-cat-content-${c}`).classList.toggle('collapsed'); }
         function toggleDetails(i) { document.getElementById(`details-${i}`).classList.toggle('show'); }
         function toggleFavDetails(i) { document.getElementById(`fav-details-${i}`).classList.toggle('show'); }
-
         function deleteCategory(c) { if(confirm("Delete group?")) { vocabData = vocabData.filter(i => i.category !== c); saveData(); } }
         function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
         function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
@@ -957,18 +854,14 @@
         function editVocab(i) {
             const item = vocabData[i];
             const w = prompt("Word:", item.word); if(!w) return;
-            vocabData[i].word = w;
-            vocabData[i].zh = prompt("Translation:", item.zh);
-            vocabData[i].enDef = prompt("Definition:", item.enDef);
+            vocabData[i].word = w; vocabData[i].zh = prompt("Translation:", item.zh); vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
         }
 
         function editFavorite(i) {
             const item = favoritesData[i];
             const w = prompt("Word:", item.word); if(!w) return;
-            favoritesData[i].word = w;
-            favoritesData[i].zh = prompt("Translation:", item.zh);
-            favoritesData[i].enDef = prompt("Definition:", item.enDef);
+            favoritesData[i].word = w; favoritesData[i].zh = prompt("Translation:", item.zh); favoritesData[i].enDef = prompt("Definition:", item.enDef);
             saveFavoritesData();
         }
 
@@ -990,7 +883,7 @@
         }
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
 
-        function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
+        function speakFromList(w, l) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
         function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
         function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
         function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
@@ -998,17 +891,13 @@
         function saveRawChanges() {
             const id = document.getElementById('rawTextSelect').value;
             const index = rawTextData.findIndex(r => r.id == id);
-            if (index !== -1) {
-                rawTextData[index].text = document.getElementById('scopeRawEditor').value;
-                saveRawData();
-            }
+            if (index !== -1) { rawTextData[index].text = document.getElementById('scopeRawEditor').value; saveRawData(); }
         }
 
         function renderRawDropdown() {
             const select = document.getElementById('rawTextSelect');
             if(!select) return;
-            select.innerHTML = `<option value="">-- Select a saved scan --</option>` + 
-                rawTextData.map(item => `<option value="${item.id}">${item.date}</option>`).join('');
+            select.innerHTML = `<option value="">-- Select a saved scan --</option>` + rawTextData.map(item => `<option value="${item.id}">${item.date}</option>`).join('');
         }
 
         function loadRawText() {
@@ -1019,15 +908,7 @@
             else { editor.style.display = 'none'; actions.style.display = 'none'; }
         }
 
-        function startSession(id) {
-            currentIndex = 0;
-            if (id === 'dictation') {
-                setupDictationConfig();
-            } else {
-                activeSessionData = [...vocabData];
-                loadTask(id);
-            }
-        }
+        function startSession(id) { currentIndex = 0; if (id === 'dictation') { setupDictationConfig(); } else { activeSessionData = [...vocabData]; loadTask(id); } }
 
         function setupDictationConfig() {
             document.getElementById('dictConfigUI').style.display = 'block';
@@ -1040,65 +921,40 @@
                     <span>${cat}</span>
                 </div>
             `).join('');
-            document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => {
-                chip.classList.remove('selected');
-                chip.querySelector('input').checked = false;
-            });
+            document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => { chip.classList.remove('selected'); chip.querySelector('input').checked = false; });
         }
 
         function initDictationSession() {
             const selectedCats = Array.from(document.querySelectorAll('#dictCategoryChecklist input:checked')).map(ck => ck.value);
             if(selectedCats.length === 0) { alert("Please select at least one category!"); return; }
-
             activeSessionData = vocabData.filter(v => selectedCats.includes(v.category || "General"));
-            
             if(document.getElementById('dictShuffleMode').checked) {
-                for (let i = activeSessionData.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [activeSessionData[i], activeSessionData[j]] = [activeSessionData[j], activeSessionData[i]];
-                }
+                for (let i = activeSessionData.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [activeSessionData[i], activeSessionData[j]] = [activeSessionData[j], activeSessionData[i]]; }
             }
-
-            dictationScore = 0; 
-            document.getElementById('dictConfigUI').style.display = 'none';
-            document.getElementById('dictPlayUI').style.display = 'block';
-            loadTask('dictation');
+            dictationScore = 0; document.getElementById('dictConfigUI').style.display = 'none'; document.getElementById('dictPlayUI').style.display = 'block'; loadTask('dictation');
         }
 
         function loadTask(id) {
             const item = activeSessionData[currentIndex];
             if (id === 'dictation') {
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                document.getElementById('dictInput').value = "";
-                document.getElementById('dictResult').innerText = "";
-                
+                document.getElementById('dictInput').value = ""; document.getElementById('dictResult').innerText = "";
                 const hintDisplay = document.getElementById('dictHintDisplay');
-                const hasMarkers = /==(.+?)==/.test(item.word);
-                if (hasMarkers) {
-                    hintDisplay.innerText = item.word.replace(/==(.+?)==/g, '_____');
-                } else {
-                    hintDisplay.innerText = "";
-                }
-                
+                hintDisplay.innerText = /==(.+?)==/.test(item.word) ? item.word.replace(/==(.+?)==/g, '_____') : "";
                 document.getElementById('dictInput').focus();
             } else if (id === 'cloze') {
                 document.getElementById('clozeProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                const text = item.word;
-                const clozeText = text.replace(/==(.+?)==/g, '<span style="border-bottom:2px solid var(--primary-blue); color:transparent; padding:0 15px;">_____</span>');
+                const clozeText = item.word.replace(/==(.+?)==/g, '<span style="border-bottom:2px solid var(--primary-blue); color:transparent; padding:0 15px;">_____</span>');
                 document.getElementById('clozeDisplay').innerHTML = `<b>Context:</b><br>${clozeText}<br><br><b>Meaning:</b><br>${item.zh}`;
-                document.getElementById('clozeInput').value = "";
-                document.getElementById('clozeResult').innerText = "";
+                document.getElementById('clozeInput').value = ""; document.getElementById('clozeResult').innerText = "";
             }
         }
 
         const matchAnswer = (user, target) => {
-            const u = user.toLowerCase().trim();
-            const t = target.toLowerCase().trim();
+            const u = user.toLowerCase().trim(); const t = target.toLowerCase().trim();
             if (u === t) return true;
-            const tNoS = t.replace(/\(s\)/g, '');
-            if (u === tNoS) return true;
-            const tWithS = t.replace(/\(s\)/g, 's');
-            if (u === tWithS) return true;
+            if (u === t.replace(/\(s\)/g, '')) return true;
+            if (u === t.replace(/\(s\)/g, 's')) return true;
             return false;
         };
 
@@ -1106,240 +962,97 @@
             const item = activeSessionData[currentIndex];
             const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
             const res = document.getElementById('dictResult');
-            
             const markers = item.word.match(/==(.+?)==/g);
-            let isCorrect = false;
-            let displayHTML = "";
-
+            let isCorrect = false; let displayHTML = "";
             if (markers && markers.length > 0) {
                 const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
                 const fullSentence = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                
-                if (matchAnswer(inputRaw, fullSentence)) {
-                    isCorrect = true;
-                } else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) {
-                    isCorrect = true;
-                } else {
+                if (matchAnswer(inputRaw, fullSentence)) isCorrect = true;
+                else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) isCorrect = true;
+                else {
                     const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
-                    if (originalAnswers.length === userAnswersComma.length && originalAnswers.every((val, index) => matchAnswer(userAnswersComma[index], val))) {
-                        isCorrect = true;
-                    }
+                    if (originalAnswers.length === userAnswersComma.length && originalAnswers.every((val, idx) => matchAnswer(userAnswersComma[idx], val))) isCorrect = true;
                 }
-                
-                const userInputWords = inputRaw.split(/\s+/);
                 const targetText = originalAnswers.length > 1 ? originalAnswers.join(', ') : originalAnswers[0];
-                const targetWords = targetText.split(/\s+/);
-
-                displayHTML = targetWords.map((tWord, i) => {
-                    const uWord = userInputWords[i] || "";
-                    if (matchAnswer(uWord, tWord)) {
-                        return tWord;
-                    } else {
-                        return `<u style="text-decoration: underline; text-decoration-color: red;">${tWord}</u>`;
-                    }
-                }).join(' ');
-
+                displayHTML = targetText.split(/\s+/).map((t, i) => matchAnswer(inputRaw.split(/\s+/)[i] || "", t) ? t : `<u style="text-decoration-color:red;">${t}</u>`).join(' ');
             } else {
                 const correctCheck = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                if (matchAnswer(inputRaw, correctCheck)) {
-                    isCorrect = true;
-                }
-                
-                const userInputWords = inputRaw.split(/\s+/);
-                const targetWords = correctCheck.split(/\s+/);
-
-                displayHTML = targetWords.map((tWord, i) => {
-                    const uWord = userInputWords[i] || "";
-                    if (matchAnswer(uWord, tWord)) {
-                        return tWord;
-                    } else {
-                        return `<u style="text-decoration: underline; text-decoration-color: red;">${tWord}</u>`;
-                    }
-                }).join(' ');
+                if (matchAnswer(inputRaw, correctCheck)) isCorrect = true;
+                displayHTML = correctCheck.split(/\s+/).map((t, i) => matchAnswer(inputRaw.split(/\s+/)[i] || "", t) ? t : `<u style="text-decoration-color:red;">${t}</u>`).join(' ');
             }
-            
             if (isCorrect) {
-                dictationScore++;
-                res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { 
-                    currentIndex++;
-                    if(currentIndex >= activeSessionData.length) {
-                        alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
-                        goHome();
-                    } else {
-                        loadTask('dictation');
-                    }
-                }, 800);
-            } else {
-                res.innerHTML = `<span style="color:red">Incorrect. The answer is:</span> <br> <span style="color:var(--primary-blue); font-size:18px;">${displayHTML}</span>`;
-            }
+                dictationScore++; res.innerText = "Correct! ✨"; res.style.color = "green";
+                setTimeout(() => { currentIndex++; if(currentIndex >= activeSessionData.length) { alert(`Finished!\nScore: ${dictationScore}/${activeSessionData.length}`); goHome(); } else loadTask('dictation'); }, 800);
+            } else res.innerHTML = `<span style="color:red">Incorrect. Answer:</span><br>${displayHTML}`;
         }
 
-        function skipDictation() {
-            currentIndex++;
-            if(currentIndex >= activeSessionData.length){
-                alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
-                goHome();
-            } else {
-                loadTask('dictation');
-            }
-        }
-
-        function prevDictation() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                loadTask('dictation');
-            }
-        }
+        function skipDictation() { currentIndex++; if(currentIndex >= activeSessionData.length) { alert(`Finished!\nScore: ${dictationScore}/${activeSessionData.length}`); goHome(); } else loadTask('dictation'); }
+        function prevDictation() { if (currentIndex > 0) { currentIndex--; loadTask('dictation'); } }
 
         function handleDictKeyDown(e) {
             if (e.key === 'Tab') {
-                e.preventDefault();
-                const synth = window.speechSynthesis;
-                if (synth.speaking && !synth.paused) {
-                    synth.pause();
-                    const pb = document.getElementById('dictPauseBtn');
-                    pb.innerText = "▶️ Resume";
-                    pb.style.background = "#43a047";
-                } else if (synth.paused) {
-                    synth.resume();
-                    const pb = document.getElementById('dictPauseBtn');
-                    pb.innerText = "⏸️ Pause";
-                    pb.style.background = "#ffb300";
-                } else {
-                    speakTarget('en-US');
-                }
-                return;
+                e.preventDefault(); const synth = window.speechSynthesis;
+                if (synth.speaking && !synth.paused) { synth.pause(); document.getElementById('dictPauseBtn').innerText = "▶️ Resume"; }
+                else if (synth.paused) { synth.resume(); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause"; }
+                else speakTarget('en-US'); return;
             }
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                checkDictation(); 
-            }
+            if(e.key === 'Enter') { e.preventDefault(); checkDictation(); }
         }
 
         function checkCloze() {
-            const item = activeSessionData[currentIndex];
-            const input = document.getElementById('clozeInput').value.trim().toLowerCase();
-            const match = item.word.match(/==(.+?)==/);
-            const correct = match ? match[1].toLowerCase() : stripMarkers(item.word).toLowerCase();
+            const item = activeSessionData[currentIndex]; const input = document.getElementById('clozeInput').value.trim().toLowerCase();
+            const match = item.word.match(/==(.+?)==/); const correct = match ? match[1].toLowerCase() : stripMarkers(item.word).toLowerCase();
             const res = document.getElementById('clozeResult');
             if (input === correct) {
                 res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { 
-                    currentIndex = (currentIndex + 1) % activeSessionData.length; 
-                    loadTask('cloze'); 
-                }, 1000);
-            } else {
-                res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
-            }
+                setTimeout(() => { currentIndex = (currentIndex + 1) % activeSessionData.length; loadTask('cloze'); }, 1000);
+            } else { res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red"; }
         }
 
         function speakTarget(lang) {
-            window.speechSynthesis.cancel(); 
-            const item = activeSessionData[currentIndex];
-            const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word));
-            u.lang = lang;
+            window.speechSynthesis.cancel(); const item = activeSessionData[currentIndex];
+            const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word)); u.lang = lang;
             u.rate = parseFloat(document.getElementById('dictSpeechRate').value) || 1.0;
-            window.speechSynthesis.speak(u);
-            const pb = document.getElementById('dictPauseBtn');
-            pb.innerText = "⏸️ Pause";
-            pb.style.background = "#ffb300";
+            window.speechSynthesis.speak(u); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause";
         }
 
         function toggleSpeechPause() {
             const pb = document.getElementById('dictPauseBtn');
             if (window.speechSynthesis.speaking) {
-                if (window.speechSynthesis.paused) {
-                    window.speechSynthesis.resume();
-                    pb.innerText = "⏸️ Pause";
-                    pb.style.background = "#ffb300";
-                } else {
-                    window.speechSynthesis.pause();
-                    pb.innerText = "▶️ Resume";
-                    pb.style.background = "#43a047";
-                }
+                if (window.speechSynthesis.paused) { window.speechSynthesis.resume(); pb.innerText = "⏸️ Pause"; }
+                else { window.speechSynthesis.pause(); pb.innerText = "▶️ Resume"; }
             }
         }
 
         function copyText(btn, encodedText) {
-            const text = decodeURIComponent(encodedText);
-            navigator.clipboard.writeText(text).then(() => {
-                btn.innerText = '✅';
-                setTimeout(() => {
-                    btn.innerText = '📋';
-                }, 1000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
+            navigator.clipboard.writeText(decodeURIComponent(encodedText)).then(() => { btn.innerText = '✅'; setTimeout(() => btn.innerText = '📋', 1000); });
         }
 
-        function manuallySaveToRaw() {
-            const content = document.getElementById('ocrTextEditor').value.trim();
-            if(!content) return;
-            rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content });
-            saveRawData();
-            showToast('scanToast');
-        }
-
-        function clearEditor() { 
-            if(confirm("Delete all text in editor?")) {
-                document.getElementById('ocrTextEditor').value = ""; 
-                document.getElementById('editorSection').style.display = 'none'; 
-            }
-        }
-        function deleteCurrentRaw() {
-            if(confirm("Delete all text in this source?")) {
-                const id = document.getElementById('rawTextSelect').value;
-                rawTextData = rawTextData.filter(r => r.id != id);
-                saveRawData(); loadRawText();
-            }
-        }
-        function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
-        function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
+        function manuallySaveToRaw() { const content = document.getElementById('ocrTextEditor').value.trim(); if(!content) return; rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content }); saveRawData(); showToast('scanToast'); }
+        function clearEditor() { if(confirm("Delete all?")) { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; } }
+        function deleteCurrentRaw() { if(confirm("Delete this source?")) { rawTextData = rawTextData.filter(r => r.id != document.getElementById('rawTextSelect').value); saveRawData(); loadRawText(); } }
+        function clearAllVocab() { if(confirm("Delete everything?")) { vocabData = []; saveData(); } }
+        function clearAllFavorites() { if(confirm("Delete everything?")) { favoritesData = []; saveFavoritesData(); } }
         
         function exportAllData() {
-            const bundle = {
-                vocab: vocabData,
-                raw: rawTextData,
-                fav: favoritesData,
-                hist: searchHistory,
-                ver: "1.0"
-            };
-            const dataStr = JSON.stringify(bundle, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "LexiconMaster_Backup.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const dataStr = JSON.stringify({ vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory }, null, 2);
+            const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); a.download = "LexiconMaster_Backup.json"; a.click();
         }
 
         function importAllData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const bundle = JSON.parse(e.target.result);
-                    if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
+                    if (confirm("這將會替換目前的資料，確定匯入嗎？")) {
                         localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-                        vocabData = bundle.vocab || [];
-                        rawTextData = bundle.raw || [];
-                        favoritesData = bundle.fav || [];
-                        searchHistory = bundle.hist || [];
-                        alert("✨ 資料匯入成功！系統即將重新載入。");
                         location.reload();
                     }
-                } catch (err) {
-                    alert("❌ 檔案解析失敗，請確保選擇的是正確的備份檔案。");
-                }
-                event.target.value = '';
+                } catch (err) { alert("❌ 檔案解析失敗。"); }
             };
             reader.readAsText(file);
         }
