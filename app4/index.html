@@ -418,14 +418,14 @@
                 <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">Words: 0</div>
                 
                 <div class="app-btn-group">
-                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">Grammarly</button>
-                    <button class="btn-action btn-deepl" onclick="openInDeepL()">DeepL</button>
+                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">✨ Grammarly Check</button>
+                    <button class="btn-action btn-deepl" onclick="openInDeepL()">🌐 DeepL Translate</button>
                     <button class="btn-secondary" onclick="copyWritingText()">📋 Copy All</button>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save Article</button>
-                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Delete All</button>
+                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1231,8 +1231,10 @@
             
             if(!textToProcess) return;
             
-            // Only open via deep link
+            // Try to open the app via deep link
             window.location.href = `deepl://translate?text=${encodeURIComponent(textToProcess)}`;
+            // Fallback to web version if app doesn't open
+            setTimeout(() => { window.open(`https://www.deepl.com/translator#en/zh/${encodeURIComponent(textToProcess)}`, '_blank'); }, 800);
         }
 
         function openInGrammarly() {
