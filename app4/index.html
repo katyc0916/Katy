@@ -17,59 +17,34 @@
             --deepl-blue: #002451;
         }
 
-        /* 專業全螢幕模式修改：禁止外層滾動 */
-        html, body {
-            height: 100%;
-            overflow: hidden; 
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center; /* 垂直居中 */
+            padding: 20px 15px 150px 15px;
             box-sizing: border-box;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
-        /* 專業容器修改：內部滾動 */
         .container {
             background: white;
-            width: 95%;
+            width: 100%;
             max-width: 900px;
-            height: 92vh; /* 高度佔滿大部分視口 */
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             padding: 30px;
             border-top: 12px solid var(--accent-green);
             position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* 隱藏容器溢出 */
-            box-sizing: border-box;
         }
 
-        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; flex-shrink: 0; }
+        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
 
-        /* 內容滾動區間：將滾動權限交給內容頁面 */
-        .page-content { 
-            display: none; 
-            animation: fadeIn 0.3s ease; 
-            flex: 1;
-            overflow-y: auto; /* 僅此處允許滾動 */
-            padding-right: 10px; /* 為滾動條留出空間 */
-            -webkit-overflow-scrolling: touch;
-        }
-        
+        .page-content { display: none; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-
-        /* 自定義滾動條樣式，增加專業感 */
-        .page-content::-webkit-scrollbar { width: 6px; }
-        .page-content::-webkit-scrollbar-track { background: transparent; }
-        .page-content::-webkit-scrollbar-thumb { background: #cfd8dc; border-radius: 10px; }
-
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -558,8 +533,7 @@
         function goHome() {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById('homePage').classList.add('active');
-            // 全螢幕模式改為滾動容器內部置頂
-            document.querySelector('.page-content.active').scrollTo(0,0);
+            window.scrollTo(0,0);
         }
 
         function switchPage(id) {
@@ -573,8 +547,7 @@
             if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation') startSession(id);
             if (id === 'writing') renderWritingList();
-            // 全螢幕模式改為滾動容器內部置頂
-            document.querySelector('.page-content.active').scrollTo(0,0);
+            window.scrollTo(0,0);
         }
 
         function switchScopeTab(tabId) {
@@ -804,7 +777,7 @@
             document.getElementById('dictLookupInput').value = info.word;
             renderLookupResultUI(info);
             addToHistory(info);
-            document.querySelector('.page-content.active').scrollTo(0,0);
+            window.scrollTo(0,0);
         }
 
         async function extractTextToDictation(areaId) {
@@ -1208,7 +1181,7 @@
             }
             updateWordCount();
             contentInput.addEventListener('input', updateWordCount);
-            document.querySelector('.page-content.active').scrollTo(0,0);
+            window.scrollTo(0,0);
         }
 
         function updateWordCount() {
