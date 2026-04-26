@@ -52,7 +52,7 @@
         .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .card i { font-size: 30px; display: block; margin-bottom: 10px; }
 
-        #ocrTextEditor, #scopeRawEditor {
+        #ocrTextEditor, #scopeRawEditor, #writingContent {
             width: 100%; height: 300px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
             font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
             margin-top: 10px; resize: vertical; box-sizing: border-box;
@@ -121,7 +121,23 @@
         .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
         .cat-delete-btn:hover { background: #ef9a9a; color: white; }
 
-        .cloze-box { font-size: 1.2rem; background: #fafafa; padding: 25px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; }
+        /* Writing Specific Styles */
+        .writing-card {
+            border-left: 5px solid var(--primary-blue);
+            margin-bottom: 12px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .writing-title { font-weight: bold; color: var(--primary-blue); font-size: 18px; margin-bottom: 5px; }
+        .writing-meta { font-size: 12px; color: #90a4ae; }
+        .writing-preview { font-size: 14px; color: #546e7a; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .app-btn-group { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-grammarly { background: #11a683; color: white; }
+
         .status-msg { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
 
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -213,7 +229,7 @@
                 <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Text Scanner</h3><p>Photo to Text</p></div>
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
-                <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
+                <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Composition Lab</p></div>
             </div>
 
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
@@ -345,7 +361,7 @@
                 
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">2. Preferences:</div>
                 <div class="category-chip" onclick="this.querySelector('input').click()">
-                    <input type="checkbox" id="dictShuffleMode" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="dictShuffleMode" onclick="event.stopPropagation()">
                     <span style="font-weight: 500;">Randomize Order</span>
                 </div>
                 
@@ -383,15 +399,34 @@
             </div>
         </div>
 
-        <div id="clozePage" class="page-content">
-            <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <div style="text-align:center">
-                <h3 id="clozeProgress">0 / 0</h3>
-                <div id="clozeDisplay" class="cloze-box"></div>
-                <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
-                <br><br>
-                <button class="btn-action" onclick="checkCloze()" style="width:100%">Check Answer</button>
-                <div id="clozeResult" class="status-msg"></div>
+        <div id="writingPage" class="page-content">
+            <div class="back-btn" onclick="switchPage('writing')">← Back to List</div>
+            <div id="writingListUI">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="back-btn" onclick="goHome()" style="margin-bottom:0;">← Back to Home</div>
+                    <button class="btn-action" onclick="openWritingEditor()">New Article</button>
+                </div>
+                <div id="writingList"></div>
+            </div>
+
+            <div id="writingEditUI" style="display:none;">
+                <input type="text" id="writingTitle" placeholder="Article Title (e.g. My Daily Routine)" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
+                <div class="instruction-tip" style="background: #e8f5e9; border-left-color: #43a047;">
+                    💡 <b>Tip:</b> Highlight text to check specific parts, or use buttons to process the full text in Grammarly or DeepL.
+                </div>
+                <textarea id="writingContent" placeholder="Start your English writing here..."></textarea>
+                <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">Words: 0</div>
+                
+                <div class="app-btn-group">
+                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">Grammarly</button>
+                    <button class="btn-action btn-deepl" onclick="openInDeepL()">DeepL</button>
+                    <button class="btn-secondary" onclick="copyWritingText()">📋 Copy All</button>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save Article</button>
+                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Delete All</button>
+                </div>
             </div>
         </div>
     </div>
@@ -401,10 +436,12 @@
         let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
         let favoritesData = JSON.parse(localStorage.getItem('masterFavorites')) || [];
         let searchHistory = JSON.parse(localStorage.getItem('masterHistory')) || []; 
-        
+        let writingData = JSON.parse(localStorage.getItem('masterWriting')) || [];
+
         let currentIndex = 0;
         let touchStartX = 0;
         let currentLookupData = null;
+        let activeWritingIndex = -1;
 
         // Session Variables
         let activeSessionData = [];
@@ -500,7 +537,7 @@
         }
 
         function switchPage(id) {
-            if ((id === 'dictation' || id === 'cloze') && vocabData.length === 0) {
+            if ((id === 'dictation') && vocabData.length === 0) {
                 alert("Please add items to Study Scope first!"); return;
             }
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
@@ -508,7 +545,8 @@
             if (id === 'scope') renderTable();
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
-            if (id === 'dictation' || id === 'cloze') startSession(id);
+            if (id === 'dictation') startSession(id);
+            if (id === 'writing') renderWritingList();
             window.scrollTo(0,0);
         }
 
@@ -993,9 +1031,6 @@
             currentIndex = 0;
             if (id === 'dictation') {
                 setupDictationConfig();
-            } else {
-                activeSessionData = [...vocabData];
-                loadTask(id);
             }
         }
 
@@ -1006,28 +1041,26 @@
             const categories = [...new Set(vocabData.map(v => v.category || "General"))];
             checklist.innerHTML = categories.map(cat => `
                 <div class="category-chip" onclick="const ck = this.querySelector('input'); ck.checked = !ck.checked; this.classList.toggle('selected', ck.checked)">
-                    <input type="checkbox" value="${cat}" checked onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
+                    <input type="checkbox" value="${cat}" onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
                     <span>${cat}</span>
                 </div>
             `).join('');
-            document.querySelectorAll('#dictCategoryChecklist .category-chip input').forEach(ck => {
-                if(ck.checked) ck.parentElement.classList.add('selected');
+            document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => {
+                chip.classList.remove('selected');
+                chip.querySelector('input').checked = false;
             });
         }
 
         function initDictationSession() {
             const selectedCats = Array.from(document.querySelectorAll('#dictCategoryChecklist input:checked')).map(ck => ck.value);
             if(selectedCats.length === 0) { alert("Please select at least one category!"); return; }
-
             activeSessionData = vocabData.filter(v => selectedCats.includes(v.category || "General"));
-            
             if(document.getElementById('dictShuffleMode').checked) {
                 for (let i = activeSessionData.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [activeSessionData[i], activeSessionData[j]] = [activeSessionData[j], activeSessionData[i]];
                 }
             }
-
             dictationScore = 0; 
             document.getElementById('dictConfigUI').style.display = 'none';
             document.getElementById('dictPlayUI').style.display = 'block';
@@ -1040,77 +1073,43 @@
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
                 document.getElementById('dictInput').value = "";
                 document.getElementById('dictResult').innerText = "";
-                
                 const hintDisplay = document.getElementById('dictHintDisplay');
                 const hasMarkers = /==(.+?)==/.test(item.word);
-                if (hasMarkers) {
-                    hintDisplay.innerText = item.word.replace(/==(.+?)==/g, '_____');
-                } else {
-                    hintDisplay.innerText = "";
-                }
-                
+                if (hasMarkers) { hintDisplay.innerText = item.word.replace(/==(.+?)==/g, '_____'); } else { hintDisplay.innerText = ""; }
                 document.getElementById('dictInput').focus();
-            } else if (id === 'cloze') {
-                document.getElementById('clozeProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                const text = item.word;
-                const clozeText = text.replace(/==(.+?)==/g, '<span style="border-bottom:2px solid var(--primary-blue); color:transparent; padding:0 15px;">_____</span>');
-                document.getElementById('clozeDisplay').innerHTML = `<b>Context:</b><br>${clozeText}<br><br><b>Meaning:</b><br>${item.zh}`;
-                document.getElementById('clozeInput').value = "";
-                document.getElementById('clozeResult').innerText = "";
             }
         }
 
-        // New logic: Support ignoring (s)
+        const matchAnswer = (user, target) => {
+            const u = user.toLowerCase().trim();
+            const t = target.toLowerCase().trim();
+            if (u === t) return true;
+            const tNoS = t.replace(/\(s\)/g, '');
+            if (u === tNoS) return true;
+            const tWithS = t.replace(/\(s\)/g, 's');
+            if (u === tWithS) return true;
+            return false;
+        };
+
         function checkDictation() {
             const item = activeSessionData[currentIndex];
             const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
             const res = document.getElementById('dictResult');
-            
             const markers = item.word.match(/==(.+?)==/g);
             let isCorrect = false;
-            let expectedDisplay = "";
-
-            // Helper to handle (s) variations
-            const matchAnswer = (user, target) => {
-                const u = user.toLowerCase().trim();
-                const t = target.toLowerCase().trim();
-                // 1. Exact match
-                if (u === t) return true;
-                // 2. Ignore (s) match
-                const tNoS = t.replace(/\(s\)/g, '');
-                if (u === tNoS) return true;
-                // 3. Optional (s) as 's' match
-                const tWithS = t.replace(/\(s\)/g, 's');
-                if (u === tWithS) return true;
-                return false;
-            };
-
+            let displayHTML = "";
             if (markers && markers.length > 0) {
                 const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
                 const fullSentence = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                
-                if (matchAnswer(inputRaw, fullSentence)) {
-                    isCorrect = true;
-                } else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) {
-                    isCorrect = true;
-                } else {
-                    const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
-                    if (originalAnswers.length === userAnswersComma.length && originalAnswers.every((val, index) => matchAnswer(userAnswersComma[index], val))) {
-                        isCorrect = true;
-                    }
-                }
-                
-                expectedDisplay = originalAnswers.length > 1 
-                    ? originalAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
-                    : originalAnswers[0];
+                if (matchAnswer(inputRaw, fullSentence)) { isCorrect = true; } 
+                else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) { isCorrect = true; }
+                const targetText = originalAnswers.length > 1 ? originalAnswers.join(', ') : originalAnswers[0];
+                displayHTML = targetText;
             } else {
                 const correctCheck = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                if (matchAnswer(inputRaw, correctCheck)) {
-                    isCorrect = true;
-                }
-                expectedDisplay = stripMarkers(item.word).trim();
+                if (matchAnswer(inputRaw, correctCheck)) { isCorrect = true; }
+                displayHTML = correctCheck;
             }
-            
             if (isCorrect) {
                 dictationScore++;
                 res.innerText = "Correct! ✨"; res.style.color = "green";
@@ -1119,13 +1118,9 @@
                     if(currentIndex >= activeSessionData.length) {
                         alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
                         goHome();
-                    } else {
-                        loadTask('dictation');
-                    }
+                    } else { loadTask('dictation'); }
                 }, 800);
-            } else {
-                res.innerText = `Incorrect. The answer is: "${expectedDisplay}"`; res.style.color = "red";
-            }
+            } else { res.innerHTML = `<span style="color:red">Incorrect. The answer is:</span> <br> <span style="color:var(--primary-blue); font-size:18px;">${displayHTML}</span>`; }
         }
 
         function skipDictation() {
@@ -1133,61 +1128,131 @@
             if(currentIndex >= activeSessionData.length){
                 alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
                 goHome();
-            } else {
-                loadTask('dictation');
-            }
+            } else { loadTask('dictation'); }
         }
 
-        // New Prev function
-        function prevDictation() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                loadTask('dictation');
-            }
-        }
+        function prevDictation() { if (currentIndex > 0) { currentIndex--; loadTask('dictation'); } }
 
         function handleDictKeyDown(e) {
-            // Tab to play/pause US voice
             if (e.key === 'Tab') {
                 e.preventDefault();
                 const synth = window.speechSynthesis;
-                if (synth.speaking && !synth.paused) {
-                    synth.pause();
-                    const pb = document.getElementById('dictPauseBtn');
-                    pb.innerText = "▶️ Resume";
-                    pb.style.background = "#43a047";
-                } else if (synth.paused) {
-                    synth.resume();
-                    const pb = document.getElementById('dictPauseBtn');
-                    pb.innerText = "⏸️ Pause";
-                    pb.style.background = "#ffb300";
-                } else {
-                    speakTarget('en-US');
-                }
+                if (synth.speaking && !synth.paused) { synth.pause(); document.getElementById('dictPauseBtn').innerText = "▶️ Resume"; } 
+                else if (synth.paused) { synth.resume(); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause"; } 
+                else { speakTarget('en-US'); }
                 return;
             }
-            // Enter to check
-            if(e.key === 'Enter') { 
-                e.preventDefault(); 
-                checkDictation(); 
+            if(e.key === 'Enter') { e.preventDefault(); checkDictation(); }
+        }
+
+        // --- Writing Logic ---
+        function renderWritingList() {
+            document.getElementById('writingListUI').style.display = 'block';
+            document.getElementById('writingEditUI').style.display = 'none';
+            const list = document.getElementById('writingList');
+            if (writingData.length === 0) {
+                list.innerHTML = "<div style='text-align:center; padding: 40px; color:#90a4ae;'>No articles found. Click 'New Article' to begin.</div>";
+                return;
+            }
+            list.innerHTML = writingData.map((item, index) => `
+                <div class="list-item-row" id="write-row-${index}" ontouchstart="handleWriteTouchStart(event)" ontouchmove="handleWriteTouchMove(event, ${index})" ontouchend="handleWriteTouchEnd(event, ${index})">
+                    <div class="delete-btn-overlay" onclick="deleteWriting(${index})">DELETE</div>
+                    <div class="item-main-content" onclick="openWritingEditor(${index})">
+                        <div class="writing-title">${item.title || "Untitled Article"}</div>
+                        <div class="writing-meta">📅 ${item.date} | 📝 ${item.content.length} characters</div>
+                        <div class="writing-preview">${item.content.substring(0, 100)}...</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openWritingEditor(index = -1) {
+            activeWritingIndex = index;
+            document.getElementById('writingListUI').style.display = 'none';
+            document.getElementById('writingEditUI').style.display = 'block';
+            const titleInput = document.getElementById('writingTitle');
+            const contentInput = document.getElementById('writingContent');
+            if (index === -1) {
+                titleInput.value = "";
+                contentInput.value = "";
+            } else {
+                titleInput.value = writingData[index].title;
+                contentInput.value = writingData[index].content;
+            }
+            updateWordCount();
+            contentInput.addEventListener('input', updateWordCount);
+            window.scrollTo(0,0);
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('writingContent').value.trim();
+            const count = text ? text.split(/\s+/).length : 0;
+            document.getElementById('wordCount').innerText = `Words: ${count}`;
+        }
+
+        function saveWriting() {
+            const title = document.getElementById('writingTitle').value.trim();
+            const content = document.getElementById('writingContent').value.trim();
+            if (!content) { alert("Content cannot be empty!"); return; }
+            const payload = {
+                title: title || "Untitled Article",
+                content: content,
+                date: new Date().toLocaleString()
+            };
+            if (activeWritingIndex === -1) { writingData.unshift(payload); } 
+            else { writingData[activeWritingIndex] = payload; }
+            localStorage.setItem('masterWriting', JSON.stringify(writingData));
+            renderWritingList();
+        }
+
+        function cancelWriting() { if(confirm("Discard unsaved changes?")) renderWritingList(); }
+
+        function deleteWriting(index) {
+            if(confirm("Are you sure you want to delete this article?")) {
+                writingData.splice(index, 1);
+                localStorage.setItem('masterWriting', JSON.stringify(writingData));
+                renderWritingList();
             }
         }
 
-        function checkCloze() {
-            const item = activeSessionData[currentIndex];
-            const input = document.getElementById('clozeInput').value.trim().toLowerCase();
-            const match = item.word.match(/==(.+?)==/);
-            const correct = match ? match[1].toLowerCase() : stripMarkers(item.word).toLowerCase();
-            const res = document.getElementById('clozeResult');
-            if (input === correct) {
-                res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { 
-                    currentIndex = (currentIndex + 1) % activeSessionData.length; 
-                    loadTask('cloze'); 
-                }, 1000);
-            } else {
-                res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red";
-            }
+        function handleWriteTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleWriteTouchMove(e, i) {
+            let row = document.getElementById(`write-row-${i}`);
+            let diff = touchStartX - e.touches[0].clientX;
+            if (diff > 20) row.classList.add('swiped-left');
+            else if (diff < -20) row.classList.remove('swiped-left');
+        }
+        function handleWriteTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`write-row-${i}`).classList.remove('swiped-left'); }
+
+        function openInDeepL() {
+            const area = document.getElementById('writingContent');
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToProcess = selectedText || area.value.trim();
+            
+            if(!textToProcess) return;
+            
+            // Only open via deep link
+            window.location.href = `deepl://translate?text=${encodeURIComponent(textToProcess)}`;
+        }
+
+        function openInGrammarly() {
+            const area = document.getElementById('writingContent');
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToProcess = selectedText || area.value.trim();
+            
+            if(!textToProcess) return;
+            
+            navigator.clipboard.writeText(textToProcess).then(() => {
+                const mode = selectedText ? "Selected fragment" : "Full article";
+                alert(`${mode} copied to clipboard! Grammarly will now open. Please paste your text there.`);
+                window.location.href = "grammarly://"; 
+                setTimeout(() => { window.open("https://app.grammarly.com/", "_blank"); }, 800);
+            });
+        }
+
+        function copyWritingText() {
+            const text = document.getElementById('writingContent').value;
+            navigator.clipboard.writeText(text).then(() => alert("All text copied!"));
         }
 
         function speakTarget(lang) {
@@ -1197,23 +1262,13 @@
             u.lang = lang;
             u.rate = parseFloat(document.getElementById('dictSpeechRate').value) || 1.0;
             window.speechSynthesis.speak(u);
-            const pb = document.getElementById('dictPauseBtn');
-            pb.innerText = "⏸️ Pause";
-            pb.style.background = "#ffb300";
         }
 
         function toggleSpeechPause() {
             const pb = document.getElementById('dictPauseBtn');
             if (window.speechSynthesis.speaking) {
-                if (window.speechSynthesis.paused) {
-                    window.speechSynthesis.resume();
-                    pb.innerText = "⏸️ Pause";
-                    pb.style.background = "#ffb300";
-                } else {
-                    window.speechSynthesis.pause();
-                    pb.innerText = "▶️ Resume";
-                    pb.style.background = "#43a047";
-                }
+                if (window.speechSynthesis.paused) { window.speechSynthesis.resume(); pb.innerText = "⏸️ Pause"; } 
+                else { window.speechSynthesis.pause(); pb.innerText = "▶️ Resume"; }
             }
         }
 
@@ -1221,11 +1276,7 @@
             const text = decodeURIComponent(encodedText);
             navigator.clipboard.writeText(text).then(() => {
                 btn.innerText = '✅';
-                setTimeout(() => {
-                    btn.innerText = '📋';
-                }, 1000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
+                setTimeout(() => { btn.innerText = '📋'; }, 1000);
             });
         }
 
@@ -1237,40 +1288,19 @@
             showToast('scanToast');
         }
 
-        function clearEditor() { 
-            if(confirm("Delete all text in editor?")) {
-                document.getElementById('ocrTextEditor').value = ""; 
-                document.getElementById('editorSection').style.display = 'none'; 
-            }
-        }
-        function deleteCurrentRaw() {
-            if(confirm("Delete all text in this source?")) {
-                const id = document.getElementById('rawTextSelect').value;
-                rawTextData = rawTextData.filter(r => r.id != id);
-                saveRawData(); loadRawText();
-            }
-        }
+        function clearEditor() { if(confirm("Delete all text in editor?")) { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; } }
+        function deleteCurrentRaw() { if(confirm("Delete all text in this source?")) { const id = document.getElementById('rawTextSelect').value; rawTextData = rawTextData.filter(r => r.id != id); saveRawData(); loadRawText(); } }
         function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
         function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
         
         function exportAllData() {
-            const bundle = {
-                vocab: vocabData,
-                raw: rawTextData,
-                fav: favoritesData,
-                hist: searchHistory,
-                ver: "1.0"
-            };
+            const bundle = { vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory, writing: writingData, ver: "1.0" };
             const dataStr = JSON.stringify(bundle, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.href = url;
-            a.download = "LexiconMaster_Backup.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = "LexiconMaster_Backup.json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function importAllData(event) {
@@ -1280,21 +1310,16 @@
             reader.onload = function(e) {
                 try {
                     const bundle = JSON.parse(e.target.result);
-                    if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
+                    if (confirm("This will replace all current data. Proceed?")) {
                         localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-                        vocabData = bundle.vocab || [];
-                        rawTextData = bundle.raw || [];
-                        favoritesData = bundle.fav || [];
-                        searchHistory = bundle.hist || [];
-                        alert("✨ 資料匯入成功！系統即將重新載入。");
+                        localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || []));
+                        alert("✨ Import successful! Reloading...");
                         location.reload();
                     }
-                } catch (err) {
-                    alert("❌ 檔案解析失敗，請確保選擇的是正確的備份檔案。");
-                }
+                } catch (err) { alert("❌ File parsing failed."); }
                 event.target.value = '';
             };
             reader.readAsText(file);
