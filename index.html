@@ -21,7 +21,6 @@
             --transport-blue: #0056b3; 
         }
 
-        /* --- 修改後的 Body 背景：與內頁保持一致 --- */
         body { 
             margin: 0; 
             background-color: var(--japan-blue);
@@ -41,7 +40,7 @@
         .phone-container { 
             width: 95vw; max-width: 400px; height: 85vh; perspective: 2000px; position: relative; 
             transform-style: preserve-3d; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            background: var(--japan-blue); /* 確保容器底色一致 */
+            background: var(--japan-blue); 
         }
 
         .nav-side-btn {
@@ -165,8 +164,11 @@
         .custom-emoji-input { width: 35px; background: #fff; border: 1.5px solid var(--theme-blue); border-radius: 6px; text-align: center; font-size: 0.9rem; padding: 2px; font-family: inherit; outline: none; flex-shrink: 0; }
         .time-input { width: 60px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
         .loc-input { flex: 1; background: linear-gradient(to right, rgba(162, 210, 255, 0.7) 0%, rgba(162, 210, 255, 0.1) 100%); border: none; font-weight: bold; font-size: 1rem; outline: none; color: #1a1b26; font-family: inherit; line-height: 1.4; resize: none; overflow: hidden; min-height: 1.4em; padding: 2px 8px; border-radius: 4px; display: inline-block; box-sizing: border-box; }
-        .transport-box { display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box; padding-left: 43px; }
-        .transport-input { flex: 1; background: #f0f7ff; border: none; border-radius: 6px; padding: 8px 10px; font-size: 0.9rem; line-height: 1.4; color: var(--transport-blue); font-weight: bold; outline: none; font-family: inherit; resize: none; overflow: hidden; min-height: 1.2em; display: flex; align-items: center; }
+        
+        /* 修改交通/口袋清單樣式 */
+        .transport-box { display: flex; align-items: center; gap: 8px; width: 100%; box-sizing: border-box; padding-left: 43px; }
+        .transport-input { flex: 1; background: #f0f7ff; border: none; border-radius: 6px; padding: 2px 8px; font-size: 0.9rem; line-height: 1.4; color: var(--transport-blue); font-weight: bold; outline: none; font-family: inherit; resize: none; overflow: hidden; min-height: 1.4em; display: inline-block; box-sizing: border-box; border-radius: 4px; }
+        
         .preview-box { width: 100%; box-sizing: border-box; margin-top: 6px; padding-left: 43px; }
         .preview-input { width: 100%; background: #fffbe6; border: 1px dashed #ffe58f; border-radius: 6px; padding: 4px 8px; font-size: 0.7rem; color: #8c6d1f; outline: none; font-family: inherit; box-sizing: border-box; margin-bottom: 6px; }
         .preview-box img { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; border: 1px solid rgba(162, 210, 255, 0.4); }
@@ -391,7 +393,6 @@
 <div id="toast" class="toast-notification"></div>
 
 <script>
-    /* --- 全域快捷鍵與狀態管理 --- */
     const $ = id => document.getElementById(id), $$ = sel => document.querySelectorAll(sel);
     
     let liveRate = 0.052, customRate = 0.054, currentRate = 0.052, useMode = 'live';
@@ -405,7 +406,6 @@
 
     const safeEval = str => { try { const clean = String(str).replace(/[^0-9+\-*/.]/g, ''); return clean ? eval(clean) : 0; } catch(e) { return 0; } };
 
-    /* --- 初始化與動態渲染 --- */
     function renderDayPages(savedLabels) {
         const p14 = document.querySelector('.p14'), startDate = new Date(2026, 6, 16), weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         for (let i = 1; i <= 8; i++) {
@@ -427,7 +427,6 @@
         }
     }
 
-    /* --- 行程管理 --- */
     function addNewRow(cId, data = null, shouldSave = true) {
         const container = $(cId); if (!container) return;
         const div = document.createElement('div');
@@ -456,7 +455,6 @@
         if (shouldSave) saveAllRundowns();
     }
 
-    /* --- Pocket Lists 功能 --- */
     function switchPocketTab(tab) {
         $$('.pocket-tab-btn').forEach(btn => btn.classList.remove('active'));
         $$('.pocket-list-container').forEach(cont => cont.classList.remove('active'));
@@ -499,12 +497,14 @@
     function savePockets() {
         ['shop', 'eat', 'mall'].forEach(type => {
             const list = $(`pocket-${type}-list`);
-            storage.save(`osaka_pocket_${type}`, [...list.querySelectorAll('.timeline-row')].map(row => ({
-                e: row.querySelector('.custom-emoji-input').value,
-                n: row.querySelector('.loc-input').value,
-                d: row.querySelector('.transport-input').value,
-                img: row.querySelector('.preview-input').value
-            })));
+            if (list) {
+                storage.save(`osaka_pocket_${type}`, [...list.querySelectorAll('.timeline-row')].map(row => ({
+                    e: row.querySelector('.custom-emoji-input').value,
+                    n: row.querySelector('.loc-input').value,
+                    d: row.querySelector('.transport-input').value,
+                    img: row.querySelector('.preview-input').value
+                })));
+            }
         });
     }
 
@@ -522,7 +522,6 @@
         saveAllRundowns();
     }
 
-    /* --- 數據儲存與同步 --- */
     function saveInputs() { const data = {}; $$('.js-save').forEach(el => data[el.id] = el.value); storage.save('osaka_stay_info', data); }
 
     function saveAllRundowns() {
@@ -538,7 +537,6 @@
         }
     }
 
-    /* --- 預算與匯率 --- */
     async function fetchLiveExchangeRate() {
         const btn = $('refresh-fx'); btn.classList.add('spinning');
         try {
@@ -572,7 +570,6 @@
         updateRateDisplay();
     }
 
-    /* --- 帳單與分帳 --- */
     function renderLedger() {
         const list = $('ledger-list'); list.innerHTML = ''; let tj = 0, th = 0;
         Object.keys(ledgerByDay).forEach(d => {
@@ -608,29 +605,20 @@
 
     function toggleSet(i, el) { settlementData[i].checked = el.checked; if(el.checked) confetti(); storage.save('osaka_settlement', settlementData); renderSettlement(); }
 
-    /* --- UI 交互功能 --- */
     const jumpToPage = idx => { $$('.single-page').forEach((p, i) => p.classList.toggle('flipped', i < idx)); $('page-nav-menu').style.display = 'none'; };
     
     const goNext = () => { 
         const pages = $$('.single-page');
         const unflipped = $$('.single-page:not(.flipped)'); 
-        if (unflipped.length > 1) { 
-            unflipped[0].classList.add('flipped'); 
-        } else { 
-            pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); 
-        } 
+        if (unflipped.length > 1) { unflipped[0].classList.add('flipped'); } 
+        else { pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); } 
     };
 
     const goPrev = () => { 
         const pages = $$('.single-page');
         const flipped = $$('.single-page.flipped'); 
-        if (flipped.length > 0) { 
-            flipped[flipped.length - 1].classList.remove('flipped'); 
-        } else { 
-            for (let i = 0; i < pages.length - 1; i++) {
-                pages[i].classList.add('flipped');
-            }
-        } 
+        if (flipped.length > 0) { flipped[flipped.length - 1].classList.remove('flipped'); } 
+        else { for (let i = 0; i < pages.length - 1; i++) { pages[i].classList.add('flipped'); } } 
     };
     
     function toggleMusic(aId, bId, defI, playI) {
@@ -703,36 +691,27 @@
         } catch(e) { alert("解密失敗"); }
     }
 
-    /* --- 生命週期初始化 --- */
     window.addEventListener('load', () => {
         const savedStay = storage.load('osaka_stay_info', {});
         renderDayPages(savedStay);
-        
         const savedPacking = storage.load('osaka_packing_status', {});
         ledgerByDay = storage.load('osaka_ledger_days', ledgerByDay);
         settlementData = storage.load('osaka_settlement', []);
-
         for (let i = 1; i <= 8; i++) storage.load(`osaka_rundown_day${i}`, []).forEach(r => addNewRow(`day${i}-list`, r, false));
         ['shop', 'eat', 'mall'].forEach(type => storage.load(`osaka_pocket_${type}`, []).forEach(r => addPocketRow(type, r, false)));
-        
         $$('.js-pack-check').forEach(cb => { cb.checked = !!savedPacking[cb.id]; cb.onchange = () => { const p = {}; $$('.js-pack-check').forEach(c=>p[c.id]=c.checked); storage.save('osaka_packing_status', p); }; });
         $$('.js-save').forEach(el => { el.value = savedStay[el.id] || el.value; if(el.tagName==='TEXTAREA') autoResizeTextarea(el); el.oninput = saveInputs; });
-
         if(localStorage.getItem('osaka_fx_mode')) switchFX(localStorage.getItem('osaka_fx_mode'));
         customRate = parseFloat(localStorage.getItem('osaka_custom_rate')) || 0.054;
         $('custom-rate-input').value = customRate;
-        
         $('custom-rate-input').onchange = e => { customRate = parseFloat(e.target.value)||0.054; storage.save('osaka_custom_rate', customRate); updateRateDisplay(); };
         $('jpy-input').oninput = convertCurrency;
         $('hkd-input').oninput = e => { const v = parseFloat(e.target.value); $('jpy-input').value = isNaN(v)?"":Math.round(v/currentRate); convertCurrency(); };
-
         fetchLiveExchangeRate(); renderLedger(); renderSettlement();
-        
         setInterval(() => {
             const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
             $$('.local-clock').forEach(el => el.innerText = t);
         }, 1000);
-        
         document.addEventListener('click', () => $('page-nav-menu').style.display = 'none');
     });
 </script>
