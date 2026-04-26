@@ -151,7 +151,7 @@
         
         .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
 
-        .toast-added { color: #2e7d32; font-size: 20px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
+        .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
         mark.highlighter {
             background-color: var(--highlight-yellow);
@@ -166,9 +166,11 @@
         .category-chip input { transform: scale(1.2); }
 
         /* Dictation Textarea Style */
+        .dict-input-wrapper { position: relative; width: 100%; }
         #dictInput {
             width: 100%;
             padding: 18px;
+            padding-right: 50px; /* Space for trash icon */
             font-size: 20px;
             border: 2px solid #ddd;
             border-radius: 12px;
@@ -177,6 +179,23 @@
             resize: none;
             min-height: 80px;
             overflow-y: auto;
+        }
+        .input-clear-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #e53935;
+            font-size: 16px;
+            z-index: 5;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -335,24 +354,28 @@
 
             <div id="dictPlayUI" style="display:none; text-align:center;">
                 <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
-                    <h3 id="dictProgress" style="margin: 0;">0 / 0</h3>
+                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏮️ Prev</button>
+                    <h3 id="dictProgress" style="margin: 0; min-width: 60px;">0 / 0</h3>
                     <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏭️ Next</button>
                 </div>
                 <div style="margin-bottom: 15px;">
                     <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
-                    <button class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
+                    <button id="btnUsVoice" class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
                 </div>
 
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; background: #f1f8e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #c5e1a5;">
                     <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;">
                         <span style="font-size: 13px; font-weight: bold; color: #558b2f; min-width: 50px;">Speed:</span>
-                        <input type="range" id="dictSpeechRate" min="0.5" max="1.5" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1; max-width: 150px;">
+                        <input type="range" id="dictSpeechRate" min="0.1" max="1.0" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1; max-width: 150px;">
                         <span id="rateDisplay" style="font-size: 13px; font-weight: bold; color: var(--primary-blue); min-width: 35px;">1x</span>
                     </div>
                     <button id="dictPauseBtn" class="btn-secondary" onclick="toggleSpeechPause()" style="background: #ffb300; width: 100%; max-width: 200px; padding: 8px;">⏸️ Pause</button>
                 </div>
 
-                <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="if(event.key === 'Enter') { event.preventDefault(); checkDictation(); }"></textarea>
+                <div class="dict-input-wrapper">
+                    <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="handleDictKeyDown(event)"></textarea>
+                    <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus();">🗑️</div>
+                </div>
                 <br><br>
                 <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
                 <div id="dictHintDisplay" style="margin-top: 15px; font-size: 16px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
@@ -374,7 +397,7 @@
     </div>
 
     <script>
-        let vocabData = JSON.parse(localStorage.getItem('masterVococab')) || [];
+        let vocabData = JSON.parse(localStorage.getItem('masterVocab')) || [];
         let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
         let favoritesData = JSON.parse(localStorage.getItem('masterFavorites')) || [];
         let searchHistory = JSON.parse(localStorage.getItem('masterHistory')) || []; 
@@ -405,7 +428,7 @@
                        .replace(/\[.*?\]/g, '')
                        .replace(/❖.*/g, '')
                        .replace(/<br>/g, ' ')
-                       .replace(/\//g, ' ') // 修改點：朗讀時將斜槓轉為空格，語音更自然
+                       .replace(/\//g, ' ') 
                        .trim();
         }
 
@@ -604,11 +627,11 @@
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
                     <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK</button>
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
                         <span>${info.ukPhonetic}</span>
                     </div>
                     <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US</button>
+                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
                         <span>${info.usPhonetic}</span>
                     </div>
                     <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite">Erudite</a>
@@ -830,8 +853,8 @@
                                     </div>
                                     <div id="details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK ${item.ukPhonetic}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US ${item.usPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
                                             <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
@@ -876,8 +899,8 @@
                                     </div>
                                     <div id="fav-details-${item.originalIndex}" class="item-details">
                                         <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'").replace(/"/g, "&quot;")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
+                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
                                             <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
                                             <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
                                             <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
@@ -937,7 +960,7 @@
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
 
         function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
-        function saveData() { localStorage.setItem('masterVococab', JSON.stringify(vocabData)); renderTable(); }
+        function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
         function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
         function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
 
@@ -976,7 +999,6 @@
             }
         }
 
-        // Dictation Setup UI
         function setupDictationConfig() {
             document.getElementById('dictConfigUI').style.display = 'block';
             document.getElementById('dictPlayUI').style.display = 'none';
@@ -988,7 +1010,6 @@
                     <span>${cat}</span>
                 </div>
             `).join('');
-            // Apply selected style initially
             document.querySelectorAll('#dictCategoryChecklist .category-chip input').forEach(ck => {
                 if(ck.checked) ck.parentElement.classList.add('selected');
             });
@@ -998,10 +1019,8 @@
             const selectedCats = Array.from(document.querySelectorAll('#dictCategoryChecklist input:checked')).map(ck => ck.value);
             if(selectedCats.length === 0) { alert("Please select at least one category!"); return; }
 
-            // Filter
             activeSessionData = vocabData.filter(v => selectedCats.includes(v.category || "General"));
             
-            // Randomize
             if(document.getElementById('dictShuffleMode').checked) {
                 for (let i = activeSessionData.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -1009,7 +1028,7 @@
                 }
             }
 
-            dictationScore = 0; // Reset Score
+            dictationScore = 0; 
             document.getElementById('dictConfigUI').style.display = 'none';
             document.getElementById('dictPlayUI').style.display = 'block';
             loadTask('dictation');
@@ -1041,6 +1060,7 @@
             }
         }
 
+        // New logic: Support ignoring (s)
         function checkDictation() {
             const item = activeSessionData[currentIndex];
             const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
@@ -1050,26 +1070,42 @@
             let isCorrect = false;
             let expectedDisplay = "";
 
+            // Helper to handle (s) variations
+            const matchAnswer = (user, target) => {
+                const u = user.toLowerCase().trim();
+                const t = target.toLowerCase().trim();
+                // 1. Exact match
+                if (u === t) return true;
+                // 2. Ignore (s) match
+                const tNoS = t.replace(/\(s\)/g, '');
+                if (u === tNoS) return true;
+                // 3. Optional (s) as 's' match
+                const tWithS = t.replace(/\(s\)/g, 's');
+                if (u === tWithS) return true;
+                return false;
+            };
+
             if (markers && markers.length > 0) {
                 const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
-                const correctAnswers = originalAnswers.map(m => m.toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' '));
-                const fullSentence = stripMarkers(item.word).toLowerCase().trim().replace(/\//g, ' ').replace(/\s+/g, ' ');
-                const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
+                const fullSentence = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
                 
-                if (inputRaw === fullSentence) {
+                if (matchAnswer(inputRaw, fullSentence)) {
                     isCorrect = true;
-                } else if (correctAnswers.length === 1 && inputRaw === correctAnswers[0]) {
+                } else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) {
                     isCorrect = true;
-                } else if (correctAnswers.length === userAnswersComma.length && correctAnswers.every((val, index) => val === userAnswersComma[index])) {
-                    isCorrect = true;
+                } else {
+                    const userAnswersComma = inputRaw.split(/[,;\n]+/).map(w => w.trim()).filter(w => w.length > 0);
+                    if (originalAnswers.length === userAnswersComma.length && originalAnswers.every((val, index) => matchAnswer(userAnswersComma[index], val))) {
+                        isCorrect = true;
+                    }
                 }
                 
                 expectedDisplay = originalAnswers.length > 1 
                     ? originalAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
                     : originalAnswers[0];
             } else {
-                const correctCheck = stripMarkers(item.word).toLowerCase().trim().replace(/\//g, ' ').replace(/\s+/g, ' ');
-                if (inputRaw === correctCheck) {
+                const correctCheck = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
+                if (matchAnswer(inputRaw, correctCheck)) {
                     isCorrect = true;
                 }
                 expectedDisplay = stripMarkers(item.word).trim();
@@ -1102,6 +1138,41 @@
             }
         }
 
+        // New Prev function
+        function prevDictation() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadTask('dictation');
+            }
+        }
+
+        function handleDictKeyDown(e) {
+            // Tab to play/pause US voice
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const synth = window.speechSynthesis;
+                if (synth.speaking && !synth.paused) {
+                    synth.pause();
+                    const pb = document.getElementById('dictPauseBtn');
+                    pb.innerText = "▶️ Resume";
+                    pb.style.background = "#43a047";
+                } else if (synth.paused) {
+                    synth.resume();
+                    const pb = document.getElementById('dictPauseBtn');
+                    pb.innerText = "⏸️ Pause";
+                    pb.style.background = "#ffb300";
+                } else {
+                    speakTarget('en-US');
+                }
+                return;
+            }
+            // Enter to check
+            if(e.key === 'Enter') { 
+                e.preventDefault(); 
+                checkDictation(); 
+            }
+        }
+
         function checkCloze() {
             const item = activeSessionData[currentIndex];
             const input = document.getElementById('clozeInput').value.trim().toLowerCase();
@@ -1119,7 +1190,6 @@
             }
         }
 
-        // Updated for Speech Speed & Pause Control
         function speakTarget(lang) {
             window.speechSynthesis.cancel(); 
             const item = activeSessionData[currentIndex];
@@ -1194,7 +1264,6 @@
             const dataStr = JSON.stringify(bundle, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement("a");
             a.href = url;
             a.download = "LexiconMaster_Backup.json";
@@ -1207,22 +1276,19 @@
         function importAllData(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const bundle = JSON.parse(e.target.result);
                     if (confirm("這將會替換目前的單字庫、掃描紀錄與收藏夾，確定匯入嗎？")) {
-                        localStorage.setItem('masterVococab', JSON.stringify(bundle.vocab || []));
+                        localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-
                         vocabData = bundle.vocab || [];
                         rawTextData = bundle.raw || [];
                         favoritesData = bundle.fav || [];
                         searchHistory = bundle.hist || [];
-
                         alert("✨ 資料匯入成功！系統即將重新載入。");
                         location.reload();
                     }
