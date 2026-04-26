@@ -81,11 +81,6 @@
         .file-upload-wrapper input[type="file"] { display: none; }
         .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); }
 
-        /* Crop/Edit Interface Styling */
-        #cropContainer { display: none; margin-top: 20px; text-align: center; background: #333; padding: 15px; border-radius: 15px; }
-        #cropCanvas { max-width: 100%; background: #000; cursor: crosshair; }
-        .crop-controls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-
         .action-row-container {
             width: 100%;
             display: flex;
@@ -308,17 +303,6 @@
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
                 <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text Content...</div>
             </div>
-
-            <div id="cropContainer">
-                <p style="color: white; font-size: 13px; margin-bottom: 10px;">Drag to crop or use buttons to rotate.</p>
-                <canvas id="cropCanvas"></canvas>
-                <div class="crop-controls">
-                    <button class="btn-secondary" onclick="rotateImage()">🔄 Rotate</button>
-                    <button class="btn-action" style="background: var(--accent-green);" onclick="confirmPreprocessing()">✅ Confirm & Scan</button>
-                    <button class="btn-danger" style="margin: 0;" onclick="cancelPreprocessing()">❌ Cancel</button>
-                </div>
-            </div>
-
             <div id="editorSection" style="display:none; margin-top: 20px;">
                 <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
                 <textarea id="ocrTextEditor"></textarea>
@@ -477,13 +461,6 @@
         let activeSessionData = [];
         let dictationScore = 0;
 
-        // Image Preprocessing Variables
-        let originalImg = null;
-        let rotationAngle = 0;
-        let cropRect = { x: 50, y: 50, w: 200, h: 100 };
-        let isDragging = false;
-        let dragHandle = null;
-
         function stripMarkers(str) { return str.replace(/==/g, ''); }
         function formatDisplay(str) { return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>'); }
         function hasChinese(text) { return /[\u4e00-\u9fa5]/.test(text); }
@@ -491,113 +468,45 @@
         function showToast(id) { const toast = document.getElementById(id); if (!toast) return; toast.style.opacity = '1'; setTimeout(() => { toast.style.opacity = '0'; }, 2000); }
 
         function handleFileSelect(input) {
+            const fileLabel = document.getElementById('fileLabel');
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    originalImg = new Image();
-                    originalImg.onload = () => initPreprocessing();
-                    originalImg.src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
+                fileLabel.innerText = "📄 " + input.files[0].name;
+                processOCR(input.files[0]);
+            } else {
+                fileLabel.innerText = "📁 Click to Upload Image";
             }
         }
 
-        function initPreprocessing() {
-            document.getElementById('cropContainer').style.display = 'block';
-            document.getElementById('editorSection').style.display = 'none';
-            rotationAngle = 0;
-            const canvas = document.getElementById('cropCanvas');
-            const scale = Math.min(window.innerWidth * 0.8 / originalImg.width, 400 / originalImg.height);
-            canvas.width = originalImg.width * scale;
-            canvas.height = originalImg.height * scale;
-            cropRect = { x: canvas.width * 0.1, y: canvas.height * 0.1, w: canvas.width * 0.8, h: canvas.height * 0.8 };
-            drawPreview();
-            
-            canvas.onmousedown = canvas.ontouchstart = startDrag;
-            window.onmousemove = window.ontouchmove = doDrag;
-            window.onmouseup = window.ontouchend = stopDrag;
-        }
-
-        function drawPreview() {
-            const canvas = document.getElementById('cropCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width/2, canvas.height/2);
-            ctx.rotate(rotationAngle * Math.PI / 180);
-            const drawW = (rotationAngle % 180 === 0) ? canvas.width : canvas.height;
-            const drawH = (rotationAngle % 180 === 0) ? canvas.height : canvas.width;
-            ctx.drawImage(originalImg, -drawW/2, -drawH/2, drawW, drawH);
-            ctx.restore();
-
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(0,0,canvas.width, cropRect.y);
-            ctx.fillRect(0, cropRect.y+cropRect.h, canvas.width, canvas.height);
-            ctx.fillRect(0, cropRect.y, cropRect.x, cropRect.h);
-            ctx.fillRect(cropRect.x+cropRect.w, cropRect.y, canvas.width, cropRect.h);
-            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-            ctx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(cropRect.x+cropRect.w-10, cropRect.y+cropRect.h-10, 10, 10);
-        }
-
-        function rotateImage() { rotationAngle = (rotationAngle + 90) % 360; drawPreview(); }
-        function cancelPreprocessing() { document.getElementById('cropContainer').style.display = 'none'; document.getElementById('fileInput').value = ""; }
-
-        function startDrag(e) {
-            const canvas = document.getElementById('cropCanvas');
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            if (x > cropRect.x + cropRect.w - 20 && y > cropRect.y + cropRect.h - 20) dragHandle = 'resize';
-            else if (x > cropRect.x && x < cropRect.x + cropRect.w && y > cropRect.y && y < cropRect.y + cropRect.h) dragHandle = 'move';
-            else dragHandle = null;
-            if (dragHandle) { isDragging = true; e.preventDefault(); }
-        }
-
-        function doDrag(e) {
-            if (!isDragging) return;
-            const canvas = document.getElementById('cropCanvas');
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            if (dragHandle === 'resize') { cropRect.w = Math.max(20, x - cropRect.x); cropRect.h = Math.max(20, y - cropRect.y); }
-            else if (dragHandle === 'move') { cropRect.x = x - cropRect.w/2; cropRect.y = y - cropRect.h/2; }
-            drawPreview();
-        }
-
-        function stopDrag() { isDragging = false; }
-
-        function confirmPreprocessing() {
-            const canvas = document.createElement('canvas');
-            const previewCanvas = document.getElementById('cropCanvas');
-            const scale = originalImg.width / ((rotationAngle % 180 === 0) ? previewCanvas.width : previewCanvas.height);
-            canvas.width = cropRect.w * scale; canvas.height = cropRect.h * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.save();
-            ctx.translate(canvas.width/2, canvas.height/2);
-            ctx.rotate(rotationAngle * Math.PI / 180);
-            const drawW = (rotationAngle % 180 === 0) ? previewCanvas.width * scale : previewCanvas.height * scale;
-            const drawH = (rotationAngle % 180 === 0) ? previewCanvas.height * scale : previewCanvas.width * scale;
-            ctx.drawImage(originalImg, (-previewCanvas.width*scale/2) + (previewCanvas.width*scale/2 - (cropRect.x + cropRect.w/2)*scale), (-previewCanvas.height*scale/2) + (previewCanvas.height*scale/2 - (cropRect.y + cropRect.h/2)*scale), drawW, drawH);
-            ctx.restore();
-            document.getElementById('cropContainer').style.display = 'none';
-            processOCRFromBlob(canvas.toDataURL('image/png'));
-        }
-
-        async function processOCRFromBlob(dataUrl) {
+        async function processOCR(file) {
             const loader = document.getElementById('ocrLoading');
             loader.style.display = 'block';
             try {
                 const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
                 await worker.setParameters({ preserve_interword_spaces: '1', tessedit_pageseg_mode: '3' });
-                const { data } = await worker.recognize(dataUrl);
-                const orderedText = data.blocks.sort((a,b) => a.bbox.y0 - b.bbox.y0).map(b => b.text.trim()).filter(t => t.length > 0).join('\n\n');
+                const { data } = await worker.recognize(file);
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                await img.decode();
+                const midX = img.width / 2;
+                const leftBlocks = [];
+                const rightBlocks = [];
+                data.blocks.forEach(block => {
+                    const blockCenterX = (block.bbox.x0 + block.bbox.x1) / 2;
+                    if (blockCenterX < midX) { leftBlocks.push(block); } else { rightBlocks.push(block); }
+                });
+                const sortTopDown = (a, b) => a.bbox.y0 - b.bbox.y0;
+                leftBlocks.sort(sortTopDown);
+                rightBlocks.sort(sortTopDown);
+                const orderedText = [...leftBlocks, ...rightBlocks].map(b => b.text.trim()).filter(t => t.length > 0).join('\n\n');
                 await worker.terminate();
                 document.getElementById('ocrTextEditor').value = orderedText;
                 document.getElementById('editorSection').style.display = 'block';
                 loader.style.display = 'none';
-            } catch (err) { alert("OCR Error: " + err.message); loader.style.display = 'none'; }
+            } catch (err) {
+                console.error(err);
+                alert("OCR Error: " + err.message);
+                loader.style.display = 'none';
+            }
         }
 
         document.getElementById('dictInput').addEventListener('focus', (e) => {
