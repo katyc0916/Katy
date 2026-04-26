@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a1b26">
+    <meta name="theme-color" content="#d1e9f0">
     <title>8-Day Osaka Itinerary</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -22,14 +22,14 @@
         }
 
         body { 
-            margin: 0; background: #1a1b26; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; 
+            margin: 0; background: #d1e9f0; font-family: 'Noto Sans TC', sans-serif; font-weight: bold; 
             display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-y: auto; 
             -webkit-font-smoothing: antialiased;
         }
 
         .phone-container { 
             width: 95vw; max-width: 400px; height: 85vh; perspective: 2000px; position: relative; 
-            transform-style: preserve-3d; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform-style: preserve-3d; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
 
         .nav-side-btn {
@@ -354,7 +354,7 @@
                 <div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="margin-top:0; color:var(--osaka-red); font-size: 0.95rem;">📞 日本緊急求助電話</h4><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;"><div class="em-box"><span style="font-size:0.7rem; color:#666; display:block;">警察局 (報案)</span><strong style="font-size:1.3rem; color:var(--osaka-red);">110</strong></div><div class="em-box"><span style="font-size:0.7rem; color:#666; display:block;">消防/救護車</span><strong style="font-size:1.3rem; color:var(--osaka-red);">119</strong></div></div><div style="background:#eef7ff; padding:10px; border-radius:8px; border:1.5px solid #3498db; display: flex; align-items: center; gap: 10px;"><div style="font-size: 1.5rem;">📞</div><div style="flex:1;"><span style="font-size:0.7rem; color:#0056b3; display:block; font-weight:bold;">JNTO 日本觀光局熱線 (24/7)</span><a href="tel:05038162787" style="font-size:1.15rem; color:#007bff; text-decoration:none; font-weight:800;">050-3816-2787</a><span style="font-size:0.65rem; color:#555; display:block;">(支援中/英/韓/日文 - 事故、傷病、一般諮詢)</span></div></div></div>
                 <div class="info-box"><h4 style="margin-top:0; color:#333; font-size: 0.95rem;">🗣️ 重要求助短句 (Point-and-Speak)</h4><div style="background:#f9f9f9; padding:12px; border-radius:8px; font-size:1.05rem; line-height:1.7;"><p style="margin:6px 0;">🚓 <strong>警察を呼んでください</strong><br><small style="color:#777; font-weight:normal;">(Kei-sa-tsu o yon-de ku-da-sai)</small><br><small style="font-size:0.85rem; color:#e63946;">請幫我叫警察</small></p><hr style="border:0; border-top:1px dashed #ddd; margin:8px 0;"><p style="margin:6px 0;">🚑 <strong>救急車を呼んでください</strong><br><small style="color:#777; font-weight:normal;">(Kyuu-kyuu-sha o yon-de ku-da-sai)</small><br><small style="font-size:0.85rem; color:#e63946;">請幫我叫救護車</small></p></div></div>
                 <div class="info-box" style="border-bottom-color: #3498db;"><h4 style="margin-top:0; color:#3498db; font-size: 0.95rem;">🏥 醫療與支援 (附近設施)</h4><div style="display:flex; flex-direction:column; gap:8px;"><div class="em-card"><span style="font-size:0.85rem;">👮 <strong>南警察署</strong> (島之內鄰近)</span><span onclick="openStaticMap('大阪府南警察署')" class="map-icon">🌐</span></div><div class="em-card"><span style="font-size:0.85rem;">🏥 <strong>大阪市立急病診療所</strong></span><span onclick="openStaticMap('大阪市立急病診療所')" class="map-icon">🌐</span></div><div class="em-card"><span style="font-size:0.85rem;">💊 <strong>24 小時藥妝店</strong> (松本清)</span><span onclick="openStaticMap('マツモトキヨシ 道頓堀一丁目店')" class="map-icon">🌐</span></div><div class="em-card"><span style="font-size:0.85rem;">🇨🇳 <strong>中國駐大阪總領事館</strong></span><span onclick="openStaticMap('中華人民共和国駐大阪総領事館')" class="map-icon">🌐</span></div></div></div>
-                <div class="info-box" style="border-bottom-color: #27ae60;"><h4 style="margin-top:0; color:#27ae60; font-size: 0.95rem;">🏃 附近指定避難所 (大地震/海嘯)</h4><div style="display:flex; flex-direction:column; gap:8px;"><div class="em-card"><span style="font-size:0.85rem;">🏫 <strong>南小學校</strong> (最近)</span><span onclick="openStaticMap('大阪市立南小学校')" class="map-icon">🌐</span></div><div class="em-card"><span style="font-size:0.85rem;">🏫 <strong>高津小學校</strong></span><span onclick="openStaticMap('大阪市立高津小学校')" class="map-icon">🌐</span></div></div></div>
+                <div class="info-box" style="border-bottom-color: #27ae60;"><h4 style="margin-top:0; color:#27ae60; font-size: 0.95rem;">跑 附近指定避難所 (大地震/海嘯)</h4><div style="display:flex; flex-direction:column; gap:8px;"><div class="em-card"><span style="font-size:0.85rem;">🏫 <strong>南小學校</strong> (最近)</span><span onclick="openStaticMap('大阪市立南小学校')" class="map-icon">🌐</span></div><div class="em-card"><span style="font-size:0.85rem;">🏫 <strong>高津小學校</strong></span><span onclick="openStaticMap('大阪市立高津小学校')" class="map-icon">🌐</span></div></div></div>
                 <div class="info-box"><h4 style="margin-top:0; color:#333; font-size: 0.95rem;">🌀 交通與防災資訊</h4><div style="display:flex; flex-direction:column; gap:8px;"><a href="https://www.westjr.co.jp/global/tc/" class="vjw-item" target="_blank" style="color:#00469b; border-color:#00469b; background:white;">🚉 JR 西日本運行情報</a><a href="https://www.jnto.go.jp/emergency/chc/mi_guide.html" class="vjw-item" target="_blank" style="color:#007bff; border-color:#007bff; background:white;">🏥 JNTO 外語醫療支援搜尋</a><a href="https://www.jnto.go.jp/safety-tips/chc/app.html" class="vjw-item" target="_blank" style="color:#e67e22; border-color:#e67e22; background:rgba(230,126,34,0.05);">⚠️ Safety tips (官方防災 App)</a><a href="https://www3.nhk.or.jp/nhkworld/zt/" class="vjw-item" target="_blank" style="color:white; border-color:#e63946; background:#e63946;">📺 NHK World-Japan 繁中防災</a></div></div>
                 <div style="width: 100%; text-align: center; margin-bottom: 25px; padding: 0 10px; box-sizing: border-box;"><p style="font-size:0.75rem; color:#666; line-height:1.6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;"><span style="font-size: 1.2rem;">💡</span><span>溫馨提醒：請備份所有同行者的</span><span><strong style="color:var(--osaka-red);">護照截圖</strong> 與 <strong style="color:var(--osaka-red);">保險單據</strong> 於手機相簿。</span></p></div>
             </div>
