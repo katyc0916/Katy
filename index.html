@@ -599,8 +599,33 @@
 
     /* --- UI 交互功能 --- */
     const jumpToPage = idx => { $$('.single-page').forEach((p, i) => p.classList.toggle('flipped', i < idx)); $('page-nav-menu').style.display = 'none'; };
-    const goNext = () => { const u = $$('.single-page:not(.flipped)'); if (u.length > 1) u[0].classList.add('flipped'); else $$('.single-page').forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 50)); };
-    const goPrev = () => { const f = $$('.single-page.flipped'); if (f.length) f[f.length - 1].classList.remove('flipped'); else $$('.single-page').forEach((p, i, arr) => { if(i < arr.length - 1) p.classList.add('flipped'); }); };
+    
+    // --- 修復與優化撥頁邏輯 ---
+    const goNext = () => { 
+        const pages = $$('.single-page');
+        const unflipped = $$('.single-page:not(.flipped)'); 
+        if (unflipped.length > 1) { 
+            unflipped[0].classList.add('flipped'); 
+        } else { 
+            // 循環回首頁
+            pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); 
+        } 
+    };
+
+    const goPrev = () => { 
+        const pages = $$('.single-page');
+        const flipped = $$('.single-page.flipped'); 
+        if (flipped.length > 0) { 
+            // 正常回上一頁
+            flipped[flipped.length - 1].classList.remove('flipped'); 
+        } else { 
+            // 循環至最後一頁 (緊急資訊頁)
+            // 需要翻轉除了最後一頁以外的所有頁面
+            for (let i = 0; i < pages.length - 1; i++) {
+                pages[i].classList.add('flipped');
+            }
+        } 
+    };
     
     function toggleMusic(aId, bId, defI, playI) {
         const audio = $(aId), btn = $(bId), span = btn.querySelector('span'), isPlaying = !audio.paused;
@@ -613,7 +638,7 @@
     const showToast = msg => { const t = $("toast"); t.innerText = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3000); };
     const toggleNavMenu = e => { e.stopPropagation(); const m = $('page-nav-menu'); m.style.display = m.style.display==='flex'?'none':'flex'; };
     
-    const openMapModal = q => { $('map-modal-title').innerText = "地圖: "+q; $('map-iframe').src = "https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q="+encodeURIComponent(q); $('map-modal').style.display = 'flex'; };
+    const openMapModal = q => { $('map-modal-title').innerText = "地圖: "+q; $('map-iframe').src = "https://www.google.com/maps?q="+encodeURIComponent(q)+"&output=embed"; $('map-modal').style.display = 'flex'; };
     const openStaticMap = openMapModal;
     const closeMapModal = () => { $('map-modal').style.display = 'none'; $('map-iframe').src = ''; };
     const openDynamicMap = btn => { const loc = btn.closest('.timeline-row').querySelector('.loc-input').value; loc ? openMapModal(loc) : showToast('⚠️ 請填寫地點'); };
