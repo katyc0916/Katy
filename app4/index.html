@@ -17,6 +17,10 @@
             --deepl-blue: #002451;
         }
 
+        * {
+            box-sizing: border-box; /* 確保所有寬度計算包含 Padding */
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg-gradient);
@@ -24,10 +28,9 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            padding: 20px 15px 150px 15px;
-            box-sizing: border-box;
+            padding: 10px 10px 100px 10px; /* 縮減間距以適應手機 */
             scroll-behavior: smooth;
-            overflow-x: hidden;
+            overflow-x: hidden; /* 防止橫向滾動 */
         }
 
         .container {
@@ -36,40 +39,61 @@
             max-width: 900px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            padding: 30px;
+            padding: 20px;
             border-top: 12px solid var(--accent-green);
             position: relative;
+            overflow: hidden; /* 確保內部元件不溢出圓角 */
         }
 
         h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
 
-        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        .page-content { display: none; animation: fadeIn 0.3s ease; width: 100%; }
         .page-content.active { display: block; }
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
-        .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: #fff; border: 2px solid #eee; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; border-width: 3px; }
+        .portal-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+            gap: 12px; 
+            margin-top: 20px; 
+        }
+        .card { 
+            background: #fff; 
+            border: 2px solid #eee; 
+            padding: 15px 10px; 
+            border-radius: 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            border-width: 3px; 
+            word-wrap: break-word;
+        }
         .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .card i { font-size: 30px; display: block; margin-bottom: 10px; }
+        .card i { font-size: 28px; display: block; margin-bottom: 8px; }
+        .card h3 { font-size: 16px; margin: 5px 0; }
+        .card p { font-size: 12px; margin: 0; }
 
         #ocrTextEditor, #scopeRawEditor, #writingContent {
             width: 100%; height: 300px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
             font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
-            margin-top: 10px; resize: vertical; box-sizing: border-box;
+            margin-top: 10px; resize: vertical; box-sizing: border-box; display: block;
         }
-        .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; }
+        .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; word-wrap: break-word; }
 
-        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
-        .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .btn-action, .btn-secondary, .btn-danger { 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
+            display: inline-flex; align-items: center; justify-content: center;
+            text-align: center; max-width: 100%;
+        }
+        .btn-action { background: var(--primary-blue); color: white; padding: 12px 15px; }
+        .btn-secondary { background: #78909c; color: white; padding: 12px 15px; }
+        .btn-danger { background: #e53935; color: white; padding: 8px 16px; margin-bottom: 10px; }
 
-        .file-upload-wrapper { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .file-upload-wrapper { border: 2px dashed #ccc; padding: 25px 15px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; width: 100%; box-sizing: border-box; }
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
         .file-upload-wrapper input[type="file"] { display: none; }
-        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); }
+        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); word-break: break-all; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        
         .list-item-row { 
             position: relative; 
             overflow: hidden; 
@@ -78,6 +102,7 @@
             border-bottom: 1px solid #eee;
             border-radius: 10px;
             margin-bottom: 8px;
+            width: 100%;
         }
         
         .item-main-content {
@@ -109,17 +134,17 @@
             transform: translateX(-80px);
         }
         
-        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; width: 100%; }
         .category-header { 
             background: #f8f9fa; padding: 12px 15px; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center;
             font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid #eee;
+            width: 100%;
         }
-        .category-content { display: block; padding: 10px; background: #fff; }
+        .category-content { display: block; padding: 10px; background: #fff; width: 100%; }
         .category-content.collapsed { display: none; }
         .cat-count { background: var(--primary-blue); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
         .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
-        .cat-delete-btn:hover { background: #ef9a9a; color: white; }
 
         /* Writing Specific Styles */
         .writing-card {
@@ -130,91 +155,75 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             cursor: pointer;
+            width: 100%;
         }
-        .writing-title { font-weight: bold; color: var(--primary-blue); font-size: 18px; margin-bottom: 5px; }
-        .writing-meta { font-size: 12px; color: #90a4ae; }
-        .writing-preview { font-size: 14px; color: #546e7a; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .writing-title { font-weight: bold; color: var(--primary-blue); font-size: 18px; margin-bottom: 5px; word-wrap: break-word; }
+        .writing-preview { font-size: 14px; color: #546e7a; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
         
-        .app-btn-group { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .btn-grammarly { background: #11a683; color: white; }
+        .app-btn-group { display: flex; gap: 8px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap; width: 100%; }
+        .app-btn-group button { flex: 1 1 auto; }
 
-        .status-msg { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
-
-        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; }
+        .tab-container { display: flex; gap: 5px; margin-bottom: 20px; width: 100%; }
+        .tab-btn { flex: 1; padding: 12px 5px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .tab-btn.active { background: var(--light-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; width: 100%; }
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
 
-        .vocab-row-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; position: relative; }
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; padding-right: 80px; }
-        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
-        .phonetic-line { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
-        .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
-        .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
+        .vocab-row-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; position: relative; width: 100%; }
+        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; padding-right: 70px; word-wrap: break-word; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; word-wrap: break-word; }
+        .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; width: 100%; }
         
-        .app-link-btn { cursor: pointer; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: white; text-decoration: none; display: inline-block; }
-        .btn-erudite { background: var(--erudite-green); }
-        .btn-deepl { background: var(--deepl-blue); }
-
-        .header-actions { position: absolute; right: 0; top: 0; display: flex; gap: 8px; align-items: center; }
-        .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
-        .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
+        .app-link-btn { cursor: pointer; border: none; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: bold; color: white; text-decoration: none; display: inline-flex; align-items: center; }
         
-        .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
+        .header-actions { position: absolute; right: 0; top: 0; display: flex; gap: 5px; align-items: center; }
+        
+        .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; width: 100%; overflow-wrap: break-word; }
         .item-details.show { display: block; }
-        
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; word-wrap: break-word; }
 
-        .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
-
-        mark.highlighter {
-            background-color: var(--highlight-yellow);
-            color: inherit;
-            padding: 0 2px;
-            border-radius: 3px;
-        }
-
-        /* Dictation Specific */
-        .category-chip { display: flex; align-items: center; gap: 8px; background: #f1f3f4; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-        .category-chip.selected { border-color: var(--primary-blue); background: var(--light-blue); }
-        .category-chip input { transform: scale(1.2); }
-
-        /* Dictation Textarea Style */
         .dict-input-wrapper { position: relative; width: 100%; }
         #dictInput {
             width: 100%;
-            padding: 18px;
-            padding-right: 50px; /* Space for trash icon */
-            font-size: 20px;
+            padding: 15px;
+            padding-right: 45px;
+            font-size: 18px;
             border: 2px solid #ddd;
             border-radius: 12px;
             box-sizing: border-box;
             font-family: inherit;
             resize: none;
-            min-height: 80px;
-            overflow-y: auto;
+            min-height: 70px;
+            display: block;
         }
         .input-clear-btn {
             position: absolute;
-            right: 15px;
-            bottom: 15px;
+            right: 12px;
+            bottom: 12px;
             background: #f5f5f5;
             border: 1px solid #ddd;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: #e53935;
-            font-size: 16px;
             z-index: 5;
         }
 
+        #lookupResult { word-wrap: break-word; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Responsive Fix for extremely small screens */
+        @media (max-width: 360px) {
+            .portal-grid { grid-template-columns: 1fr 1fr; }
+            .vocab-target { font-size: 16px; }
+            .btn-action { padding: 10px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
@@ -232,32 +241,31 @@
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Composition Lab</p></div>
             </div>
 
-            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
+            <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
                 <h3 style="margin-top: 0; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportAllData()">📤 Export Data</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" style="flex: 1; background: #607d8b; font-size: 13px;" onclick="exportAllData()">📤 Export Data</button>
                     <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
-                    <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
+                    <button class="btn-secondary" style="flex: 1; background: #546e7a; font-size: 13px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
                 </div>
-                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
+                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Download data as a file. <br> Import: Select file to restore.</p>
             </div>
         </div>
 
         <div id="dictionaryPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>📖 Smart Lookup</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
                 <div style="position: relative; flex: 1;">
-                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
-                    <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
+                    <input type="text" id="dictLookupInput" placeholder="Enter word..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                    <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-weight: bold; padding: 5px;">✕</span>
                 </div>
                 <button class="btn-action" onclick="performLookup()">Search</button>
             </div>
-            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative;">
-                </div>
-            <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
+            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 12px; margin-bottom: 20px; position: relative;"></div>
+            <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 8px;">
                 <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
-                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Study Scope</button>
+                <button class="btn-action" style="flex: 1; background: #0288d1;" onclick="saveLookupToScope()">➕ Add to Scope</button>
             </div>
 
             <div id="searchHistoryContainer" style="margin-top: 30px;">
@@ -265,7 +273,6 @@
                     <h3 style="font-size: 18px; color: #546e7a; margin: 0;">Recent Searches</h3>
                     <button class="btn-danger" style="margin: 0; padding: 4px 8px; font-size: 12px;" onclick="clearAllHistory()">🗑️ Delete All</button>
                 </div>
-                <div style="font-size: 12px; color: #90a4ae; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap to view.</div>
                 <div id="searchHistoryList"></div>
             </div>
         </div>
@@ -273,11 +280,10 @@
         <div id="favoritesPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>⭐ My Library</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn-action" style="flex: 1;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
-                <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button class="btn-action" style="flex: 1; font-size: 13px;" onclick="addNewManualFavorite()">➕ New Word</button>
+                <button class="btn-danger" style="margin-bottom: 0; font-size: 13px;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
-            <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
             <div id="favoritesList"></div>
         </div>
 
@@ -287,64 +293,63 @@
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
                 <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
-                <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text Content...</div>
+                <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text...</div>
             </div>
             <div id="editorSection" style="display:none; margin-top: 20px;">
-                <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
                 <textarea id="ocrTextEditor"></textarea>
-                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
-                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('ocrTextEditor')">➕ Add Selected</button>
-                        <button id="btnAddAllScan" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ Add All</button>
-                        <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Texts</button>
+                <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('ocrTextEditor')">➕ Sel Dict</button>
+                        <button id="btnAddAllScan" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('ocrTextEditor')">➕ All Dict</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
-                        <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
-                        <span id="scanToast" class="toast-added">✓ Added</span>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Sel Lib</button>
+                        <button id="btnLibAllScan" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ All Lib</button>
                     </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="background:#4db6ac; flex: 1;" onclick="manuallySaveToRaw()">💾 Save Text</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="clearEditor()">🗑️ Clear</button>
+                    </div>
+                    <span id="scanToast" class="toast-added" style="text-align:center;">✓ Added</span>
                 </div>
             </div>
         </div>
 
         <div id="scopePage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>📋 Study Scope Management</h2>
+            <h2>📋 Study Scope</h2>
             <div class="tab-container">
-                <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Source Texts</div>
-                <div id="btnDictTab" class="tab-btn" onclick="switchScopeTab('dictTab')">🎯 Dictation Scope</div>
+                <div id="btnRawTab" class="tab-btn active" onclick="switchScopeTab('rawTab')">📄 Sources</div>
+                <div id="btnDictTab" class="tab-btn" onclick="switchScopeTab('dictTab')">🎯 Scope</div>
             </div>
 
             <div id="rawTab" class="tab-content active">
                 <select id="rawTextSelect" class="raw-select" onchange="loadRawText()">
-                    <option value="">-- Select a saved scan --</option>
+                    <option value="">-- Select Scan --</option>
                 </select>
                 <textarea id="scopeRawEditor" style="display:none;"></textarea>
-                <div id="rawActions" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
-                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Add Selected</button>
-                        <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ Add All</button>
-                        <button class="btn-action" style="background:#4db6ac; padding: 12px 15px;" onclick="saveRawChanges()">💾 Save Changes</button>
+                <div id="rawActions" style="display:none; margin-top: 15px; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="flex: 1;" onclick="extractTextToDictation('scopeRawEditor')">➕ Sel Dict</button>
+                        <button id="btnAddAllRaw" class="btn-action" style="flex: 1; background: #fb8c00;" onclick="addAllToDictation('scopeRawEditor')">➕ All Dict</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
-                        <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
-                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
-                        <span id="rawToast" class="toast-added">✓ Added</span>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="flex: 1; background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Sel Lib</button>
+                        <button id="btnLibAllRaw" class="btn-action" style="flex: 1; background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ All Lib</button>
                     </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="btn-action" style="background:#4db6ac; flex: 1;" onclick="saveRawChanges()">💾 Save</button>
+                        <button class="btn-action" style="flex: 1; background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete</button>
+                    </div>
+                    <span id="rawToast" class="toast-added" style="text-align:center;">✓ Added</span>
                 </div>
             </div>
 
             <div id="dictTab" class="tab-content">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn-action" style="flex: 1;" onclick="addNewManualVocab()">➕ Add New Word/Phrase</button>
-                    <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllVocab()">🗑️ Delete All</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <button class="btn-action" style="flex: 1; font-size: 13px;" onclick="addNewManualVocab()">➕ New Item</button>
+                    <button class="btn-danger" style="margin-bottom: 0; font-size: 13px;" onclick="clearAllVocab()">🗑️ Delete All</button>
                 </div>
-                <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; margin-bottom: 15px;">
-                    💡 <b>Advanced Tip:</b> Use double equals (==word==) to define fill-in-the-blank targets.
-                </div>
-                <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
                 <div id="vocabList"></div>
             </div>
         </div>
@@ -353,79 +358,68 @@
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             
             <div id="dictConfigUI">
-                <h2 style="text-align:center;">🎧 Dictation Setup</h2>
-                <div class="instruction-tip">Select categories for practice. No hints will be displayed during the session.</div>
-                
-                <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">1. Choose Scope:</div>
-                <div id="dictCategoryChecklist" style="margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
-                
-                <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">2. Preferences:</div>
+                <h2 style="text-align:center;">🎧 Dictation</h2>
+                <div id="dictCategoryChecklist" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 10px; padding: 5px;"></div>
                 <div class="category-chip" onclick="this.querySelector('input').click()">
                     <input type="checkbox" id="dictShuffleMode" onclick="event.stopPropagation()">
                     <span style="font-weight: 500;">Randomize Order</span>
                 </div>
-                
                 <button class="btn-action" onclick="initDictationSession()" style="width:100%; margin-top: 15px; background: var(--erudite-green);">Start Session</button>
             </div>
 
             <div id="dictPlayUI" style="display:none; text-align:center;">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
-                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏮️ Prev</button>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 6px 12px;">⏮️</button>
                     <h3 id="dictProgress" style="margin: 0; min-width: 60px;">0 / 0</h3>
-                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏭️ Next</button>
+                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 6px 12px;">⏭️</button>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
-                    <button id="btnUsVoice" class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
+                <div style="margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;">
+                    <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; flex: 1; font-size: 16px;">🔊 UK</button>
+                    <button class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; flex: 1; font-size: 16px;">🔊 US</button>
                 </div>
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; background: #f1f8e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #c5e1a5;">
-                    <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;">
-                        <span style="font-size: 13px; font-weight: bold; color: #558b2f; min-width: 50px;">Speed:</span>
-                        <input type="range" id="dictSpeechRate" min="0.1" max="1.0" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1; max-width: 150px;">
-                        <span id="rateDisplay" style="font-size: 13px; font-weight: bold; color: var(--primary-blue); min-width: 35px;">1x</span>
+                <div style="background: #f1f8e9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #c5e1a5;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <span style="font-size: 13px; font-weight: bold; color: #558b2f;">Speed:</span>
+                        <input type="range" id="dictSpeechRate" min="0.1" max="1.0" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1;">
+                        <span id="rateDisplay" style="font-size: 13px; font-weight: bold; width: 30px;">1x</span>
                     </div>
-                    <button id="dictPauseBtn" class="btn-secondary" onclick="toggleSpeechPause()" style="background: #ffb300; width: 100%; max-width: 200px; padding: 8px;">⏸️ Pause</button>
+                    <button id="dictPauseBtn" class="btn-secondary" onclick="toggleSpeechPause()" style="background: #ffb300; width: 100%; padding: 8px;">⏸️ Pause/Resume</button>
                 </div>
 
                 <div class="dict-input-wrapper">
-                    <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="handleDictKeyDown(event)"></textarea>
-                    <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus();">🗑️</div>
+                    <textarea id="dictInput" placeholder="Type here..." onkeydown="handleDictKeyDown(event)"></textarea>
+                    <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = '';">🗑️</div>
                 </div>
-                <br><br>
-                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
-                <div id="dictHintDisplay" style="margin-top: 15px; font-size: 16px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
+                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px; margin-top: 15px;">Check Answer</button>
+                <div id="dictHintDisplay" style="margin-top: 15px; font-size: 15px; font-weight: bold; color: var(--primary-blue); min-height: 20px;"></div>
                 <div id="dictResult" class="status-msg"></div>
             </div>
         </div>
 
         <div id="writingPage" class="page-content">
-            <div class="back-btn" onclick="switchPage('writing')">← Back to List</div>
             <div id="writingListUI">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div class="back-btn" onclick="goHome()" style="margin-bottom:0;">← Back to Home</div>
+                    <div class="back-btn" onclick="goHome()" style="margin-bottom:0;">← Back</div>
                     <button class="btn-action" onclick="openWritingEditor()">New Article</button>
                 </div>
                 <div id="writingList"></div>
             </div>
 
             <div id="writingEditUI" style="display:none;">
-                <input type="text" id="writingTitle" placeholder="Article Title (e.g. My Daily Routine)" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
-                <div class="instruction-tip" style="background: #e8f5e9; border-left-color: #43a047;">
-                    💡 <b>Tip:</b> Highlight text to check specific parts, or use buttons to process the full text in Grammarly or DeepL.
-                </div>
-                <textarea id="writingContent" placeholder="Start your English writing here..."></textarea>
+                <input type="text" id="writingTitle" placeholder="Title" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
+                <textarea id="writingContent" placeholder="Write here..."></textarea>
                 <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">Words: 0</div>
                 
                 <div class="app-btn-group">
-                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">Grammarly</button>
-                    <button class="btn-action btn-deepl" onclick="openInDeepL()">DeepL</button>
-                    <button class="btn-secondary" onclick="copyWritingText()">📋 Copy All</button>
+                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()" style="background: #11a683;">Grammarly</button>
+                    <button class="btn-action" onclick="openInDeepL()" style="background: var(--deepl-blue);">DeepL</button>
+                    <button class="btn-secondary" onclick="copyWritingText()">📋 Copy</button>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save Article</button>
-                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Delete All</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save</button>
+                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Discard</button>
                 </div>
             </div>
         </div>
@@ -442,93 +436,35 @@
         let touchStartX = 0;
         let currentLookupData = null;
         let activeWritingIndex = -1;
-
-        // Session Variables
         let activeSessionData = [];
         let dictationScore = 0;
 
-        function stripMarkers(str) {
-            return str.replace(/==/g, '');
-        }
-
-        function formatDisplay(str) {
-            return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>');
-        }
-
-        function hasChinese(text) {
-            return /[\u4e00-\u9fa5]/.test(text);
-        }
-
-        function cleanSpeechText(text) {
-            return text.replace(/==/g, '')
-                       .replace(/⟪.*?⟫/g, '')
-                       .replace(/\[.*?\]/g, '')
-                       .replace(/❖.*/g, '')
-                       .replace(/<br>/g, ' ')
-                       .replace(/\//g, ' ') 
-                       .trim();
-        }
-
-        function showToast(id) {
-            const toast = document.getElementById(id);
-            if (!toast) return;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-        }
+        function stripMarkers(str) { return str.replace(/==/g, ''); }
+        function formatDisplay(str) { return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>'); }
+        function hasChinese(text) { return /[\u4e00-\u9fa5]/.test(text); }
+        function cleanSpeechText(text) { return text.replace(/==/g, '').replace(/⟪.*?⟫/g, '').replace(/\[.*?\]/g, '').replace(/❖.*/g, '').replace(/<br>/g, ' ').replace(/\//g, ' ').trim(); }
+        function showToast(id) { const t = document.getElementById(id); if (t) { t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); } }
 
         function handleFileSelect(input) {
-            const fileLabel = document.getElementById('fileLabel');
             if (input.files && input.files[0]) {
-                fileLabel.innerText = "📄 " + input.files[0].name;
+                document.getElementById('fileLabel').innerText = "📄 " + input.files[0].name;
                 processOCR(input.files[0]);
-            } else {
-                fileLabel.innerText = "📁 Click to Upload Image";
             }
         }
 
         async function processOCR(file) {
             const loader = document.getElementById('ocrLoading');
             loader.style.display = 'block';
-
             try {
                 const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
-                await worker.setParameters({
-                    preserve_interword_spaces: '1',
-                    tessedit_pageseg_mode: '3', 
-                });
+                await worker.setParameters({ preserve_interword_spaces: '1', tessedit_pageseg_mode: '3' });
                 const { data } = await worker.recognize(file);
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await img.decode();
-                const midX = img.width / 2;
-                const leftBlocks = [];
-                const rightBlocks = [];
-                data.blocks.forEach(block => {
-                    const blockCenterX = (block.bbox.x0 + block.bbox.x1) / 2;
-                    if (blockCenterX < midX) { leftBlocks.push(block); } else { rightBlocks.push(block); }
-                });
-                const sortTopDown = (a, b) => a.bbox.y0 - b.bbox.y0;
-                leftBlocks.sort(sortTopDown);
-                rightBlocks.sort(sortTopDown);
-                const orderedText = [...leftBlocks, ...rightBlocks]
-                    .map(b => b.text.trim())
-                    .filter(t => t.length > 0)
-                    .join('\n\n');
                 await worker.terminate();
-                document.getElementById('ocrTextEditor').value = orderedText;
+                document.getElementById('ocrTextEditor').value = data.text;
                 document.getElementById('editorSection').style.display = 'block';
-                loader.style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                alert("OCR Error: " + err.message);
-                loader.style.display = 'none';
-            }
+            } catch (err) { alert("OCR Error: " + err.message); }
+            loader.style.display = 'none';
         }
-
-        const focusHandler = (e) => {
-            setTimeout(() => { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
-        };
-        document.getElementById('dictInput').addEventListener('focus', focusHandler);
 
         function goHome() {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
@@ -537,15 +473,13 @@
         }
 
         function switchPage(id) {
-            if ((id === 'dictation') && vocabData.length === 0) {
-                alert("Please add items to Study Scope first!"); return;
-            }
+            if (id === 'dictation' && vocabData.length === 0) { alert("Please add items to Scope first!"); return; }
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById(`${id}Page`).classList.add('active');
             if (id === 'scope') renderTable();
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
-            if (id === 'dictation') startSession(id);
+            if (id === 'dictation') setupDictationConfig();
             if (id === 'writing') renderWritingList();
             window.scrollTo(0,0);
         }
@@ -565,157 +499,63 @@
             const isChinese = hasChinese(cleanText);
             const sourceLang = isChinese ? 'zh-CN' : 'en';
             const targetLang = isChinese ? 'en' : 'zh-TW';
-
-            const result = { 
-                word: text, 
-                ukPhonetic: "/.../", 
-                usPhonetic: "/.../", 
-                enDef: "Parsing definitions...", 
-                zh: "Translating...", 
-                category: "General" 
-            };
-            
+            const result = { word: text, ukPhonetic: "/.../", usPhonetic: "/.../", enDef: "Parsing...", zh: "Translating...", category: "General" };
             try {
                 const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=bd&dt=md&q=${encodeURIComponent(cleanText)}`;
                 const transResponse = await fetch(transUrl);
                 const data = await transResponse.json();
-                
                 if (!data) return result;
-
                 const primaryTranslation = data[0] ? data[0].map(x => x[0]).join('').trim() : "";
-                const lookupStr = isChinese ? primaryTranslation : cleanText;
-                const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
-
-                let zhLines = [];
-                if (data[1]) {
-                    const posMap = {
-                        "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "adv.",
-                        "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int."
-                    };
-                    
-                    data[1].forEach(posSection => {
-                        const posRaw = posSection[0].toLowerCase();
-                        const posLabel = posMap[posRaw] || posSection[0]; 
-                        let candidates = [];
-
-                        if (posSection.length > 2 && Array.isArray(posSection[2])) {
-                            candidates = posSection[2].map(item => {
-                                let score = 0;
-                                for(let i=2; i<item.length; i++) if (typeof item[i] === 'number') { score = item[i]; break; }
-                                return { word: item[0], score: score };
-                            }).filter(w => {
-                                const blackList = /[朕翫覿邴廋疏敝竊羿糗]/;
-                                if (blackList.test(w.word)) return false;
-                                if (!/^[\u4E00-\u9FA5]+$/.test(w.word)) return false;
-                                if (w.word.length === 1 && w.score < 0.15) return false;
-                                return true;
-                            });
-                            candidates.sort((a, b) => b.score - a.score);
-                        } else if (posSection[1]) {
-                            candidates = posSection[1].map(w => ({ word: w, score: 1 }));
-                        }
-
-                        const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join(', ');
-                        if (finalPicks) zhLines.push(`[${posLabel}] ${finalPicks}`);
-                    });
-                }
-                
-                result.zh = zhLines.length > 0 ? zhLines.slice(0, 3).join('<br>') : (primaryTranslation || "No match found");
-
+                result.zh = primaryTranslation || "No match";
                 let enDefLines = [];
-                if (data[12]) {
-                    data[12].forEach(sec => {
-                        if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`));
-                    });
-                }
-                if (enDefLines.length === 0) enDefLines.push(isPhraseOrSentence ? "<i>Contextual verified entry.</i>" : "<i>Standard entry.</i>");
-                result.enDef = enDefLines.join('<br>');
-
-                if (!isPhraseOrSentence) {
-                    const cleanLookup = lookupStr.split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
+                if (data[12]) data[12].forEach(sec => { if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`)); });
+                result.enDef = enDefLines.join('<br>') || "Standard entry";
+                const cleanLookup = (isChinese ? primaryTranslation : cleanText).split(',')[0].replace(/[^\w\s-]/g, '').trim().toLowerCase();
+                if (!cleanLookup.includes(' ')) {
                     try {
                         const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanLookup)}`);
                         if (dictRes.ok) {
                             const dictData = await dictRes.json();
                             const entry = dictData[0];
                             if (entry.phonetics) {
-                                const uk = entry.phonetics.find(p => p.audio?.includes('-uk') || p.text?.includes('UK'));
-                                const us = entry.phonetics.find(p => p.audio?.includes('-us') || p.text?.includes('US'));
+                                const uk = entry.phonetics.find(p => p.audio?.includes('-uk'));
+                                const us = entry.phonetics.find(p => p.audio?.includes('-us'));
                                 result.ukPhonetic = uk?.text || entry.phonetic || "/.../";
                                 result.usPhonetic = us?.text || entry.phonetic || "/.../";
                             }
                         }
                     } catch(e) {}
                 }
-                if (isChinese && result.ukPhonetic === "/.../") { result.ukPhonetic = "N/A"; result.usPhonetic = "N/A"; }
-            } catch (e) { result.zh = "Query service unavailable"; }
+            } catch (e) { result.zh = "Error"; }
             return result;
         }
 
         function renderLookupResultUI(info) {
-            const resultBox = document.getElementById('lookupResult');
-            const actionsBox = document.getElementById('lookupActions');
-            const cleanSpeech = cleanSpeechText(hasChinese(info.word) ? info.zh : info.word);
-            const encodedWord = encodeURIComponent(stripMarkers(info.word));
-            resultBox.style.display = 'block';
-            resultBox.innerHTML = `
-                <button onclick="document.getElementById('lookupResult').style.display='none'; document.getElementById('lookupActions').style.display='none';" style="position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #e53935; padding: 5px;">🗑️</button>
-                <div class="vocab-row-header" style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px;">
-                    <span class="vocab-target" style="font-size: 24px; padding-right: 0;">${formatDisplay(info.word)}</span>
+            const box = document.getElementById('lookupResult');
+            const acts = document.getElementById('lookupActions');
+            const cleanW = cleanSpeechText(hasChinese(info.word) ? info.zh : info.word);
+            box.style.display = 'block';
+            box.innerHTML = `
+                <button onclick="this.parentElement.style.display='none'; document.getElementById('lookupActions').style.display='none';" style="position: absolute; right: 10px; top: 10px; border:none; background:none; font-size:18px;">🗑️</button>
+                <div class="vocab-row-header"><span class="vocab-target">${formatDisplay(info.word)}</span></div>
+                <div class="phonetic-line">
+                    <button class="pron-icon" style="background:#eceff1; border:none; padding:4px 8px; border-radius:4px;" onclick="speakFromList('${cleanW}', 'en-GB')">UK ${info.ukPhonetic}</button>
+                    <button class="pron-icon" style="background:#eceff1; border:none; padding:4px 8px; border-radius:4px;" onclick="speakFromList('${cleanW}', 'en-US')">US ${info.usPhonetic}</button>
                 </div>
-                <div class="phonetic-line" style="margin-bottom: 15px;">
-                    <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-GB')">UK</button>
-                        <span>${info.ukPhonetic}</span>
-                    </div>
-                    <div class="phonetic-item">
-                        <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
-                        <span>${info.usPhonetic}</span>
-                    </div>
-                    <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite">Erudite</a>
-                    <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl">DeepL</a>
-                    <button class="app-link-btn" style="background: #78909c;" onclick="copyText(this, '${encodedWord}')">📋</button>
-                </div>
-                <div style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); line-height: 1.6;">
-                    <strong style="color: var(--primary-blue);">Translation:</strong><br>${info.zh}
-                </div>
-                <div class="definition-en-line" style="font-size: 15px;">
-                    <strong style="color: var(--primary-blue); font-style: normal;">Definition:</strong><br>${info.enDef}
-                </div>`;
-            actionsBox.style.display = 'flex';
+                <div><strong style="color:var(--primary-blue)">ZH:</strong> ${info.zh}</div>
+                <div class="definition-en-line" style="margin-top:10px">${info.enDef}</div>`;
+            acts.style.display = 'flex';
         }
 
         async function performLookup() {
             const input = document.getElementById('dictLookupInput').value.trim();
             if (!input) return;
-            const resultBox = document.getElementById('lookupResult');
-            const actionsBox = document.getElementById('lookupActions');
-            resultBox.style.display = 'block';
-            resultBox.innerHTML = '<div style="color:var(--primary-blue); font-weight:bold;">Pro Engine Analyzing...</div>';
-            actionsBox.style.display = 'none';
+            const box = document.getElementById('lookupResult');
+            box.style.display = 'block'; box.innerHTML = 'Analyzing...';
             const info = await fetchInfo(input);
-            info.word = input;
-            currentLookupData = info;
+            info.word = input; currentLookupData = info;
             renderLookupResultUI(info);
             addToHistory(info);
-        }
-
-        function saveLookupToFavorites() {
-            if (!currentLookupData) return;
-            const cat = prompt("Assign a collection category (Category Name):", "My Words") || "My Words";
-            currentLookupData.category = cat;
-            favoritesData.push({...currentLookupData});
-            saveFavoritesData();
-            alert("✓ Successfully Added to Library!");
-        }
-
-        function saveLookupToScope() {
-            if (!currentLookupData) return;
-            const cat = prompt("Assign a category for Study Scope:", "General") || "General";
-            currentLookupData.category = cat;
-            vocabData.push({...currentLookupData});
-            saveData();
-            alert("✓ Successfully Added to Study Scope!");
         }
 
         function addToHistory(info) {
@@ -725,607 +565,224 @@
             saveHistoryData();
         }
 
-        function clearAllHistory() {
-            if(confirm("Clear all search history?")) {
-                searchHistory = [];
-                saveHistoryData();
-            }
-        }
-
-        function saveHistoryData() {
-            localStorage.setItem('masterHistory', JSON.stringify(searchHistory));
-            renderHistoryList();
-        }
-
+        function saveHistoryData() { localStorage.setItem('masterHistory', JSON.stringify(searchHistory)); renderHistoryList(); }
         function renderHistoryList() {
             const list = document.getElementById('searchHistoryList');
-            if (searchHistory.length === 0) {
-                list.innerHTML = "<div style='color:#90a4ae; font-size:14px; padding: 10px;'>No recent searches.</div>";
-                return;
-            }
             list.innerHTML = searchHistory.map((item, index) => `
                 <div class="list-item-row" id="hist-row-${index}" ontouchstart="handleHistTouchStart(event)" ontouchmove="handleHistTouchMove(event, ${index})" ontouchend="handleHistTouchEnd(event, ${index})">
-                    <div class="delete-btn-overlay" onclick="event.stopPropagation(); deleteHistItem(${index})">DELETE</div>
-                    <div class="item-main-content" onclick="viewHistoryItem(${index})" style="cursor:pointer; padding: 12px;">
-                        <div class="vocab-row-header" style="margin-bottom:0;">
-                            <span class="vocab-target" style="font-size:16px;">${formatDisplay(item.word)}</span>
-                            <span class="vocab-zh" style="font-size:14px; color:#78909c;">${item.zh.replace(/<br>/g, ' ').substring(0, 30)}...</span>
-                        </div>
+                    <div class="delete-btn-overlay" onclick="deleteHistItem(${index})">DELETE</div>
+                    <div class="item-main-content" onclick="viewHistoryItem(${index})">
+                        <b>${item.word}</b> <span style="color:#78909c; font-size:13px;">- ${item.zh.substring(0,20)}</span>
                     </div>
                 </div>`).join('');
         }
 
-        function handleHistTouchStart(e) { touchStartX = e.touches[0].clientX; }
-        function handleHistTouchMove(e, index) {
-            let moveX = e.touches[0].clientX;
-            let diff = touchStartX - moveX;
-            let row = document.getElementById(`hist-row-${index}`);
-            if (!row) return;
-            if (diff > 20 && diff < 100) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
-        }
-        function handleHistTouchEnd(e, index) {
-            let touchEndX = e.changedTouches[0].clientX;
-            let row = document.getElementById(`hist-row-${index}`);
-            if (row && touchStartX - touchEndX < 40) row.classList.remove('swiped-left');
-        }
-
         function deleteHistItem(i) { searchHistory.splice(i, 1); saveHistoryData(); }
-        function viewHistoryItem(index) {
-            const info = searchHistory[index];
-            currentLookupData = info;
-            document.getElementById('dictLookupInput').value = info.word;
-            renderLookupResultUI(info);
-            addToHistory(info);
-            window.scrollTo(0,0);
+        function viewHistoryItem(i) { const info = searchHistory[i]; currentLookupData = info; document.getElementById('dictLookupInput').value = info.word; renderLookupResultUI(info); }
+
+        async function extractTextToDictation(id) {
+            const area = document.getElementById(id);
+            const sel = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            if (!sel) return;
+            const info = await fetchInfo(sel); info.word = sel;
+            vocabData.push(info); saveData(); showToast(id === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
-        async function extractTextToDictation(areaId) {
-            const area = document.getElementById(areaId);
-            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            if (!selectedText) { alert("Please highlight text!"); return; }
-            const cat = prompt("Assign category:", "General") || "General";
-            const info = await fetchInfo(selectedText);
-            info.word = selectedText; info.category = cat;
-            vocabData.push(info);
-            saveData();
-            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+        async function addAllToDictation(id) {
+            const lines = document.getElementById(id).value.split('\n').filter(l => l.trim());
+            for (const l of lines) { const info = await fetchInfo(l); info.word = l; vocabData.push(info); }
+            saveData(); showToast(id === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
-        async function extractTextToLibrary(areaId) {
-            const area = document.getElementById(areaId);
-            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            if (!selectedText) { alert("Please highlight text!"); return; }
-            const cat = prompt("Assign collection category:", "My Words") || "My Words";
-            const info = await fetchInfo(selectedText);
-            info.word = selectedText; info.category = cat;
-            favoritesData.push(info);
-            saveFavoritesData();
-            showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
+        async function extractTextToLibrary(id) {
+            const area = document.getElementById(id);
+            const sel = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            if (!sel) return;
+            const info = await fetchInfo(sel); info.word = sel;
+            favoritesData.push(info); saveFavoritesData(); showToast(id === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
-        async function addAllToDictation(areaId) {
-            const area = document.getElementById(areaId);
-            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length === 0) return;
-            const cat = prompt("Assign category:", "General") || "General";
-            const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnAddAllScan' : 'btnAddAllRaw');
-            btn.innerText = "•••"; btn.disabled = true;
-            try {
-                for (const line of lines) {
-                    const info = await fetchInfo(line);
-                    info.word = line; info.category = cat;
-                    vocabData.push(info);
-                }
-                saveData();
-                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
-            } finally { btn.innerText = "➕ Add All"; btn.disabled = false; }
-        }
-
-        async function addAllToLibrary(areaId) {
-            const area = document.getElementById(areaId);
-            const lines = area.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            if (lines.length === 0) return;
-            const cat = prompt("Assign collection category:", "My Words") || "My Words";
-            const btn = document.getElementById(areaId === 'ocrTextEditor' ? 'btnLibAllScan' : 'btnLibAllRaw');
-            const originalText = btn.innerText;
-            btn.innerText = "•••"; btn.disabled = true;
-            try {
-                for (const line of lines) {
-                    const info = await fetchInfo(line);
-                    info.word = line; info.category = cat;
-                    favoritesData.push(info);
-                }
-                saveFavoritesData();
-                showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
-            } finally { btn.innerText = originalText; btn.disabled = false; }
-        }
-
-        async function addNewManualVocab() {
-            const word = prompt("Enter English Word/Phrase:");
-            if (!word) return;
-            const cat = prompt("Enter Category:", "General") || "General";
-            const info = await fetchInfo(word);
-            vocabData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: cat });
-            saveData();
-        }
-
-        async function addNewManualFavorite() {
-            const word = prompt("Enter English Word/Phrase:");
-            if (!word) return;
-            const Granary = prompt("Enter Collection Category:", "My Words") || "My Words";
-            const info = await fetchInfo(word);
-            favoritesData.push({ word, zh: info.zh, enDef: info.enDef, ukPhonetic: info.ukPhonetic, usPhonetic: info.usPhonetic, category: Granary });
-            saveFavoritesData();
+        async function addAllToLibrary(id) {
+            const lines = document.getElementById(id).value.split('\n').filter(l => l.trim());
+            for (const l of lines) { const info = await fetchInfo(l); info.word = l; favoritesData.push(info); }
+            saveFavoritesData(); showToast(id === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
         function renderTable() {
             const list = document.getElementById('vocabList');
-            if (vocabData.length === 0) { list.innerHTML = ""; return; }
-            const groups = vocabData.reduce((acc, item, index) => {
-                const cat = item.category || "Uncategorized";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push({ ...item, originalIndex: index });
-                return acc;
-            }, {});
-            list.innerHTML = Object.keys(groups).map(catName => `
-                <div class="category-group">
-                    <div class="category-header" onclick="toggleCategory('${catName}')">
-                        <div>📁 ${catName} <span class="cat-count">${groups[catName].length}</span></div>
-                        <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCategory('${catName}')">🗑️</button>
-                    </div>
-                    <div id="cat-content-${catName}" class="category-content collapsed">
-                        ${groups[catName].map(item => {
-                            const encodedWord = encodeURIComponent(stripMarkers(item.word));
-                            return `
-                            <div class="list-item-row" id="row-${item.originalIndex}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${item.originalIndex})" ontouchend="handleTouchEnd(event, ${item.originalIndex})">
-                                <div class="delete-btn-overlay" onclick="deleteItem(${item.originalIndex})">DELETE</div>
-                                <div class="item-main-content">
-                                    <div class="vocab-row-header">
-                                        <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">${item.zh}</span>
-                                        <div class="header-actions">
-                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleDetails(${item.originalIndex})">↕️</button>
-                                            <button class="edit-icon" onclick="event.stopPropagation(); editVocab(${item.originalIndex})">✎</button>
-                                        </div>
-                                    </div>
-                                    <div id="details-${item.originalIndex}" class="item-details">
-                                        <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic}</button>
-                                            <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
-                                            <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
-                                            <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
-                                        </div>
-                                        <div class="definition-en-line">${item.enDef}</div>
-                                    </div>
-                                </div>
-                            </div>`}).join('')}
+            list.innerHTML = vocabData.map((item, i) => `
+                <div class="list-item-row" id="row-${i}" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event, ${i})">
+                    <div class="delete-btn-overlay" onclick="deleteItem(${i})">DELETE</div>
+                    <div class="item-main-content">
+                        <div class="vocab-row-header">
+                            <span class="vocab-target">${formatDisplay(item.word)}</span>
+                            <span class="vocab-zh">${item.zh}</span>
+                            <button class="expand-btn" style="position:absolute; right:0; top:0; border:none; background:#f0f4f8; padding:5px;" onclick="toggleDetails(${i})">↕️</button>
+                        </div>
+                        <div id="details-${i}" class="item-details">${item.enDef}</div>
                     </div>
                 </div>`).join('');
         }
 
         function renderFavoritesTable() {
             const list = document.getElementById('favoritesList');
-            if (favoritesData.length === 0) { list.innerHTML = "<div style='text-align:center; padding: 20px; color:#78909c;'>Empty.</div>"; return; }
-            const groups = favoritesData.reduce((acc, item, index) => {
-                const cat = item.category || "Uncategorized";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push({ ...item, originalIndex: index });
-                return acc;
-            }, {});
-            list.innerHTML = Object.keys(groups).map(catName => `
-                <div class="category-group">
-                    <div class="category-header" onclick="toggleFavCategory('${catName}')">
-                        <div>📁 ${catName} <span class="cat-count">${groups[catName].length}</span></div>
-                        <button class="cat-delete-btn" onclick="event.stopPropagation(); deleteFavCategory('${catName}')">🗑️</button>
-                    </div>
-                    <div id="fav-cat-content-${catName}" class="category-content collapsed">
-                        ${groups[catName].map(item => {
-                            const encodedWord = encodeURIComponent(stripMarkers(item.word));
-                            return `
-                            <div class="list-item-row" id="fav-row-${item.originalIndex}" ontouchstart="handleFavTouchStart(event)" ontouchmove="handleFavTouchMove(event, ${item.originalIndex})" ontouchend="handleFavTouchEnd(event, ${item.originalIndex})">
-                                <div class="delete-btn-overlay" onclick="deleteFavItem(${item.originalIndex})">DELETE</div>
-                                <div class="item-main-content">
-                                    <div class="vocab-row-header">
-                                        <span class="vocab-target">${formatDisplay(item.word)}</span>
-                                        <span class="vocab-zh">${item.zh}</span>
-                                        <div class="header-actions">
-                                            <button class="expand-btn" onclick="event.stopPropagation(); toggleFavDetails(${item.originalIndex})">↕️</button>
-                                            <button class="edit-icon" onclick="event.stopPropagation(); editFavorite(${item.originalIndex})">✎</button>
-                                        </div>
-                                    </div>
-                                    <div id="fav-details-${item.originalIndex}" class="item-details">
-                                        <div class="phonetic-line">
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-GB')">UK ${item.ukPhonetic || '/.../'}</button>
-                                            <button class="pron-icon" onclick="event.stopPropagation(); speakFromList('${cleanSpeechText(item.word).replace(/'/g, "\\'")}', 'en-US')">US ${item.usPhonetic || '/.../'}</button>
-                                            <a href="erudite://search?text=${encodedWord}" class="app-link-btn btn-erudite" onclick="event.stopPropagation()">Erudite</a>
-                                            <a href="deepl://translate?text=${encodedWord}" class="app-link-btn btn-deepl" onclick="event.stopPropagation()">DeepL</a>
-                                            <button class="app-link-btn" style="background: #78909c;" onclick="event.stopPropagation(); copyText(this, '${encodedWord}')">📋</button>
-                                        </div>
-                                        <div class="definition-en-line">${item.enDef}</div>
-                                    </div>
-                                </div>
-                            </div>`}).join('')}
+            list.innerHTML = favoritesData.map((item, i) => `
+                <div class="list-item-row" id="fav-row-${i}" ontouchstart="handleFavTouchStart(event)" ontouchmove="handleFavTouchMove(event, ${i})">
+                    <div class="delete-btn-overlay" onclick="deleteFavItem(${i})">DELETE</div>
+                    <div class="item-main-content">
+                        <div class="vocab-row-header">
+                            <span class="vocab-target">${formatDisplay(item.word)}</span>
+                            <span class="vocab-zh">${item.zh}</span>
+                            <button style="position:absolute; right:0; top:0; border:none; background:#f0f4f8; padding:5px;" onclick="toggleFavDetails(${i})">↕️</button>
+                        </div>
+                        <div id="fav-details-${i}" class="item-details">${item.enDef}</div>
                     </div>
                 </div>`).join('');
         }
 
-        function toggleCategory(c) { document.getElementById(`cat-content-${c}`).classList.toggle('collapsed'); }
-        function toggleFavCategory(c) { document.getElementById(`fav-cat-content-${c}`).classList.toggle('collapsed'); }
-        function toggleDetails(i) { document.getElementById(`details-${i}`).classList.toggle('show'); }
-        function toggleFavDetails(i) { document.getElementById(`fav-details-${i}`).classList.toggle('show'); }
-
-        function deleteCategory(c) { if(confirm("Delete group?")) { vocabData = vocabData.filter(i => i.category !== c); saveData(); } }
-        function deleteFavCategory(c) { if(confirm("Delete group?")) { favoritesData = favoritesData.filter(i => i.category !== c); saveFavoritesData(); } }
-        function deleteItem(i) { vocabData.splice(i, 1); saveData(); }
-        function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
-        
-        function editVocab(i) {
-            const item = vocabData[i];
-            const w = prompt("Word:", item.word); if(!w) return;
-            vocabData[i].word = w;
-            vocabData[i].zh = prompt("Translation:", item.zh);
-            vocabData[i].enDef = prompt("Definition:", item.enDef);
-            saveData();
-        }
-
-        function editFavorite(i) {
-            const item = favoritesData[i];
-            const w = prompt("Word:", item.word); if(!w) return;
-            favoritesData[i].word = w;
-            favoritesData[i].zh = prompt("Translation:", item.zh);
-            favoritesData[i].enDef = prompt("Definition:", item.enDef);
-            saveFavoritesData();
-        }
-
-        function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
-        function handleTouchMove(e, i) {
-            let row = document.getElementById(`row-${i}`);
-            let diff = touchStartX - e.touches[0].clientX;
-            if (diff > 20) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
-        }
-        function handleTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`row-${i}`).classList.remove('swiped-left'); }
-
-        function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
-        function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${i}`);
-            let diff = touchStartX - e.touches[0].clientX;
-            if (diff > 20) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
-        }
-        function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
-
-        function speakFromList(w, l) { const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
+        function toggleDetails(i) { const d = document.getElementById(`details-${i}`); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+        function toggleFavDetails(i) { const d = document.getElementById(`fav-details-${i}`); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+        function deleteItem(i) { vocabData.splice(i,1); saveData(); }
+        function deleteFavItem(i) { favoritesData.splice(i,1); saveFavoritesData(); }
         function saveData() { localStorage.setItem('masterVocab', JSON.stringify(vocabData)); renderTable(); }
-        function saveRawData() { localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
         function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
-
-        function saveRawChanges() {
-            const id = document.getElementById('rawTextSelect').value;
-            const index = rawTextData.findIndex(r => r.id == id);
-            if (index !== -1) {
-                rawTextData[index].text = document.getElementById('scopeRawEditor').value;
-                saveRawData();
-            }
-        }
-
-        function renderRawDropdown() {
-            const select = document.getElementById('rawTextSelect');
-            if(!select) return;
-            select.innerHTML = `<option value="">-- Select a saved scan --</option>` + 
-                rawTextData.map(item => `<option value="${item.id}">${item.date}</option>`).join('');
-        }
-
-        function loadRawText() {
-            const item = rawTextData.find(r => r.id == document.getElementById('rawTextSelect').value);
-            const editor = document.getElementById('scopeRawEditor');
-            const actions = document.getElementById('rawActions');
-            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; }
-            else { editor.style.display = 'none'; actions.style.display = 'none'; }
-        }
-
-        // --- Session Logic ---
-        function startSession(id) {
-            currentIndex = 0;
-            if (id === 'dictation') {
-                setupDictationConfig();
-            }
-        }
 
         function setupDictationConfig() {
             document.getElementById('dictConfigUI').style.display = 'block';
             document.getElementById('dictPlayUI').style.display = 'none';
             const checklist = document.getElementById('dictCategoryChecklist');
-            const categories = [...new Set(vocabData.map(v => v.category || "General"))];
-            checklist.innerHTML = categories.map(cat => `
-                <div class="category-chip" onclick="const ck = this.querySelector('input'); ck.checked = !ck.checked; this.classList.toggle('selected', ck.checked)">
-                    <input type="checkbox" value="${cat}" onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
-                    <span>${cat}</span>
-                </div>
-            `).join('');
-            document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => {
-                chip.classList.remove('selected');
-                chip.querySelector('input').checked = false;
-            });
+            const cats = [...new Set(vocabData.map(v => v.category || "General"))];
+            checklist.innerHTML = cats.map(c => `<div class="category-chip" style="margin:5px; padding:10px; background:#f5f5f5; border-radius:8px;"><input type="checkbox" value="${c}" checked> ${c}</div>`).join('');
         }
 
         function initDictationSession() {
-            const selectedCats = Array.from(document.querySelectorAll('#dictCategoryChecklist input:checked')).map(ck => ck.value);
-            if(selectedCats.length === 0) { alert("Please select at least one category!"); return; }
-            activeSessionData = vocabData.filter(v => selectedCats.includes(v.category || "General"));
-            if(document.getElementById('dictShuffleMode').checked) {
-                for (let i = activeSessionData.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [activeSessionData[i], activeSessionData[j]] = [activeSessionData[j], activeSessionData[i]];
-                }
-            }
-            dictationScore = 0; 
+            activeSessionData = [...vocabData];
+            if (document.getElementById('dictShuffleMode').checked) activeSessionData.sort(() => Math.random() - 0.5);
+            currentIndex = 0; dictationScore = 0;
             document.getElementById('dictConfigUI').style.display = 'none';
             document.getElementById('dictPlayUI').style.display = 'block';
-            loadTask('dictation');
+            loadTask();
         }
 
-        function loadTask(id) {
+        function loadTask() {
             const item = activeSessionData[currentIndex];
-            if (id === 'dictation') {
-                document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                document.getElementById('dictInput').value = "";
-                document.getElementById('dictResult').innerText = "";
-                const hintDisplay = document.getElementById('dictHintDisplay');
-                const hasMarkers = /==(.+?)==/.test(item.word);
-                if (hasMarkers) { hintDisplay.innerText = item.word.replace(/==(.+?)==/g, '_____'); } else { hintDisplay.innerText = ""; }
-                document.getElementById('dictInput').focus();
-            }
+            document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
+            document.getElementById('dictInput').value = "";
+            document.getElementById('dictResult').innerText = "";
+            const hint = document.getElementById('dictHintDisplay');
+            hint.innerText = item.word.includes('==') ? item.word.replace(/==(.+?)==/g, '_____') : "";
+            document.getElementById('dictInput').focus();
         }
-
-        const matchAnswer = (user, target) => {
-            const u = user.toLowerCase().trim();
-            const t = target.toLowerCase().trim();
-            if (u === t) return true;
-            const tNoS = t.replace(/\(s\)/g, '');
-            if (u === tNoS) return true;
-            const tWithS = t.replace(/\(s\)/g, 's');
-            if (u === tWithS) return true;
-            return false;
-        };
 
         function checkDictation() {
             const item = activeSessionData[currentIndex];
-            const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
+            const input = document.getElementById('dictInput').value.trim().toLowerCase();
+            const target = stripMarkers(item.word).toLowerCase();
             const res = document.getElementById('dictResult');
-            const markers = item.word.match(/==(.+?)==/g);
-            let isCorrect = false;
-            let displayHTML = "";
-            if (markers && markers.length > 0) {
-                const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
-                const fullSentence = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                if (matchAnswer(inputRaw, fullSentence)) { isCorrect = true; } 
-                else if (originalAnswers.length === 1 && matchAnswer(inputRaw, originalAnswers[0])) { isCorrect = true; }
-                const targetText = originalAnswers.length > 1 ? originalAnswers.join(', ') : originalAnswers[0];
-                displayHTML = targetText;
-            } else {
-                const correctCheck = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
-                if (matchAnswer(inputRaw, correctCheck)) { isCorrect = true; }
-                displayHTML = correctCheck;
-            }
-            if (isCorrect) {
-                dictationScore++;
-                res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { 
-                    currentIndex++;
-                    if(currentIndex >= activeSessionData.length) {
-                        alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
-                        goHome();
-                    } else { loadTask('dictation'); }
-                }, 800);
-            } else { res.innerHTML = `<span style="color:red">Incorrect. The answer is:</span> <br> <span style="color:var(--primary-blue); font-size:18px;">${displayHTML}</span>`; }
+            if (input === target) {
+                dictationScore++; res.innerText = "Correct! ✨"; res.style.color = "green";
+                setTimeout(() => { currentIndex++; if(currentIndex < activeSessionData.length) loadTask(); else { alert("Score: " + dictationScore); goHome(); } }, 800);
+            } else { res.innerHTML = `<span style="color:red">Answer:</span> <br> ${target}`; }
         }
 
-        function skipDictation() {
-            currentIndex++;
-            if(currentIndex >= activeSessionData.length){
-                alert(`Session Finished!\nTotal Score: ${dictationScore} / ${activeSessionData.length}`);
-                goHome();
-            } else { loadTask('dictation'); }
-        }
-
-        function prevDictation() { if (currentIndex > 0) { currentIndex--; loadTask('dictation'); } }
-
-        function handleDictKeyDown(e) {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const synth = window.speechSynthesis;
-                if (synth.speaking && !synth.paused) { synth.pause(); document.getElementById('dictPauseBtn').innerText = "▶️ Resume"; } 
-                else if (synth.paused) { synth.resume(); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause"; } 
-                else { speakTarget('en-US'); }
-                return;
-            }
-            if(e.key === 'Enter') { e.preventDefault(); checkDictation(); }
-        }
-
-        // --- Writing Logic ---
-        function renderWritingList() {
-            document.getElementById('writingListUI').style.display = 'block';
-            document.getElementById('writingEditUI').style.display = 'none';
-            const list = document.getElementById('writingList');
-            if (writingData.length === 0) {
-                list.innerHTML = "<div style='text-align:center; padding: 40px; color:#90a4ae;'>No articles found. Click 'New Article' to begin.</div>";
-                return;
-            }
-            list.innerHTML = writingData.map((item, index) => `
-                <div class="list-item-row" id="write-row-${index}" ontouchstart="handleWriteTouchStart(event)" ontouchmove="handleWriteTouchMove(event, ${index})" ontouchend="handleWriteTouchEnd(event, ${index})">
-                    <div class="delete-btn-overlay" onclick="deleteWriting(${index})">DELETE</div>
-                    <div class="item-main-content" onclick="openWritingEditor(${index})">
-                        <div class="writing-title">${item.title || "Untitled Article"}</div>
-                        <div class="writing-meta">📅 ${item.date} | 📝 ${item.content.length} characters</div>
-                        <div class="writing-preview">${item.content.substring(0, 100)}...</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openWritingEditor(index = -1) {
-            activeWritingIndex = index;
-            document.getElementById('writingListUI').style.display = 'none';
-            document.getElementById('writingEditUI').style.display = 'block';
-            const titleInput = document.getElementById('writingTitle');
-            const contentInput = document.getElementById('writingContent');
-            if (index === -1) {
-                titleInput.value = "";
-                contentInput.value = "";
-            } else {
-                titleInput.value = writingData[index].title;
-                contentInput.value = writingData[index].content;
-            }
-            updateWordCount();
-            contentInput.addEventListener('input', updateWordCount);
-            window.scrollTo(0,0);
-        }
-
-        function updateWordCount() {
-            const text = document.getElementById('writingContent').value.trim();
-            const count = text ? text.split(/\s+/).length : 0;
-            document.getElementById('wordCount').innerText = `Words: ${count}`;
-        }
-
-        function saveWriting() {
-            const title = document.getElementById('writingTitle').value.trim();
-            const content = document.getElementById('writingContent').value.trim();
-            if (!content) { alert("Content cannot be empty!"); return; }
-            const payload = {
-                title: title || "Untitled Article",
-                content: content,
-                date: new Date().toLocaleString()
-            };
-            if (activeWritingIndex === -1) { writingData.unshift(payload); } 
-            else { writingData[activeWritingIndex] = payload; }
-            localStorage.setItem('masterWriting', JSON.stringify(writingData));
-            renderWritingList();
-        }
-
-        function cancelWriting() { if(confirm("Discard unsaved changes?")) renderWritingList(); }
-
-        function deleteWriting(index) {
-            if(confirm("Are you sure you want to delete this article?")) {
-                writingData.splice(index, 1);
-                localStorage.setItem('masterWriting', JSON.stringify(writingData));
-                renderWritingList();
-            }
-        }
-
-        function handleWriteTouchStart(e) { touchStartX = e.touches[0].clientX; }
-        function handleWriteTouchMove(e, i) {
-            let row = document.getElementById(`write-row-${i}`);
-            let diff = touchStartX - e.touches[0].clientX;
-            if (diff > 20) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
-        }
-        function handleWriteTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`write-row-${i}`).classList.remove('swiped-left'); }
-
-        function openInDeepL() {
-            const area = document.getElementById('writingContent');
-            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            const textToProcess = selectedText || area.value.trim();
-            
-            if(!textToProcess) return;
-            
-            // Only open via deep link
-            window.location.href = `deepl://translate?text=${encodeURIComponent(textToProcess)}`;
-        }
-
-        function openInGrammarly() {
-            const area = document.getElementById('writingContent');
-            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            const textToProcess = selectedText || area.value.trim();
-            
-            if(!textToProcess) return;
-            
-            navigator.clipboard.writeText(textToProcess).then(() => {
-                const mode = selectedText ? "Selected fragment" : "Full article";
-                alert(`${mode} copied to clipboard! Grammarly will now open. Please paste your text there.`);
-                window.location.href = "grammarly://"; 
-                setTimeout(() => { window.open("https://app.grammarly.com/", "_blank"); }, 800);
-            });
-        }
-
-        function copyWritingText() {
-            const text = document.getElementById('writingContent').value;
-            navigator.clipboard.writeText(text).then(() => alert("All text copied!"));
-        }
+        function skipDictation() { currentIndex++; if(currentIndex < activeSessionData.length) loadTask(); else goHome(); }
+        function prevDictation() { if(currentIndex > 0) { currentIndex--; loadTask(); } }
 
         function speakTarget(lang) {
-            window.speechSynthesis.cancel(); 
-            const item = activeSessionData[currentIndex];
-            const u = new SpeechSynthesisUtterance(cleanSpeechText(item.word));
-            u.lang = lang;
-            u.rate = parseFloat(document.getElementById('dictSpeechRate').value) || 1.0;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(cleanSpeechText(activeSessionData[currentIndex].word));
+            u.lang = lang; u.rate = document.getElementById('dictSpeechRate').value;
             window.speechSynthesis.speak(u);
         }
 
         function toggleSpeechPause() {
-            const pb = document.getElementById('dictPauseBtn');
             if (window.speechSynthesis.speaking) {
-                if (window.speechSynthesis.paused) { window.speechSynthesis.resume(); pb.innerText = "⏸️ Pause"; } 
-                else { window.speechSynthesis.pause(); pb.innerText = "▶️ Resume"; }
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+                else window.speechSynthesis.pause();
             }
         }
 
-        function copyText(btn, encodedText) {
-            const text = decodeURIComponent(encodedText);
-            navigator.clipboard.writeText(text).then(() => {
-                btn.innerText = '✅';
-                setTimeout(() => { btn.innerText = '📋'; }, 1000);
-            });
+        function renderWritingList() {
+            document.getElementById('writingListUI').style.display = 'block';
+            document.getElementById('writingEditUI').style.display = 'none';
+            const list = document.getElementById('writingList');
+            list.innerHTML = writingData.map((item, i) => `
+                <div class="list-item-row" id="write-row-${i}" ontouchstart="handleWriteTouchStart(event)" ontouchmove="handleWriteTouchMove(event, ${i})">
+                    <div class="delete-btn-overlay" onclick="deleteWriting(${i})">DELETE</div>
+                    <div class="item-main-content" onclick="openWritingEditor(${i})">
+                        <b>${item.title}</b><div style="font-size:12px; color:#999">${item.date}</div>
+                    </div>
+                </div>`).join('');
         }
 
-        function manuallySaveToRaw() {
-            const content = document.getElementById('ocrTextEditor').value.trim();
-            if(!content) return;
-            rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content });
-            saveRawData();
-            showToast('scanToast');
+        function openWritingEditor(i = -1) {
+            activeWritingIndex = i;
+            document.getElementById('writingListUI').style.display = 'none';
+            document.getElementById('writingEditUI').style.display = 'block';
+            const t = document.getElementById('writingTitle');
+            const c = document.getElementById('writingContent');
+            if (i === -1) { t.value = ""; c.value = ""; }
+            else { t.value = writingData[i].title; c.value = writingData[i].content; }
+            updateWordCount();
         }
 
-        function clearEditor() { if(confirm("Delete all text in editor?")) { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; } }
-        function deleteCurrentRaw() { if(confirm("Delete all text in this source?")) { const id = document.getElementById('rawTextSelect').value; rawTextData = rawTextData.filter(r => r.id != id); saveRawData(); loadRawText(); } }
-        function clearAllVocab() { if(confirm("Delete everything in Study Scope?")) { vocabData = []; saveData(); } }
-        function clearAllFavorites() { if(confirm("Delete everything in Library?")) { favoritesData = []; saveFavoritesData(); } }
-        
+        function saveWriting() {
+            const title = document.getElementById('writingTitle').value || "Untitled";
+            const content = document.getElementById('writingContent').value;
+            const data = { title, content, date: new Date().toLocaleDateString() };
+            if (activeWritingIndex === -1) writingData.unshift(data);
+            else writingData[activeWritingIndex] = data;
+            localStorage.setItem('masterWriting', JSON.stringify(writingData));
+            renderWritingList();
+        }
+
+        function updateWordCount() {
+            const txt = document.getElementById('writingContent').value.trim();
+            document.getElementById('wordCount').innerText = "Words: " + (txt ? txt.split(/\s+/).length : 0);
+        }
+
+        function deleteWriting(i) { writingData.splice(i, 1); localStorage.setItem('masterWriting', JSON.stringify(writingData)); renderWritingList(); }
+        function cancelWriting() { renderWritingList(); }
+        function openInDeepL() { window.location.href = `deepl://translate?text=${encodeURIComponent(document.getElementById('writingContent').value)}`; }
+        function openInGrammarly() { window.location.href = "grammarly://"; }
+        function copyWritingText() { navigator.clipboard.writeText(document.getElementById('writingContent').value); alert("Copied!"); }
+
+        function handleHistTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleHistTouchMove(e, i) { if (touchStartX - e.touches[0].clientX > 50) document.getElementById(`hist-row-${i}`).classList.add('swiped-left'); else document.getElementById(`hist-row-${i}`).classList.remove('swiped-left'); }
+        function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleTouchMove(e, i) { if (touchStartX - e.touches[0].clientX > 50) document.getElementById(`row-${i}`).classList.add('swiped-left'); else document.getElementById(`row-${i}`).classList.remove('swiped-left'); }
+        function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleFavTouchMove(e, i) { if (touchStartX - e.touches[0].clientX > 50) document.getElementById(`fav-row-${i}`).classList.add('swiped-left'); else document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
+        function handleWriteTouchStart(e) { touchStartX = e.touches[0].clientX; }
+        function handleWriteTouchMove(e, i) { if (touchStartX - e.touches[0].clientX > 50) document.getElementById(`write-row-${i}`).classList.add('swiped-left'); else document.getElementById(`write-row-${i}`).classList.remove('swiped-left'); }
+
         function exportAllData() {
-            const bundle = { vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory, writing: writingData, ver: "1.0" };
-            const dataStr = JSON.stringify(bundle, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url; a.download = "LexiconMaster_Backup.json";
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            const data = JSON.stringify({ vocab: vocabData, fav: favoritesData, write: writingData, hist: searchHistory });
+            const blob = new Blob([data], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Lexicon_Backup.json'; a.click();
         }
 
-        function importAllData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function importAllData(e) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const bundle = JSON.parse(e.target.result);
-                    if (confirm("This will replace all current data. Proceed?")) {
-                        localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
-                        localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
-                        localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
-                        localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-                        localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || []));
-                        alert("✨ Import successful! Reloading...");
-                        location.reload();
-                    }
-                } catch (err) { alert("❌ File parsing failed."); }
-                event.target.value = '';
+            reader.onload = (event) => {
+                const data = JSON.parse(event.target.result);
+                localStorage.setItem('masterVocab', JSON.stringify(data.vocab || []));
+                localStorage.setItem('masterFavorites', JSON.stringify(data.fav || []));
+                localStorage.setItem('masterWriting', JSON.stringify(data.write || []));
+                localStorage.setItem('masterHistory', JSON.stringify(data.hist || []));
+                location.reload();
             };
-            reader.readAsText(file);
+            reader.readAsText(e.target.files[0]);
         }
 
-        window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
+        function speakFromList(w, l) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(w); u.lang = l; window.speechSynthesis.speak(u); }
+        function manuallySaveToRaw() { rawTextData.push({ id: Date.now(), text: document.getElementById('ocrTextEditor').value, date: new Date().toLocaleString() }); localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); }
+        function renderRawDropdown() { const s = document.getElementById('rawTextSelect'); if(s) s.innerHTML = '<option value="">-- Select Scan --</option>' + rawTextData.map(r => `<option value="${r.id}">${r.date}</option>`).join(''); }
+        function loadRawText() { const r = rawTextData.find(x => x.id == document.getElementById('rawTextSelect').value); document.getElementById('scopeRawEditor').value = r ? r.text : ""; document.getElementById('scopeRawEditor').style.display = r ? 'block' : 'none'; document.getElementById('rawActions').style.display = r ? 'flex' : 'none'; }
+        function saveRawChanges() { const id = document.getElementById('rawTextSelect').value; const r = rawTextData.find(x => x.id == id); if(r) r.text = document.getElementById('scopeRawEditor').value; localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); }
+        function deleteCurrentRaw() { const id = document.getElementById('rawTextSelect').value; rawTextData = rawTextData.filter(x => x.id != id); localStorage.setItem('masterRawTexts', JSON.stringify(rawTextData)); renderRawDropdown(); loadRawText(); }
+
+        window.onload = () => { renderTable(); renderFavoritesTable(); renderHistoryList(); renderRawDropdown(); };
     </script>
 </body>
 </html>
