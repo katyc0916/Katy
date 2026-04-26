@@ -238,8 +238,8 @@
 
         <div id="homePage" class="page-content active">
             <div class="portal-grid">
-                <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Smart Lookup</h3><p>Lookup & Learn</p></div>
-                <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Library</h3><p>Saved Words</p></div>
+                <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Dictionary</h3><p>Lookup & Learn</p></div>
+                <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>My Favourites</h3><p>Save & Review</p></div>
                 <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Text Scanner</h3><p>Photo to Text</p></div>
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
@@ -259,7 +259,7 @@
 
         <div id="dictionaryPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>📖 Smart Lookup</h2>
+            <h2>📖 Dictionary</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <div style="position: relative; flex: 1;">
                     <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
@@ -270,7 +270,7 @@
             <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
-                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333; padding: 12px;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
+                <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333; padding: 12px;" onclick="saveLookupToFavorites()">⭐ Add to Favourites</button>
                 <button class="btn-action" style="flex: 1; background: #0288d1; padding: 12px;" onclick="saveLookupToScope()">➕ Add to Study Scope</button>
             </div>
 
@@ -286,7 +286,7 @@
 
         <div id="favoritesPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <h2>⭐ My Library</h2>
+            <h2>⭐ Translation Databases</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button class="btn-action" style="flex: 1; padding: 12px;" onclick="addNewManualFavorite()">➕ Add New Word/Phrase</button>
                 <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
@@ -314,8 +314,8 @@
                         <button class="btn-action" style="background:#4db6ac;" onclick="manuallySaveToRaw()">💾 Save Texts</button>
                     </div>
                     <div class="action-row">
-                        <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Lib Selected</button>
-                        <button id="btnLibAllScan" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Lib All</button>
+                        <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('ocrTextEditor')">➕ Fav. Selected</button>
+                        <button id="btnLibAllScan" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('ocrTextEditor')">➕ Fav. All</button>
                         <button class="btn-action" style="background: #e53935;" onclick="clearEditor()">🗑️ Delete All</button>
                     </div>
                     <div style="text-align: center;"><span id="scanToast" class="toast-added">✓ Added</span></div>
@@ -344,8 +344,8 @@
                         <button class="btn-action" style="background:#4db6ac;" onclick="saveRawChanges()">💾 Save Changes</button>
                     </div>
                     <div class="action-row">
-                        <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Lib Selected</button>
-                        <button id="btnLibAllRaw" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Lib All</button>
+                        <button class="btn-action" style="background: #d1c4e9; color: #4527a0;" onclick="extractTextToLibrary('scopeRawEditor')">➕ Fav. Selected</button>
+                        <button id="btnLibAllRaw" class="btn-action" style="background: #fff59d; color: #333;" onclick="addAllToLibrary('scopeRawEditor')">➕ Fav. All</button>
                         <button class="btn-action" style="background: #e53935;" onclick="deleteCurrentRaw()">🗑️ Delete All</button>
                     </div>
                     <div style="text-align: center;"><span id="rawToast" class="toast-added">✓ Added</span></div>
@@ -665,7 +665,7 @@
             currentLookupData.category = cat;
             favoritesData.push({...currentLookupData});
             saveFavoritesData();
-            alert("✓ Successfully Added to Library!");
+            alert("✓ Successfully Added to Favourites!");
         }
 
         function saveLookupToScope() {
@@ -1091,10 +1091,6 @@
 
         function handleWritingInput() {
             updateWordCount();
-            const statusLabel = document.getElementById('writingSaveStatus');
-            statusLabel.innerText = "Saving..."; statusLabel.style.color = "#fb8c00";
-            clearTimeout(writingAutoSaveTimer);
-            writingAutoSaveTimer = setTimeout(() => { saveWriting(); }, 1000);
         }
 
         function updateWordCount() {
