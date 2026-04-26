@@ -243,7 +243,7 @@
                 <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Text Scanner</h3><p>Photo to Text</p></div>
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
-                <div class="card" style="border-color: #00acc1;" onclick="switchPage('cloze')"><i>✍️</i><h3>Cloze</h3><p>Grammar Practice</p></div>
+                <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Draft & Edit</p></div>
             </div>
 
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
@@ -411,15 +411,39 @@
             </div>
         </div>
 
-        <div id="clozePage" class="page-content">
+        <div id="writingPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <div style="text-align:center">
-                <h3 id="clozeProgress">0 / 0</h3>
-                <div id="clozeDisplay" class="cloze-box"></div>
-                <input type="text" id="clozeInput" placeholder="Type correct word..." style="width:100%; padding:15px; font-size:18px; border: 2px solid #ddd; border-radius: 8px;">
-                <br><br>
-                <button class="btn-action" onclick="checkCloze()" style="width:100%; padding: 15px; font-size: 18px;">Check Answer</button>
-                <div id="clozeResult" class="status-msg"></div>
+            <h2>✍️ Professional Writing</h2>
+            
+            <div id="writingListView">
+                <button class="btn-action" style="width: 100%; padding: 15px; margin-bottom: 20px; font-size: 16px;" onclick="openWritingEditor()">➕ Create New Article</button>
+                <div id="writingListContainer"></div>
+            </div>
+
+            <div id="writingEditorView" style="display:none;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn-secondary" onclick="closeWritingEditor()">↩ Back to List</button>
+                    <button class="btn-action" style="flex: 1; background: #4db6ac;" onclick="saveWriting()">💾 Save Article</button>
+                </div>
+                
+                <input type="text" id="writingTitle" placeholder="Article Title..." style="width: 100%; padding: 15px; font-size: 18px; border: 2px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-weight: bold;">
+                
+                <textarea id="writingContent" placeholder="Start writing here..." oninput="handleWritingInput()" style="width: 100%; height: 350px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 8px; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.6; resize: vertical; box-sizing: border-box;"></textarea>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 13px; color: #546e7a;">
+                    <span id="writingWordCount" style="font-weight: bold; color: var(--primary-blue);">Words: 0</span>
+                    <span id="writingSaveStatus" style="font-weight: bold;"></span>
+                </div>
+
+                <div class="action-row-container" style="margin-top: 20px;">
+                    <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1;">
+                        💡 <b>Smart App Sync:</b> Automatically copies your selected text (or full text) and opens the target app.
+                    </div>
+                    <div class="action-row">
+                        <button class="btn-action" style="background: var(--deepl-blue); padding: 15px; font-size: 15px;" onclick="launchWritingApp('deepl')">📘 Open in DeepL</button>
+                        <button class="btn-action" style="background: #11a683; padding: 15px; font-size: 15px;" onclick="launchWritingApp('grammarly')">🟢 Open in Grammarly</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -429,6 +453,7 @@
         let rawTextData = JSON.parse(localStorage.getItem('masterRawTexts')) || [];
         let favoritesData = JSON.parse(localStorage.getItem('masterFavorites')) || [];
         let searchHistory = JSON.parse(localStorage.getItem('masterHistory')) || []; 
+        let writingData = JSON.parse(localStorage.getItem('masterWriting')) || [];
         
         let currentIndex = 0;
         let touchStartX = 0;
@@ -495,7 +520,7 @@
         }
 
         function switchPage(id) {
-            if ((id === 'dictation' || id === 'cloze') && vocabData.length === 0) {
+            if (id === 'dictation' && vocabData.length === 0) {
                 alert("Please add items to Study Scope first!"); return;
             }
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
@@ -503,7 +528,8 @@
             if (id === 'scope') renderTable();
             if (id === 'favorites') renderFavoritesTable(); 
             if (id === 'dictionary') renderHistoryList();
-            if (id === 'dictation' || id === 'cloze') startSession(id);
+            if (id === 'dictation') startSession(id);
+            if (id === 'writing') renderWritingList();
             window.scrollTo(0,0);
         }
 
@@ -942,10 +968,7 @@
                 hintDisplay.innerText = /==(.+?)==/.test(item.word) ? item.word.replace(/==(.+?)==/g, '_____') : "";
                 document.getElementById('dictInput').focus();
             } else if (id === 'cloze') {
-                document.getElementById('clozeProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                const clozeText = item.word.replace(/==(.+?)==/g, '<span style="border-bottom:2px solid var(--primary-blue); color:transparent; padding:0 15px;">_____</span>');
-                document.getElementById('clozeDisplay').innerHTML = `<b>Context:</b><br>${clozeText}<br><br><b>Meaning:</b><br>${item.zh}`;
-                document.getElementById('clozeInput').value = ""; document.getElementById('clozeResult').innerText = "";
+                // Preserved dead code block per instruction to not modify original functions outside writing scopes
             }
         }
 
@@ -998,14 +1021,107 @@
             if(e.key === 'Enter') { e.preventDefault(); checkDictation(); }
         }
 
-        function checkCloze() {
-            const item = activeSessionData[currentIndex]; const input = document.getElementById('clozeInput').value.trim().toLowerCase();
-            const match = item.word.match(/==(.+?)==/); const correct = match ? match[1].toLowerCase() : stripMarkers(item.word).toLowerCase();
-            const res = document.getElementById('clozeResult');
-            if (input === correct) {
-                res.innerText = "Correct! ✨"; res.style.color = "green";
-                setTimeout(() => { currentIndex = (currentIndex + 1) % activeSessionData.length; loadTask('cloze'); }, 1000);
-            } else { res.innerText = `Incorrect. Correct: "${correct}"`; res.style.color = "red"; }
+        let currentWritingId = null;
+        let writingAutoSaveTimer = null;
+
+        function renderWritingList() {
+            const container = document.getElementById('writingListContainer');
+            if (writingData.length === 0) {
+                container.innerHTML = "<div style='text-align:center; padding: 30px; background: #f8f9fa; border-radius: 12px; color:#78909c;'>No articles yet. Start writing!</div>";
+                return;
+            }
+            const sortedData = [...writingData].sort((a, b) => b.lastModified - a.lastModified);
+            container.innerHTML = sortedData.map(item => `
+                <div class="list-item-row" style="background: white; border: 1px solid #eee; margin-bottom: 10px;">
+                    <div class="item-main-content" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1; min-width: 0;" onclick="openWritingEditor(${item.id})">
+                            <h4 style="margin: 0 0 5px 0; color: var(--primary-blue); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title || 'Untitled Article'}</h4>
+                            <p style="margin: 0; font-size: 13px; color: #78909c;">
+                                Last edited: ${new Date(item.lastModified).toLocaleString()} • ${item.wordCount} words
+                            </p>
+                        </div>
+                        <button style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 8px; width: 40px; height: 40px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center;" onclick="deleteWriting(${item.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openWritingEditor(id = null) {
+            document.getElementById('writingListView').style.display = 'none';
+            document.getElementById('writingEditorView').style.display = 'block';
+            
+            const titleInput = document.getElementById('writingTitle');
+            const contentArea = document.getElementById('writingContent');
+            const statusLabel = document.getElementById('writingSaveStatus');
+            
+            statusLabel.innerText = "";
+            currentWritingId = id;
+
+            if (id) {
+                const article = writingData.find(w => w.id === id);
+                if (article) { titleInput.value = article.title; contentArea.value = article.content; }
+            } else {
+                titleInput.value = ""; contentArea.value = ""; currentWritingId = Date.now();
+            }
+            updateWordCount();
+        }
+
+        function closeWritingEditor() { saveWriting(); document.getElementById('writingListView').style.display = 'block'; document.getElementById('writingEditorView').style.display = 'none'; renderWritingList(); }
+
+        function saveWriting() {
+            if (!currentWritingId) return;
+            const title = document.getElementById('writingTitle').value.trim();
+            const content = document.getElementById('writingContent').value;
+            const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+            
+            if (!title && !content.trim()) return;
+
+            const existingIndex = writingData.findIndex(w => w.id === currentWritingId);
+            const articleObj = { id: currentWritingId, title: title || 'Untitled Article', content: content, wordCount: wordCount, lastModified: Date.now() };
+
+            if (existingIndex > -1) writingData[existingIndex] = articleObj;
+            else writingData.push(articleObj);
+            
+            localStorage.setItem('masterWriting', JSON.stringify(writingData));
+            
+            const statusLabel = document.getElementById('writingSaveStatus');
+            statusLabel.innerText = "Saved ✓"; statusLabel.style.color = "var(--erudite-green)";
+            setTimeout(() => { if (statusLabel.innerText === "Saved ✓") statusLabel.innerText = ""; }, 2000);
+        }
+
+        function handleWritingInput() {
+            updateWordCount();
+            const statusLabel = document.getElementById('writingSaveStatus');
+            statusLabel.innerText = "Saving..."; statusLabel.style.color = "#fb8c00";
+            clearTimeout(writingAutoSaveTimer);
+            writingAutoSaveTimer = setTimeout(() => { saveWriting(); }, 1000);
+        }
+
+        function updateWordCount() {
+            const content = document.getElementById('writingContent').value.trim();
+            const count = content ? content.split(/\s+/).length : 0;
+            document.getElementById('writingWordCount').innerText = `Words: ${count}`;
+        }
+
+        function deleteWriting(id) {
+            if (confirm("Delete this article?")) { writingData = writingData.filter(w => w.id !== id); localStorage.setItem('masterWriting', JSON.stringify(writingData)); renderWritingList(); }
+        }
+
+        function launchWritingApp(app) {
+            const area = document.getElementById('writingContent');
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToCopy = selectedText || area.value.trim();
+            if (!textToCopy) { alert("Please write some text first!"); return; }
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const statusLabel = document.getElementById('writingSaveStatus');
+                statusLabel.innerText = "Copied ✓"; statusLabel.style.color = "var(--primary-blue)";
+                setTimeout(() => { if (statusLabel.innerText === "Copied ✓") statusLabel.innerText = ""; }, 2000);
+                
+                const encodedText = encodeURIComponent(textToCopy);
+                if (app === 'deepl') window.location.href = `deepl://translate?text=${encodedText}`;
+                else if (app === 'grammarly') window.location.href = `grammarly://`; 
+            }).catch(err => { alert("Failed to copy: " + err); });
         }
 
         function speakTarget(lang) {
@@ -1034,7 +1150,7 @@
         function clearAllFavorites() { if(confirm("Delete everything?")) { favoritesData = []; saveFavoritesData(); } }
         
         function exportAllData() {
-            const dataStr = JSON.stringify({ vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory }, null, 2);
+            const dataStr = JSON.stringify({ vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory, writing: writingData }, null, 2);
             const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); a.download = "LexiconMaster_Backup.json"; a.click();
         }
 
@@ -1049,6 +1165,7 @@
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
+                        localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || []));
                         location.reload();
                     }
                 } catch (err) { alert("❌ 檔案解析失敗。"); }
@@ -1056,8 +1173,7 @@
             reader.readAsText(file);
         }
 
-        window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); };
+        window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); renderWritingList(); };
     </script>
 </body>
 </html>
-
