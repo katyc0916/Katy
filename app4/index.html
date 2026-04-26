@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lexicon Master | Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
@@ -17,101 +17,68 @@
             --deepl-blue: #002451;
         }
 
-        /* 全螢幕基礎設定 */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* 防止最外層出現滾動條 */
-            background: var(--bg-gradient);
-        }
-
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            padding: 10px; /* 縮小邊距以增加全螢幕感 */
             box-sizing: border-box;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         .container {
             background: white;
-            width: 100vw;
-            height: 100vh;
-            max-width: 900px;
-            /* 調整移動端適配，確保不溢出 */
-            border-radius: 0; 
+            width: 100%;
+            max-width: 1400px; /* 提高上限以適應桌面全螢幕 */
+            border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--accent-green);
+            padding: 30px;
+            border-top: 12px solid var(--accent-green);
             position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* 內容滾動區間優化 */
-        .page-content { 
-            display: none; 
-            animation: fadeIn 0.3s ease; 
-            height: 100%;
-            overflow-y: auto; /* 內容過長時在內部滾動 */
-            padding: 20px 20px 80px 20px; /* 底部預留空間 */
             box-sizing: border-box;
-            -webkit-overflow-scrolling: touch;
         }
 
-        /* 隱藏滾動條外觀 (選用) */
-        .page-content::-webkit-scrollbar { width: 4px; }
-        .page-content::-webkit-scrollbar-thumb { background: #cfd8dc; border-radius: 10px; }
+        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
 
-        h1 { text-align: center; color: var(--primary-blue); font-size: 22px; margin: 15px 0; flex-shrink: 0; }
-
+        .page-content { display: none; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
-        /* 卡片網格優化，確保寬度不超出螢幕 */
         .portal-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
-            gap: 12px; 
-            margin-top: 10px; 
-            width: 100%;
-            box-sizing: border-box;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 加寬格線以適應寬螢幕 */
+            gap: 20px; 
+            margin-top: 20px; 
         }
-        
-        .card { 
-            background: #fff; 
-            border: 2px solid #eee; 
-            padding: 15px 10px; 
-            border-radius: 15px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            border-width: 3px;
-            overflow: hidden; /* 防止內容溢出卡片 */
-        }
+        .card { background: #fff; border: 2px solid #eee; padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; border-width: 3px; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .card i { font-size: 28px; display: block; margin-bottom: 8px; }
-        .card h3 { font-size: 15px; margin: 5px 0; }
-        .card p { font-size: 12px; margin: 0; color: #78909c; }
+        .card i { font-size: 40px; display: block; margin-bottom: 10px; }
 
         #ocrTextEditor, #scopeRawEditor, #writingContent {
-            width: 100%; height: 250px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
+            width: 100%; 
+            height: 55vh; /* 動態調整高度，根據螢幕大小顯示更多資料 */
+            min-height: 350px;
+            padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
             font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
-            margin-top: 10px; resize: none; box-sizing: border-box;
+            margin-top: 10px; resize: vertical; box-sizing: border-box;
         }
-        
         .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; }
 
-        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        .btn-action { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-secondary { background: #78909c; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
         .btn-danger { background: #e53935; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
 
-        .file-upload-wrapper { border: 2px dashed #ccc; padding: 25px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; width: 100%; box-sizing: border-box; }
+        .file-upload-wrapper { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
         .file-upload-wrapper:hover { border-color: var(--primary-blue); background: #f0f7ff; }
         .file-upload-wrapper input[type="file"] { display: none; }
-        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); word-break: break-all; }
+        .upload-label { cursor: pointer; font-weight: bold; color: var(--primary-blue); font-size: 18px; }
 
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        
         .list-item-row { 
             position: relative; 
             overflow: hidden; 
@@ -120,13 +87,11 @@
             border-bottom: 1px solid #eee;
             border-radius: 10px;
             margin-bottom: 8px;
-            width: 100%;
-            box-sizing: border-box;
         }
         
         .item-main-content {
             background: white;
-            padding: 15px 12px;
+            padding: 18px 12px;
             position: relative;
             z-index: 2;
             transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
@@ -153,65 +118,111 @@
             transform: translateX(-80px);
         }
         
-        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; width: 100%; box-sizing: border-box; }
+        .category-group { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
         .category-header { 
             background: #f8f9fa; padding: 12px 15px; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center;
             font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid #eee;
         }
-        .category-content { display: block; padding: 10px; background: #fff; box-sizing: border-box; }
+        .category-content { display: block; padding: 10px; background: #fff; }
         .category-content.collapsed { display: none; }
-
-        /* 防止文字過長溢出 */
-        .vocab-target { font-size: 18px; color: var(--primary-blue); font-weight: bold; padding-right: 60px; word-wrap: break-word; display: block; }
-        .vocab-zh { font-size: 15px; color: var(--text-dark); font-weight: 500; line-height: 1.4; word-wrap: break-word; display: block; margin-top: 4px; }
-        
-        /* 針對桌機螢幕的圓角美化 */
-        @media (min-width: 901px) {
-            .container {
-                height: 95vh;
-                border-radius: 20px;
-                margin: 20px;
-            }
-        }
-
-        /* 其餘原始樣式保留 */
         .cat-count { background: var(--primary-blue); color: white; border-radius: 20px; padding: 2px 10px; font-size: 12px; }
         .cat-delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; }
-        .writing-card { border-left: 5px solid var(--primary-blue); margin-bottom: 12px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
+        .cat-delete-btn:hover { background: #ef9a9a; color: white; }
+
+        /* Writing Specific Styles */
+        .writing-card {
+            border-left: 5px solid var(--primary-blue);
+            margin-bottom: 12px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
         .writing-title { font-weight: bold; color: var(--primary-blue); font-size: 18px; margin-bottom: 5px; }
         .writing-meta { font-size: 12px; color: #90a4ae; }
         .writing-preview { font-size: 14px; color: #546e7a; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
         .app-btn-group { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .btn-grammarly { background: #11a683; color: white; }
+
         .status-msg { margin-top: 15px; font-weight: bold; text-align: center; min-height: 24px; }
+
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; font-size: 14px; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #f0f4f8; cursor: pointer; border-radius: 8px; font-weight: bold; color: #546e7a; border: 2px solid transparent; transition: 0.2s; }
         .tab-btn.active { background: var(--light-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         .raw-select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #cfd8dc; margin-bottom: 5px; font-size: 16px; box-sizing: border-box; }
-        .vocab-row-header { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; position: relative; }
-        .phonetic-line { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+
+        .vocab-row-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; position: relative; }
+        .vocab-target { font-size: 20px; color: var(--primary-blue); font-weight: bold; padding-right: 80px; }
+        .vocab-zh { font-size: 16px; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
+        .phonetic-line { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
         .phonetic-item { font-size: 13px; color: #546e7a; display: flex; align-items: center; gap: 4px; }
         .pron-icon { cursor: pointer; background: #eceff1; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: var(--primary-blue); }
+        
         .app-link-btn { cursor: pointer; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: white; text-decoration: none; display: inline-block; }
         .btn-erudite { background: var(--erudite-green); }
         .btn-deepl { background: var(--deepl-blue); }
+
         .header-actions { position: absolute; right: 0; top: 0; display: flex; gap: 8px; align-items: center; }
         .expand-btn { cursor: pointer; background: #e8f5e9; border: none; border-radius: 4px; padding: 3px 8px; font-size: 12px; color: #2e7d32; font-weight: bold; }
         .edit-icon { cursor: pointer; background: #fff3e0; border: none; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: bold; color: #ef6c00; }
+        
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
         .item-details.show { display: block; }
+        
         .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
-        mark.highlighter { background-color: var(--highlight-yellow); color: inherit; padding: 0 2px; border-radius: 3px; }
+
+        mark.highlighter {
+            background-color: var(--highlight-yellow);
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        /* Dictation Specific */
         .category-chip { display: flex; align-items: center; gap: 8px; background: #f1f3f4; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .category-chip.selected { border-color: var(--primary-blue); background: var(--light-blue); }
         .category-chip input { transform: scale(1.2); }
+
+        /* Dictation Textarea Style */
         .dict-input-wrapper { position: relative; width: 100%; }
-        #dictInput { width: 100%; padding: 18px; padding-right: 50px; font-size: 20px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; resize: none; min-height: 80px; overflow-y: auto; }
-        .input-clear-btn { position: absolute; right: 15px; bottom: 15px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #e53935; font-size: 16px; z-index: 5; }
+        #dictInput {
+            width: 100%;
+            padding: 18px;
+            padding-right: 50px; /* Space for trash icon */
+            font-size: 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: none;
+            min-height: 100px;
+            overflow-y: auto;
+        }
+        .input-clear-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #e53935;
+            font-size: 16px;
+            z-index: 5;
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -230,14 +241,14 @@
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Composition Lab</p></div>
             </div>
 
-            <div style="margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0; box-sizing: border-box;">
-                <h3 style="margin-top: 0; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
-                <div style="display: flex; gap: 10px;">
+            <div style="margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
+                <h3 style="margin-top: 0; font-size: 18px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
+                <div style="display: flex; gap: 15px; max-width: 600px; margin: 0 auto;">
                     <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportAllData()">📤 Export Data</button>
                     <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
                     <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
                 </div>
-                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
+                <p style="font-size: 12px; color: #90a4ae; margin-top: 15px; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
             </div>
         </div>
 
@@ -246,12 +257,12 @@
             <h2>📖 Smart Lookup</h2>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <div style="position: relative; flex: 1;">
-                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
+                    <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; box-sizing: border-box; padding: 15px; padding-right: 35px; font-size: 18px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
                     <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
                 </div>
-                <button class="btn-action" onclick="performLookup()">Search</button>
+                <button class="btn-action" style="padding: 0 40px;" onclick="performLookup()">Search</button>
             </div>
-            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; box-sizing: border-box;">
+            <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 25px; border-radius: 12px; margin-bottom: 20px; position: relative;">
                 </div>
             <div id="lookupActions" style="display:none; flex-wrap: wrap; gap: 10px;">
                 <button class="btn-action" style="flex: 1; background: #fbc02d; color: #333;" onclick="saveLookupToFavorites()">⭐ Add to Library</button>
@@ -285,7 +296,7 @@
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
                 <label class="upload-label" id="fileLabel">📁 Click to Upload Image</label>
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
-                <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text Content...</div>
+                <div id="ocrLoading" style="margin-top:15px; color: var(--primary-blue); font-weight: bold; display:none;">Analyzing Text Content...</div>
             </div>
             <div id="editorSection" style="display:none; margin-top: 20px;">
                 <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
@@ -355,7 +366,7 @@
                 <div class="instruction-tip">Select categories for practice. No hints will be displayed during the session.</div>
                 
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">1. Choose Scope:</div>
-                <div id="dictCategoryChecklist" style="margin-bottom: 20px; max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+                <div id="dictCategoryChecklist" style="margin-bottom: 20px; max-height: 350px; overflow-y: auto; padding: 5px; border: 1px solid #eee; border-radius: 10px;"></div>
                 
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">2. Preferences:</div>
                 <div class="category-chip" onclick="this.querySelector('input').click()">
@@ -363,37 +374,37 @@
                     <span style="font-weight: 500;">Randomize Order</span>
                 </div>
                 
-                <button class="btn-action" onclick="initDictationSession()" style="width:100%; margin-top: 15px; background: var(--erudite-green);">Start Session</button>
+                <button class="btn-action" onclick="initDictationSession()" style="width:100%; margin-top: 25px; padding: 18px; font-size: 18px; background: var(--erudite-green);">Start Session</button>
             </div>
 
             <div id="dictPlayUI" style="display:none; text-align:center;">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
-                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏮️ Prev</button>
-                    <h3 id="dictProgress" style="margin: 0; min-width: 60px;">0 / 0</h3>
-                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏭️ Next</button>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 15px;">
+                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 8px 20px; font-size: 16px;">⏮️ Prev</button>
+                    <h3 id="dictProgress" style="margin: 0; min-width: 100px; font-size: 22px;">0 / 0</h3>
+                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 8px 20px; font-size: 16px;">⏭️ Next</button>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 15px 30px; font-size: 18px;">🔊 UK Voice</button>
-                    <button id="btnUsVoice" class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 15px 30px; font-size: 18px;">🔊 US Voice</button>
+                <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 15px;">
+                    <button class="btn-action" onclick="speakTarget('en-GB')" style="background:#bbdefb; color: #0d47a1; padding: 20px 40px; font-size: 20px; flex: 1;">🔊 UK Voice</button>
+                    <button id="btnUsVoice" class="btn-action" onclick="speakTarget('en-US')" style="background:#c8e6c9; color: #1b5e20; padding: 20px 40px; font-size: 20px; flex: 1;">🔊 US Voice</button>
                 </div>
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; background: #f1f8e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #c5e1a5;">
-                    <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;">
-                        <span style="font-size: 13px; font-weight: bold; color: #558b2f; min-width: 50px;">Speed:</span>
-                        <input type="range" id="dictSpeechRate" min="0.1" max="1.0" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1; max-width: 150px;">
-                        <span id="rateDisplay" style="font-size: 13px; font-weight: bold; color: var(--primary-blue); min-width: 35px;">1x</span>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; background: #f1f8e9; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #c5e1a5;">
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%; justify-content: center;">
+                        <span style="font-size: 16px; font-weight: bold; color: #558b2f; min-width: 60px;">Speed:</span>
+                        <input type="range" id="dictSpeechRate" min="0.1" max="1.0" step="0.1" value="1" oninput="document.getElementById('rateDisplay').innerText = this.value + 'x'" style="flex: 1; max-width: 300px;">
+                        <span id="rateDisplay" style="font-size: 16px; font-weight: bold; color: var(--primary-blue); min-width: 45px;">1x</span>
                     </div>
-                    <button id="dictPauseBtn" class="btn-secondary" onclick="toggleSpeechPause()" style="background: #ffb300; width: 100%; max-width: 200px; padding: 8px;">⏸️ Pause</button>
+                    <button id="dictPauseBtn" class="btn-secondary" onclick="toggleSpeechPause()" style="background: #ffb300; width: 100%; max-width: 300px; padding: 12px;">⏸️ Pause</button>
                 </div>
 
                 <div class="dict-input-wrapper">
                     <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="handleDictKeyDown(event)"></textarea>
                     <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus();">🗑️</div>
                 </div>
-                <br><br>
-                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px;">Check Answer</button>
-                <div id="dictHintDisplay" style="margin-top: 15px; font-size: 16px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
-                <div id="dictResult" class="status-msg"></div>
+                <br>
+                <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 18px; font-size: 20px;">Check Answer</button>
+                <div id="dictHintDisplay" style="margin-top: 20px; font-size: 18px; font-weight: bold; color: var(--primary-blue); min-height: 24px;"></div>
+                <div id="dictResult" class="status-msg" style="font-size: 20px;"></div>
             </div>
         </div>
 
@@ -402,28 +413,28 @@
             <div id="writingListUI">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <div class="back-btn" onclick="goHome()" style="margin-bottom:0;">← Back to Home</div>
-                    <button class="btn-action" onclick="openWritingEditor()">New Article</button>
+                    <button class="btn-action" style="padding: 12px 30px;" onclick="openWritingEditor()">New Article</button>
                 </div>
                 <div id="writingList"></div>
             </div>
 
             <div id="writingEditUI" style="display:none;">
-                <input type="text" id="writingTitle" placeholder="Article Title (e.g. My Daily Routine)" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
+                <input type="text" id="writingTitle" placeholder="Article Title (e.g. My Daily Routine)" style="width:100%; padding:15px; font-size:20px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
                 <div class="instruction-tip" style="background: #e8f5e9; border-left-color: #43a047;">
                     💡 <b>Tip:</b> Highlight text to check specific parts, or use buttons to process the full text in Grammarly or DeepL.
                 </div>
                 <textarea id="writingContent" placeholder="Start your English writing here..."></textarea>
-                <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">Words: 0</div>
+                <div style="font-size: 14px; color: #90a4ae; text-align: right; margin-top: 8px; font-weight: bold;" id="wordCount">Words: 0</div>
                 
                 <div class="app-btn-group">
-                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">Grammarly</button>
-                    <button class="btn-action btn-deepl" onclick="openInDeepL()">DeepL</button>
-                    <button class="btn-secondary" onclick="copyWritingText()">📋 Copy All</button>
+                    <button class="btn-action btn-grammarly" style="flex: 1; padding: 15px;" onclick="openInGrammarly()">Grammarly</button>
+                    <button class="btn-action btn-deepl" style="flex: 1; padding: 15px;" onclick="openInDeepL()">DeepL</button>
+                    <button class="btn-secondary" style="flex: 1; padding: 15px;" onclick="copyWritingText()">📋 Copy All</button>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save Article</button>
-                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Delete All</button>
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn-action" style="flex: 2; background: var(--erudite-green); padding: 18px; font-size: 18px;" onclick="saveWriting()">💾 Save Article</button>
+                    <button class="btn-danger" style="flex: 1; margin-bottom:0; padding: 18px; font-size: 18px;" onclick="cancelWriting()">Discard Changes</button>
                 </div>
             </div>
         </div>
@@ -545,9 +556,7 @@
             if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation') startSession(id);
             if (id === 'writing') renderWritingList();
-            
-            // 每次切換頁面都滾動到頂部內部
-            document.getElementById(`${id}Page`).scrollTop = 0;
+            window.scrollTo(0,0);
         }
 
         function switchScopeTab(tabId) {
@@ -1181,7 +1190,7 @@
             }
             updateWordCount();
             contentInput.addEventListener('input', updateWordCount);
-            document.getElementById('writingPage').scrollTop = 0;
+            window.scrollTo(0,0);
         }
 
         function updateWordCount() {
