@@ -404,28 +404,28 @@
             <div id="writingListUI">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <div class="back-btn" onclick="goHome()" style="margin-bottom:0;">← Back to Home</div>
-                    <button class="btn-action" onclick="openWritingEditor()">新建文章</button>
+                    <button class="btn-action" onclick="openWritingEditor()">New Article</button>
                 </div>
                 <div id="writingList"></div>
             </div>
 
             <div id="writingEditUI" style="display:none;">
-                <input type="text" id="writingTitle" placeholder="文章標題 (例如: My Daily Routine)" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
+                <input type="text" id="writingTitle" placeholder="Article Title (e.g. My Daily Routine)" style="width:100%; padding:12px; font-size:18px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box;">
                 <div class="instruction-tip" style="background: #e8f5e9; border-left-color: #43a047;">
-                    💡 提示：寫作完成後可點擊下方按鈕，使用 Grammarly 或 DeepL 進行語法與翻譯校對。
+                    💡 <b>Tip:</b> Highlight text to check specific parts, or use buttons to process the full text in Grammarly or DeepL.
                 </div>
-                <textarea id="writingContent" placeholder="開始您的英文寫作..."></textarea>
-                <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">字數: 0</div>
+                <textarea id="writingContent" placeholder="Start your English writing here..."></textarea>
+                <div style="font-size: 12px; color: #90a4ae; text-align: right; margin-top: 5px;" id="wordCount">Words: 0</div>
                 
                 <div class="app-btn-group">
-                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">✨ Grammarly 校對</button>
-                    <button class="btn-action btn-deepl" onclick="openInDeepL()">🌐 DeepL 翻譯</button>
-                    <button class="btn-secondary" onclick="copyWritingText()">📋 複製全文</button>
+                    <button class="btn-action btn-grammarly" onclick="openInGrammarly()">✨ Grammarly Check</button>
+                    <button class="btn-action btn-deepl" onclick="openInDeepL()">🌐 DeepL Translate</button>
+                    <button class="btn-secondary" onclick="copyWritingText()">📋 Copy All</button>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 儲存文章</button>
-                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">取消</button>
+                    <button class="btn-action" style="flex: 2; background: var(--erudite-green);" onclick="saveWriting()">💾 Save Article</button>
+                    <button class="btn-danger" style="flex: 1; margin-bottom:0;" onclick="cancelWriting()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1151,14 +1151,14 @@
             document.getElementById('writingEditUI').style.display = 'none';
             const list = document.getElementById('writingList');
             if (writingData.length === 0) {
-                list.innerHTML = "<div style='text-align:center; padding: 40px; color:#90a4ae;'>尚未有文章，點擊右上方「新建文章」開始寫作。</div>";
+                list.innerHTML = "<div style='text-align:center; padding: 40px; color:#90a4ae;'>No articles found. Click 'New Article' to begin.</div>";
                 return;
             }
             list.innerHTML = writingData.map((item, index) => `
                 <div class="list-item-row" id="write-row-${index}" ontouchstart="handleWriteTouchStart(event)" ontouchmove="handleWriteTouchMove(event, ${index})" ontouchend="handleWriteTouchEnd(event, ${index})">
                     <div class="delete-btn-overlay" onclick="deleteWriting(${index})">DELETE</div>
                     <div class="item-main-content" onclick="openWritingEditor(${index})">
-                        <div class="writing-title">${item.title || "無標題文章"}</div>
+                        <div class="writing-title">${item.title || "Untitled Article"}</div>
                         <div class="writing-meta">📅 ${item.date} | 📝 ${item.content.length} characters</div>
                         <div class="writing-preview">${item.content.substring(0, 100)}...</div>
                     </div>
@@ -1187,15 +1187,15 @@
         function updateWordCount() {
             const text = document.getElementById('writingContent').value.trim();
             const count = text ? text.split(/\s+/).length : 0;
-            document.getElementById('wordCount').innerText = `字數: ${count}`;
+            document.getElementById('wordCount').innerText = `Words: ${count}`;
         }
 
         function saveWriting() {
             const title = document.getElementById('writingTitle').value.trim();
             const content = document.getElementById('writingContent').value.trim();
-            if (!content) { alert("請輸入內容！"); return; }
+            if (!content) { alert("Content cannot be empty!"); return; }
             const payload = {
-                title: title || "未命名文章",
+                title: title || "Untitled Article",
                 content: content,
                 date: new Date().toLocaleString()
             };
@@ -1205,10 +1205,10 @@
             renderWritingList();
         }
 
-        function cancelWriting() { if(confirm("確定取消？未儲存的內容將會遺失。")) renderWritingList(); }
+        function cancelWriting() { if(confirm("Discard unsaved changes?")) renderWritingList(); }
 
         function deleteWriting(index) {
-            if(confirm("確定刪除這篇文章？")) {
+            if(confirm("Are you sure you want to delete this article?")) {
                 writingData.splice(index, 1);
                 localStorage.setItem('masterWriting', JSON.stringify(writingData));
                 renderWritingList();
@@ -1225,26 +1225,36 @@
         function handleWriteTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`write-row-${i}`).classList.remove('swiped-left'); }
 
         function openInDeepL() {
-            const text = document.getElementById('writingContent').value;
-            if(!text) return;
-            window.location.href = `deepl://translate?text=${encodeURIComponent(text)}`;
-            // Fallback
-            setTimeout(() => { window.open(`https://www.deepl.com/translator#en/zh/${encodeURIComponent(text)}`, '_blank'); }, 500);
+            const area = document.getElementById('writingContent');
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToProcess = selectedText || area.value.trim();
+            
+            if(!textToProcess) return;
+            
+            // Try to open the app via deep link
+            window.location.href = `deepl://translate?text=${encodeURIComponent(textToProcess)}`;
+            // Fallback to web version if app doesn't open
+            setTimeout(() => { window.open(`https://www.deepl.com/translator#en/zh/${encodeURIComponent(textToProcess)}`, '_blank'); }, 800);
         }
 
         function openInGrammarly() {
-            const text = document.getElementById('writingContent').value;
-            if(!text) return;
-            navigator.clipboard.writeText(text).then(() => {
-                alert("內容已複製到剪貼簿！即將為您打開 Grammarly，請直接貼上內容進行校對。");
+            const area = document.getElementById('writingContent');
+            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToProcess = selectedText || area.value.trim();
+            
+            if(!textToProcess) return;
+            
+            navigator.clipboard.writeText(textToProcess).then(() => {
+                const mode = selectedText ? "Selected fragment" : "Full article";
+                alert(`${mode} copied to clipboard! Grammarly will now open. Please paste your text there.`);
                 window.location.href = "grammarly://"; 
-                setTimeout(() => { window.open("https://app.grammarly.com/", "_blank"); }, 500);
+                setTimeout(() => { window.open("https://app.grammarly.com/", "_blank"); }, 800);
             });
         }
 
         function copyWritingText() {
             const text = document.getElementById('writingContent').value;
-            navigator.clipboard.writeText(text).then(() => alert("文章已複製！"));
+            navigator.clipboard.writeText(text).then(() => alert("All text copied!"));
         }
 
         function speakTarget(lang) {
@@ -1302,16 +1312,16 @@
             reader.onload = function(e) {
                 try {
                     const bundle = JSON.parse(e.target.result);
-                    if (confirm("這將會替換所有資料，確定匯入嗎？")) {
+                    if (confirm("This will replace all current data. Proceed?")) {
                         localStorage.setItem('masterVocab', JSON.stringify(bundle.vocab || []));
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
                         localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || []));
-                        alert("✨ 匯入成功！系統重新載入。");
+                        alert("✨ Import successful! Reloading...");
                         location.reload();
                     }
-                } catch (err) { alert("❌ 檔案解析失敗。"); }
+                } catch (err) { alert("❌ File parsing failed."); }
                 event.target.value = '';
             };
             reader.readAsText(file);
