@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lexicon Master | Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
         :root {
             --primary-blue: #0277bd;
@@ -229,6 +231,12 @@
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Cropper Specific Styles */
+        #cropSection { display: none; margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0; }
+        .img-container { max-height: 50vh; width: 100%; margin-bottom: 15px; }
+        .img-container img { max-width: 100%; display: block; }
+        .cropper-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
     </style>
 </head>
 <body>
@@ -303,6 +311,20 @@
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(this)">
                 <div id="ocrLoading" style="margin-top:10px; color: var(--primary-blue); display:none;">Analyzing Text Content...</div>
             </div>
+            
+            <div id="cropSection">
+                <div class="instruction-tip">Crop or rotate the image before scanning for better OCR accuracy.</div>
+                <div class="img-container">
+                    <img id="cropImage" src="" alt="Picture">
+                </div>
+                <div class="cropper-actions">
+                    <button class="btn-secondary" onclick="rotateCropper(-90)">↺ Rotate Left</button>
+                    <button class="btn-secondary" onclick="rotateCropper(90)">↻ Rotate Right</button>
+                    <button class="btn-action" style="background: #e53935; padding: 12px 24px;" onclick="cancelCrop()">✕ Cancel</button>
+                    <button class="btn-action" style="background: var(--erudite-green); padding: 12px 24px;" onclick="confirmCrop()">✓ Confirm & Scan</button>
+                </div>
+            </div>
+
             <div id="editorSection" style="display:none; margin-top: 20px;">
                 <div class="instruction-tip">Highlight specific text to "Add Selected", or use "Add All" to import the entire scan.</div>
                 <textarea id="ocrTextEditor"></textarea>
@@ -460,6 +482,9 @@
         let currentLookupData = null;
         let activeSessionData = [];
         let dictationScore = 0;
+        
+        // 新增：定義 Cropper 全域變數
+        let imageCropper = null;
 
         function stripMarkers(str) { return str.replace(/==/g, ''); }
         function formatDisplay(str) { return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>'); }
@@ -471,9 +496,55 @@
             const fileLabel = document.getElementById('fileLabel');
             if (input.files && input.files[0]) {
                 fileLabel.innerText = "📄 " + input.files[0].name;
-                processOCR(input.files[0]);
+                
+                // 修改為啟動裁切工具取代直接發送 OCR
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('cropImage').src = e.target.result;
+                    document.getElementById('cropSection').style.display = 'block';
+                    document.getElementById('editorSection').style.display = 'none';
+                    
+                    if (imageCropper) { imageCropper.destroy(); }
+                    
+                    imageCropper = new Cropper(document.getElementById('cropImage'), {
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        responsive: true
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
             } else {
                 fileLabel.innerText = "📁 Click to Upload Image";
+            }
+        }
+
+        // 新增：旋轉裁切圖片
+        function rotateCropper(degree) {
+            if (imageCropper) imageCropper.rotate(degree);
+        }
+
+        // 新增：取消裁切
+        function cancelCrop() {
+            document.getElementById('cropSection').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileLabel').innerText = "📁 Click to Upload Image";
+            if (imageCropper) {
+                imageCropper.destroy();
+                imageCropper = null;
+            }
+        }
+
+        // 新增：確認裁切並發送 OCR
+        function confirmCrop() {
+            if (!imageCropper) return;
+            const canvas = imageCropper.getCroppedCanvas();
+            if (canvas) {
+                document.getElementById('cropSection').style.display = 'none';
+                canvas.toBlob(function(blob) {
+                    processOCR(blob);
+                }, 'image/jpeg');
+                imageCropper.destroy();
+                imageCropper = null;
             }
         }
 
