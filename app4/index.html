@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lexicon Master | Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
@@ -17,34 +17,52 @@
             --deepl-blue: #002451;
         }
 
+        /* 修改為全螢幕佈局 */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 防止主視窗捲動 */
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg-gradient);
-            min-height: 100vh;
-            margin: 0;
             display: flex;
             justify-content: center;
-            padding: 20px 15px 150px 15px;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-            overflow-x: hidden;
+            align-items: center; /* 居中對齊 */
         }
 
         .container {
             background: white;
-            width: 100%;
-            max-width: 900px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            padding: 30px;
-            border-top: 12px solid var(--accent-green);
+            width: 100vw; /* 寬度佔滿視窗 */
+            height: 100vh; /* 高度佔滿視窗 */
+            max-width: none; /* 取消最大寬度限制 */
+            border-radius: 0; /* 取消圓角以達成全螢幕感 */
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            border-top: 8px solid var(--accent-green);
             position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
-        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; }
-
-        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        /* 內容區域自動捲動 */
+        .page-content { 
+            display: none; 
+            animation: fadeIn 0.3s ease; 
+            flex: 1;
+            overflow-y: auto; /* 只有內容區可以捲動 */
+            padding: 20px 20px 40px 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         .page-content.active { display: block; }
+
+        h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin: 15px 0; flex-shrink: 0; }
+
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 20px; display: inline-block; }
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -533,7 +551,8 @@
         function goHome() {
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById('homePage').classList.add('active');
-            window.scrollTo(0,0);
+            // 回到首頁時捲動到頂部
+            document.querySelector('#homePage').scrollTop = 0;
         }
 
         function switchPage(id) {
@@ -547,7 +566,8 @@
             if (id === 'dictionary') renderHistoryList();
             if (id === 'dictation') startSession(id);
             if (id === 'writing') renderWritingList();
-            window.scrollTo(0,0);
+            // 切換頁面時捲動到頂部
+            document.getElementById(`${id}Page`).scrollTop = 0;
         }
 
         function switchScopeTab(tabId) {
@@ -777,7 +797,7 @@
             document.getElementById('dictLookupInput').value = info.word;
             renderLookupResultUI(info);
             addToHistory(info);
-            window.scrollTo(0,0);
+            document.getElementById('dictionaryPage').scrollTop = 0;
         }
 
         async function extractTextToDictation(areaId) {
@@ -1181,7 +1201,7 @@
             }
             updateWordCount();
             contentInput.addEventListener('input', updateWordCount);
-            window.scrollTo(0,0);
+            document.getElementById('writingPage').scrollTop = 0;
         }
 
         function updateWordCount() {
