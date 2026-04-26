@@ -345,7 +345,7 @@
                 
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">2. Preferences:</div>
                 <div class="category-chip" onclick="this.querySelector('input').click()">
-                    <input type="checkbox" id="dictShuffleMode" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="dictShuffleMode" onclick="event.stopPropagation()">
                     <span style="font-weight: 500;">Randomize Order</span>
                 </div>
                 
@@ -1006,12 +1006,14 @@
             const categories = [...new Set(vocabData.map(v => v.category || "General"))];
             checklist.innerHTML = categories.map(cat => `
                 <div class="category-chip" onclick="const ck = this.querySelector('input'); ck.checked = !ck.checked; this.classList.toggle('selected', ck.checked)">
-                    <input type="checkbox" value="${cat}" checked onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
+                    <input type="checkbox" value="${cat}" onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
                     <span>${cat}</span>
                 </div>
             `).join('');
-            document.querySelectorAll('#dictCategoryChecklist .category-chip input').forEach(ck => {
-                if(ck.checked) ck.parentElement.classList.add('selected');
+            // Ensure no category is selected by default
+            document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => {
+                chip.classList.remove('selected');
+                chip.querySelector('input').checked = false;
             });
         }
 
@@ -1060,7 +1062,18 @@
             }
         }
 
-        // New logic: Support ignoring (s)
+        // Helper to handle (s) variations
+        const matchAnswer = (user, target) => {
+            const u = user.toLowerCase().trim();
+            const t = target.toLowerCase().trim();
+            if (u === t) return true;
+            const tNoS = t.replace(/\(s\)/g, '');
+            if (u === tNoS) return true;
+            const tWithS = t.replace(/\(s\)/g, 's');
+            if (u === tWithS) return true;
+            return false;
+        };
+
         function checkDictation() {
             const item = activeSessionData[currentIndex];
             const inputRaw = document.getElementById('dictInput').value.trim().toLowerCase().replace(/\//g, ' ').replace(/\s+/g, ' ');
@@ -1068,22 +1081,7 @@
             
             const markers = item.word.match(/==(.+?)==/g);
             let isCorrect = false;
-            let expectedDisplay = "";
-
-            // Helper to handle (s) variations
-            const matchAnswer = (user, target) => {
-                const u = user.toLowerCase().trim();
-                const t = target.toLowerCase().trim();
-                // 1. Exact match
-                if (u === t) return true;
-                // 2. Ignore (s) match
-                const tNoS = t.replace(/\(s\)/g, '');
-                if (u === tNoS) return true;
-                // 3. Optional (s) as 's' match
-                const tWithS = t.replace(/\(s\)/g, 's');
-                if (u === tWithS) return true;
-                return false;
-            };
+            let displayHTML = "";
 
             if (markers && markers.length > 0) {
                 const originalAnswers = markers.map(m => m.replace(/==/g, '').trim());
@@ -1100,15 +1098,37 @@
                     }
                 }
                 
-                expectedDisplay = originalAnswers.length > 1 
-                    ? originalAnswers.map((ans, idx) => `${idx + 1}. ${ans}`).join(' ') 
-                    : originalAnswers[0];
+                // Construct feedback with underlines for wrong parts
+                const userInputWords = inputRaw.split(/\s+/);
+                const targetText = originalAnswers.length > 1 ? originalAnswers.join(', ') : originalAnswers[0];
+                const targetWords = targetText.split(/\s+/);
+
+                displayHTML = targetWords.map((tWord, i) => {
+                    const uWord = userInputWords[i] || "";
+                    if (matchAnswer(uWord, tWord)) {
+                        return tWord;
+                    } else {
+                        return `<u style="text-decoration: underline; text-decoration-color: red;">${tWord}</u>`;
+                    }
+                }).join(' ');
+
             } else {
                 const correctCheck = stripMarkers(item.word).replace(/\//g, ' ').replace(/\s+/g, ' ');
                 if (matchAnswer(inputRaw, correctCheck)) {
                     isCorrect = true;
                 }
-                expectedDisplay = stripMarkers(item.word).trim();
+                
+                const userInputWords = inputRaw.split(/\s+/);
+                const targetWords = correctCheck.split(/\s+/);
+
+                displayHTML = targetWords.map((tWord, i) => {
+                    const uWord = userInputWords[i] || "";
+                    if (matchAnswer(uWord, tWord)) {
+                        return tWord;
+                    } else {
+                        return `<u style="text-decoration: underline; text-decoration-color: red;">${tWord}</u>`;
+                    }
+                }).join(' ');
             }
             
             if (isCorrect) {
@@ -1124,7 +1144,7 @@
                     }
                 }, 800);
             } else {
-                res.innerText = `Incorrect. The answer is: "${expectedDisplay}"`; res.style.color = "red";
+                res.innerHTML = `<span style="color:red">Incorrect. The answer is:</span> <br> <span style="color:var(--primary-blue); font-size:18px;">${displayHTML}</span>`;
             }
         }
 
