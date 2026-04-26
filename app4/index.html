@@ -17,6 +17,7 @@
             --highlight-yellow: #fff59d;
             --erudite-green: #2e7d32;
             --deepl-blue: #002451;
+            --camscanner-green: #1db48d;
         }
 
         body {
@@ -308,9 +309,7 @@
             <h2>📸 Text Scanner Pro</h2>
             
             <div style="margin-bottom: 20px;">
-                <a href="camscanner://" class="btn-action" style="background: #2db871; color: white; text-decoration: none; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; font-size: 16px; box-shadow: 0 4px 12px rgba(45, 184, 113, 0.2);">
-                    <span style="font-size: 20px;">📷</span> 啟動掃描全能王 (CamScanner)
-                </a>
+                <a href="camscanner://" class="btn-action" style="background: var(--camscanner-green); width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 15px; box-sizing: border-box;">📷 掃描全能王 (CamScanner)</a>
             </div>
 
             <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
@@ -490,7 +489,6 @@
         let activeSessionData = [];
         let dictationScore = 0;
         
-        // 新增：定義 Cropper 全域變數
         let imageCropper = null;
 
         function stripMarkers(str) { return str.replace(/==/g, ''); }
@@ -503,85 +501,37 @@
             const fileLabel = document.getElementById('fileLabel');
             if (input.files && input.files[0]) {
                 fileLabel.innerText = "📄 " + input.files[0].name;
-                
-                // 修改為啟動裁切工具取代直接發送 OCR
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('cropImage').src = e.target.result;
                     document.getElementById('cropSection').style.display = 'block';
                     document.getElementById('editorSection').style.display = 'none';
-                    
                     if (imageCropper) { imageCropper.destroy(); }
-                    
                     imageCropper = new Cropper(document.getElementById('cropImage'), {
-                        viewMode: 1,
-                        autoCropArea: 1,
-                        responsive: true
+                        viewMode: 1, autoCropArea: 1, responsive: true
                     });
                 };
                 reader.readAsDataURL(input.files[0]);
-            } else {
-                fileLabel.innerText = "📁 Click to Upload Image";
-            }
+            } else { fileLabel.innerText = "📁 Click to Upload Image"; }
         }
 
-        // 新增：旋轉裁切圖片
-        function rotateCropper(degree) {
-            if (imageCropper) imageCropper.rotate(degree);
-        }
-
-        // 新增：取消裁切
-        function cancelCrop() {
-            document.getElementById('cropSection').style.display = 'none';
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileLabel').innerText = "📁 Click to Upload Image";
-            if (imageCropper) {
-                imageCropper.destroy();
-                imageCropper = null;
-            }
-        }
-
-        // 新增：確認裁切並發送 OCR
-        function confirmCrop() {
-            if (!imageCropper) return;
-            const canvas = imageCropper.getCroppedCanvas();
-            if (canvas) {
-                document.getElementById('cropSection').style.display = 'none';
-                canvas.toBlob(function(blob) {
-                    processOCR(blob);
-                }, 'image/jpeg');
-                imageCropper.destroy();
-                imageCropper = null;
-            }
-        }
+        function rotateCropper(degree) { if (imageCropper) imageCropper.rotate(degree); }
+        function cancelCrop() { document.getElementById('cropSection').style.display = 'none'; document.getElementById('fileInput').value = ''; document.getElementById('fileLabel').innerText = "📁 Click to Upload Image"; if (imageCropper) { imageCropper.destroy(); imageCropper = null; } }
+        function confirmCrop() { if (!imageCropper) return; const canvas = imageCropper.getCroppedCanvas(); if (canvas) { document.getElementById('cropSection').style.display = 'none'; canvas.toBlob(function(blob) { processOCR(blob); }, 'image/jpeg'); imageCropper.destroy(); imageCropper = null; } }
 
         async function processOCR(file) {
             const loader = document.getElementById('ocrLoading');
             loader.style.display = 'block';
             try {
                 const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
-                await worker.setParameters({ 
-                    preserve_interword_spaces: '1', 
-                    tessedit_pageseg_mode: '1' 
-                });
-                
+                await worker.setParameters({ preserve_interword_spaces: '1', tessedit_pageseg_mode: '1' });
                 const { data } = await worker.recognize(file);
-                
                 let validBlocks = data.blocks.filter(b => b.text && b.text.trim().length > 0);
                 validBlocks.sort((a, b) => {
-                    const yTolerance = 40; 
-                    const aMidY = (a.bbox.y0 + a.bbox.y1) / 2;
-                    const bMidY = (b.bbox.y0 + b.bbox.y1) / 2;
-                    
-                    if (Math.abs(aMidY - bMidY) < yTolerance) {
-                        return a.bbox.x0 - b.bbox.x0; 
-                    } else {
-                        return a.bbox.y0 - b.bbox.y0; 
-                    }
+                    const yTolerance = 40; const aMidY = (a.bbox.y0 + a.bbox.y1) / 2; const bMidY = (b.bbox.y0 + b.bbox.y1) / 2;
+                    if (Math.abs(aMidY - bMidY) < yTolerance) { return a.bbox.x0 - b.bbox.x0; } else { return a.bbox.y0 - b.bbox.y0; }
                 });
-
                 let optimizedText = validBlocks.map(b => b.text.trim()).join('\n\n');
-
                 optimizedText = optimizedText
                     .replace(/([\u4e00-\u9fa5])\s+([\u4e00-\u9fa5])/g, '$1$2')
                     .replace(/([\u4e00-\u9fa5])\s+([\u4e00-\u9fa5])/g, '$1$2')
@@ -589,35 +539,22 @@
                     .replace(/([「【（《("])\s+/g, '$1')
                     .replace(/([a-zA-Z])-\n([a-zA-Z])/g, '$1$2')
                     .replace(/^[|~_—\-\s]+$/gm, '')
-                    .replace(/\n{3,}/g, '\n\n')
-                    .trim();
-
+                    .replace(/\n{3,}/g, '\n\n').trim();
                 await worker.terminate();
-                
                 document.getElementById('ocrTextEditor').value = optimizedText;
                 document.getElementById('editorSection').style.display = 'block';
                 loader.style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                alert("OCR Error: " + err.message);
-                loader.style.display = 'none';
-            }
+            } catch (err) { console.error(err); alert("OCR Error: " + err.message); loader.style.display = 'none'; }
         }
 
         document.getElementById('dictInput').addEventListener('focus', (e) => {
             setTimeout(() => { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
         });
 
-        function goHome() {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.getElementById('homePage').classList.add('active');
-            window.scrollTo(0,0);
-        }
+        function goHome() { document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active')); document.getElementById('homePage').classList.add('active'); window.scrollTo(0,0); }
 
         function switchPage(id) {
-            if (id === 'dictation' && vocabData.length === 0) {
-                alert("Please add items to Study Scope first!"); return;
-            }
+            if (id === 'dictation' && vocabData.length === 0) { alert("Please add items to Study Scope first!"); return; }
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById(`${id}Page`).classList.add('active');
             if (id === 'scope') renderTable();
@@ -672,18 +609,14 @@
                                 return true;
                             });
                             candidates.sort((a, b) => b.score - a.score);
-                        } else if (posSection[1]) {
-                            candidates = posSection[1].map(w => ({ word: w, score: 1 }));
-                        }
+                        } else if (posSection[1]) { candidates = posSection[1].map(w => ({ word: w, score: 1 })); }
                         const finalPicks = [...new Set(candidates.map(c => c.word))].slice(0, 3).join(', ');
                         if (finalPicks) zhLines.push(`[${posLabel}] ${finalPicks}`);
                     });
                 }
                 result.zh = zhLines.length > 0 ? zhLines.slice(0, 3).join('<br>') : (primaryTranslation || "No match found");
                 let enDefLines = [];
-                if (data[12]) {
-                    data[12].forEach(sec => { if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`)); });
-                }
+                if (data[12]) { data[12].forEach(sec => { if (sec[1]) sec[1].slice(0, 2).forEach(d => enDefLines.push(`<b>[${sec[0]}]</b> ${d[0]}`)); }); }
                 if (enDefLines.length === 0) enDefLines.push(isPhraseOrSentence ? "<i>Contextual verified entry.</i>" : "<i>Standard entry.</i>");
                 result.enDef = enDefLines.join('<br>');
                 if (!isPhraseOrSentence) {
@@ -748,8 +681,7 @@
             resultBox.innerHTML = '<div style="color:var(--primary-blue); font-weight:bold;">Pro Engine Analyzing...</div>';
             actionsBox.style.display = 'none';
             const info = await fetchInfo(input);
-            info.word = input;
-            currentLookupData = info;
+            info.word = input; currentLookupData = info;
             renderLookupResultUI(info);
             addToHistory(info);
         }
@@ -757,25 +689,20 @@
         function saveLookupToFavorites() {
             if (!currentLookupData) return;
             const cat = prompt("Assign a collection category (Category Name):", "My Words") || "My Words";
-            currentLookupData.category = cat;
-            favoritesData.push({...currentLookupData});
-            saveFavoritesData();
-            alert("✓ Successfully Added to Favourites!");
+            currentLookupData.category = cat; favoritesData.push({...currentLookupData});
+            saveFavoritesData(); alert("✓ Successfully Added to Favourites!");
         }
 
         function saveLookupToScope() {
             if (!currentLookupData) return;
             const cat = prompt("Assign a category for Study Scope:", "General") || "General";
-            currentLookupData.category = cat;
-            vocabData.push({...currentLookupData});
-            saveData();
-            alert("✓ Successfully Added to Study Scope!");
+            currentLookupData.category = cat; vocabData.push({...currentLookupData});
+            saveData(); alert("✓ Successfully Added to Study Scope!");
         }
 
         function addToHistory(info) {
             searchHistory = searchHistory.filter(item => item.word.toLowerCase() !== info.word.toLowerCase());
-            searchHistory.unshift(info);
-            if (searchHistory.length > 10) searchHistory.pop();
+            searchHistory.unshift(info); if (searchHistory.length > 10) searchHistory.pop();
             saveHistoryData();
         }
 
@@ -813,8 +740,7 @@
             const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
             if (!selectedText) { alert("Please highlight text!"); return; }
             const cat = prompt("Assign category:", "General") || "General";
-            const info = await fetchInfo(selectedText);
-            info.word = selectedText; info.category = cat;
+            const info = await fetchInfo(selectedText); info.word = selectedText; info.category = cat;
             vocabData.push(info); saveData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
@@ -823,8 +749,7 @@
             const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
             if (!selectedText) { alert("Please highlight text!"); return; }
             const cat = prompt("Assign collection category:", "My Words") || "My Words";
-            const info = await fetchInfo(selectedText);
-            info.word = selectedText; info.category = cat;
+            const info = await fetchInfo(selectedText); info.word = selectedText; info.category = cat;
             favoritesData.push(info); saveFavoritesData(); showToast(areaId === 'ocrTextEditor' ? 'scanToast' : 'rawToast');
         }
 
@@ -875,8 +800,7 @@
             if (vocabData.length === 0) { list.innerHTML = ""; return; }
             const groups = vocabData.reduce((acc, item, index) => {
                 const cat = item.category || "Uncategorized";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push({ ...item, originalIndex: index });
+                if (!acc[cat]) acc[cat] = []; acc[cat].push({ ...item, originalIndex: index });
                 return acc;
             }, {});
             list.innerHTML = Object.keys(groups).map(catName => `
@@ -921,8 +845,7 @@
             if (favoritesData.length === 0) { list.innerHTML = "<div style='text-align:center; padding: 20px; color:#78909c;'>Empty.</div>"; return; }
             const groups = favoritesData.reduce((acc, item, index) => {
                 const cat = item.category || "Uncategorized";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push({ ...item, originalIndex: index });
+                if (!acc[cat]) acc[cat] = []; acc[cat].push({ ...item, originalIndex: index });
                 return acc;
             }, {});
             list.innerHTML = Object.keys(groups).map(catName => `
@@ -972,34 +895,28 @@
         function deleteFavItem(i) { favoritesData.splice(i, 1); saveFavoritesData(); }
         
         function editVocab(i) {
-            const item = vocabData[i];
-            const w = prompt("Word:", item.word); if(!w) return;
+            const item = vocabData[i]; const w = prompt("Word:", item.word); if(!w) return;
             vocabData[i].word = w; vocabData[i].zh = prompt("Translation:", item.zh); vocabData[i].enDef = prompt("Definition:", item.enDef);
             saveData();
         }
 
         function editFavorite(i) {
-            const item = favoritesData[i];
-            const w = prompt("Word:", item.word); if(!w) return;
+            const item = favoritesData[i]; const w = prompt("Word:", item.word); if(!w) return;
             favoritesData[i].word = w; favoritesData[i].zh = prompt("Translation:", item.zh); favoritesData[i].enDef = prompt("Definition:", item.enDef);
             saveFavoritesData();
         }
 
         function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleTouchMove(e, i) {
-            let row = document.getElementById(`row-${i}`);
-            let diff = touchStartX - e.touches[0].clientX;
-            if (diff > 20) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
+            let row = document.getElementById(`row-${i}`); let diff = touchStartX - e.touches[0].clientX;
+            if (diff > 20) row.classList.add('swiped-left'); else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`row-${i}`).classList.remove('swiped-left'); }
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${i}`);
-            let diff = touchStartX - e.touches[0].clientX;
-            if (diff > 20) row.classList.add('swiped-left');
-            else if (diff < -20) row.classList.remove('swiped-left');
+            let row = document.getElementById(`fav-row-${i}`); let diff = touchStartX - e.touches[0].clientX;
+            if (diff > 20) row.classList.add('swiped-left'); else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
 
@@ -1009,38 +926,31 @@
         function saveFavoritesData() { localStorage.setItem('masterFavorites', JSON.stringify(favoritesData)); renderFavoritesTable(); }
 
         function saveRawChanges() {
-            const id = document.getElementById('rawTextSelect').value;
-            const index = rawTextData.findIndex(r => r.id == id);
+            const id = document.getElementById('rawTextSelect').value; const index = rawTextData.findIndex(r => r.id == id);
             if (index !== -1) { rawTextData[index].text = document.getElementById('scopeRawEditor').value; saveRawData(); }
         }
 
         function renderRawDropdown() {
-            const select = document.getElementById('rawTextSelect');
-            if(!select) return;
+            const select = document.getElementById('rawTextSelect'); if(!select) return;
             select.innerHTML = `<option value="">-- Select a saved scan --</option>` + rawTextData.map(item => `<option value="${item.id}">${item.date}</option>`).join('');
         }
 
         function loadRawText() {
             const item = rawTextData.find(r => r.id == document.getElementById('rawTextSelect').value);
-            const editor = document.getElementById('scopeRawEditor');
-            const actions = document.getElementById('rawActions');
-            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; }
-            else { editor.style.display = 'none'; actions.style.display = 'none'; }
+            const editor = document.getElementById('scopeRawEditor'); const actions = document.getElementById('rawActions');
+            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; } else { editor.style.display = 'none'; actions.style.display = 'none'; }
         }
 
         function startSession(id) { currentIndex = 0; if (id === 'dictation') { setupDictationConfig(); } else { activeSessionData = [...vocabData]; loadTask(id); } }
 
         function setupDictationConfig() {
-            document.getElementById('dictConfigUI').style.display = 'block';
-            document.getElementById('dictPlayUI').style.display = 'none';
-            const checklist = document.getElementById('dictCategoryChecklist');
-            const categories = [...new Set(vocabData.map(v => v.category || "General"))];
+            document.getElementById('dictConfigUI').style.display = 'block'; document.getElementById('dictPlayUI').style.display = 'none';
+            const checklist = document.getElementById('dictCategoryChecklist'); const categories = [...new Set(vocabData.map(v => v.category || "General"))];
             checklist.innerHTML = categories.map(cat => `
                 <div class="category-chip" onclick="const ck = this.querySelector('input'); ck.checked = !ck.checked; this.classList.toggle('selected', ck.checked)">
                     <input type="checkbox" value="${cat}" onclick="event.stopPropagation(); this.parentElement.classList.toggle('selected', this.checked)">
                     <span>${cat}</span>
-                </div>
-            `).join('');
+                </div>`).join('');
             document.querySelectorAll('#dictCategoryChecklist .category-chip').forEach(chip => { chip.classList.remove('selected'); chip.querySelector('input').checked = false; });
         }
 
@@ -1067,10 +977,7 @@
 
         const matchAnswer = (user, target) => {
             const u = user.toLowerCase().trim(); const t = target.toLowerCase().trim();
-            if (u === t) return true;
-            if (u === t.replace(/\(s\)/g, '')) return true;
-            if (u === t.replace(/\(s\)/g, 's')) return true;
-            return false;
+            if (u === t) return true; if (u === t.replace(/\(s\)/g, '')) return true; if (u === t.replace(/\(s\)/g, 's')) return true; return false;
         };
 
         function checkDictation() {
@@ -1108,54 +1015,35 @@
             if (e.key === 'Tab') {
                 e.preventDefault(); const synth = window.speechSynthesis;
                 if (synth.speaking && !synth.paused) { synth.pause(); document.getElementById('dictPauseBtn').innerText = "▶️ Resume"; }
-                else if (synth.paused) { synth.resume(); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause"; }
-                else speakTarget('en-US'); return;
+                else if (synth.paused) { synth.resume(); document.getElementById('dictPauseBtn').innerText = "⏸️ Pause"; } else speakTarget('en-US'); return;
             }
             if(e.key === 'Enter') { e.preventDefault(); checkDictation(); }
         }
 
-        let currentWritingId = null;
-        let writingAutoSaveTimer = null;
+        let currentWritingId = null; let writingAutoSaveTimer = null;
 
         function renderWritingList() {
             const container = document.getElementById('writingListContainer');
-            if (writingData.length === 0) {
-                container.innerHTML = "<div style='text-align:center; padding: 30px; background: #f8f9fa; border-radius: 12px; color:#78909c;'>No articles yet. Start writing!</div>";
-                return;
-            }
+            if (writingData.length === 0) { container.innerHTML = "<div style='text-align:center; padding: 30px; background: #f8f9fa; border-radius: 12px; color:#78909c;'>No articles yet. Start writing!</div>"; return; }
             const sortedData = [...writingData].sort((a, b) => b.lastModified - a.lastModified);
             container.innerHTML = sortedData.map(item => `
                 <div class="list-item-row" style="background: white; border: 1px solid #eee; margin-bottom: 10px;">
                     <div class="item-main-content" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                         <div style="flex: 1; min-width: 0;" onclick="openWritingEditor(${item.id})">
                             <h4 style="margin: 0 0 5px 0; color: var(--primary-blue); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title || 'Untitled Article'}</h4>
-                            <p style="margin: 0; font-size: 13px; color: #78909c;">
-                                Last edited: ${new Date(item.lastModified).toLocaleString()} • ${item.wordCount} words
-                            </p>
+                            <p style="margin: 0; font-size: 13px; color: #78909c;">Last edited: ${new Date(item.lastModified).toLocaleString()} • ${item.wordCount} words</p>
                         </div>
                         <button style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 8px; width: 40px; height: 40px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center;" onclick="deleteWriting(${item.id})">🗑️</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function openWritingEditor(id = null) {
-            document.getElementById('writingListView').style.display = 'none';
-            document.getElementById('writingEditorView').style.display = 'block';
-            
-            const titleInput = document.getElementById('writingTitle');
-            const contentArea = document.getElementById('writingContent');
-            const statusLabel = document.getElementById('writingSaveStatus');
-            
-            statusLabel.innerText = "";
-            currentWritingId = id;
-
-            if (id) {
-                const article = writingData.find(w => w.id === id);
-                if (article) { titleInput.value = article.title; contentArea.value = article.content; }
-            } else {
-                titleInput.value = ""; contentArea.value = ""; currentWritingId = Date.now();
-            }
+            document.getElementById('writingListView').style.display = 'none'; document.getElementById('writingEditorView').style.display = 'block';
+            const titleInput = document.getElementById('writingTitle'); const contentArea = document.getElementById('writingContent'); const statusLabel = document.getElementById('writingSaveStatus');
+            statusLabel.innerText = ""; currentWritingId = id;
+            if (id) { const article = writingData.find(w => w.id === id); if (article) { titleInput.value = article.title; contentArea.value = article.content; } }
+            else { titleInput.value = ""; contentArea.value = ""; currentWritingId = Date.now(); }
             updateWordCount();
         }
 
@@ -1163,50 +1051,27 @@
 
         function saveWriting() {
             if (!currentWritingId) return;
-            const title = document.getElementById('writingTitle').value.trim();
-            const content = document.getElementById('writingContent').value;
+            const title = document.getElementById('writingTitle').value.trim(); const content = document.getElementById('writingContent').value;
             const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
-            
             if (!title && !content.trim()) return;
-
             const existingIndex = writingData.findIndex(w => w.id === currentWritingId);
             const articleObj = { id: currentWritingId, title: title || 'Untitled Article', content: content, wordCount: wordCount, lastModified: Date.now() };
-
-            if (existingIndex > -1) writingData[existingIndex] = articleObj;
-            else writingData.push(articleObj);
-            
+            if (existingIndex > -1) writingData[existingIndex] = articleObj; else writingData.push(articleObj);
             localStorage.setItem('masterWriting', JSON.stringify(writingData));
-            
-            const statusLabel = document.getElementById('writingSaveStatus');
-            statusLabel.innerText = "Saved ✓"; statusLabel.style.color = "var(--erudite-green)";
+            const statusLabel = document.getElementById('writingSaveStatus'); statusLabel.innerText = "Saved ✓"; statusLabel.style.color = "var(--erudite-green)";
             setTimeout(() => { if (statusLabel.innerText === "Saved ✓") statusLabel.innerText = ""; }, 2000);
         }
 
-        function handleWritingInput() {
-            updateWordCount();
-        }
-
-        function updateWordCount() {
-            const content = document.getElementById('writingContent').value.trim();
-            const count = content ? content.split(/\s+/).length : 0;
-            document.getElementById('writingWordCount').innerText = `Words: ${count}`;
-        }
-
-        function deleteWriting(id) {
-            if (confirm("Delete this article?")) { writingData = writingData.filter(w => w.id !== id); localStorage.setItem('masterWriting', JSON.stringify(writingData)); renderWritingList(); }
-        }
+        function handleWritingInput() { updateWordCount(); }
+        function updateWordCount() { const content = document.getElementById('writingContent').value.trim(); const count = content ? content.split(/\s+/).length : 0; document.getElementById('writingWordCount').innerText = `Words: ${count}`; }
+        function deleteWriting(id) { if (confirm("Delete this article?")) { writingData = writingData.filter(w => w.id !== id); localStorage.setItem('masterWriting', JSON.stringify(writingData)); renderWritingList(); } }
 
         function launchWritingApp(app) {
-            const area = document.getElementById('writingContent');
-            const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
-            const textToCopy = selectedText || area.value.trim();
-            if (!textToCopy) { alert("Please write some text first!"); return; }
-
+            const area = document.getElementById('writingContent'); const selectedText = area.value.substring(area.selectionStart, area.selectionEnd).trim();
+            const textToCopy = selectedText || area.value.trim(); if (!textToCopy) { alert("Please write some text first!"); return; }
             navigator.clipboard.writeText(textToCopy).then(() => {
-                const statusLabel = document.getElementById('writingSaveStatus');
-                statusLabel.innerText = "Copied ✓"; statusLabel.style.color = "var(--primary-blue)";
+                const statusLabel = document.getElementById('writingSaveStatus'); statusLabel.innerText = "Copied ✓"; statusLabel.style.color = "var(--primary-blue)";
                 setTimeout(() => { if (statusLabel.innerText === "Copied ✓") statusLabel.innerText = ""; }, 2000);
-                
                 const encodedText = encodeURIComponent(textToCopy);
                 if (app === 'deepl') window.location.href = `deepl://translate?text=${encodedText}`;
                 else if (app === 'grammarly') window.location.href = `grammarly://`; 
@@ -1228,24 +1093,15 @@
             }
         }
 
-        function copyText(btn, encodedText) {
-            navigator.clipboard.writeText(decodeURIComponent(encodedText)).then(() => { btn.innerText = '✅'; setTimeout(() => btn.innerText = '📋', 1000); });
-        }
-
+        function copyText(btn, encodedText) { navigator.clipboard.writeText(decodeURIComponent(encodedText)).then(() => { btn.innerText = '✅'; setTimeout(() => btn.innerText = '📋', 1000); }); }
         function manuallySaveToRaw() { const content = document.getElementById('ocrTextEditor').value.trim(); if(!content) return; rawTextData.push({ id: Date.now(), date: new Date().toLocaleString() + " (Scan)", text: content }); saveRawData(); showToast('scanToast'); }
         function clearEditor() { if(confirm("Delete all?")) { document.getElementById('ocrTextEditor').value = ""; document.getElementById('editorSection').style.display = 'none'; } }
         function deleteCurrentRaw() { if(confirm("Delete this source?")) { rawTextData = rawTextData.filter(r => r.id != document.getElementById('rawTextSelect').value); saveRawData(); loadRawText(); } }
         function clearAllVocab() { if(confirm("Delete everything?")) { vocabData = []; saveData(); } }
         function clearAllFavorites() { if(confirm("Delete everything?")) { favoritesData = []; saveFavoritesData(); } }
-        
-        function exportAllData() {
-            const dataStr = JSON.stringify({ vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory, writing: writingData }, null, 2);
-            const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); a.download = "LexiconMaster_Backup.json"; a.click();
-        }
-
+        function exportAllData() { const dataStr = JSON.stringify({ vocab: vocabData, raw: rawTextData, fav: favoritesData, hist: searchHistory, writing: writingData }, null, 2); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([dataStr], { type: "application/json" })); a.download = "LexiconMaster_Backup.json"; a.click(); }
         function importAllData(event) {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
+            const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const bundle = JSON.parse(e.target.result);
@@ -1254,8 +1110,7 @@
                         localStorage.setItem('masterRawTexts', JSON.stringify(bundle.raw || []));
                         localStorage.setItem('masterFavorites', JSON.stringify(bundle.fav || []));
                         localStorage.setItem('masterHistory', JSON.stringify(bundle.hist || []));
-                        localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || []));
-                        location.reload();
+                        localStorage.setItem('masterWriting', JSON.stringify(bundle.writing || [])); location.reload();
                     }
                 } catch (err) { alert("❌ 檔案解析失敗。"); }
             };
