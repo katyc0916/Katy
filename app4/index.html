@@ -548,29 +548,55 @@
             }
         }
 
+        // ------------------------- 核心修改區域開始 -------------------------
         async function processOCR(file) {
             const loader = document.getElementById('ocrLoading');
             loader.style.display = 'block';
             try {
+                // 優化 1：變更 PSM 模式為 1 (自動版面分析)，取代原本的模式 3
                 const worker = await Tesseract.createWorker(['eng', 'chi_tra']);
-                await worker.setParameters({ preserve_interword_spaces: '1', tessedit_pageseg_mode: '3' });
-                const { data } = await worker.recognize(file);
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await img.decode();
-                const midX = img.width / 2;
-                const leftBlocks = [];
-                const rightBlocks = [];
-                data.blocks.forEach(block => {
-                    const blockCenterX = (block.bbox.x0 + block.bbox.x1) / 2;
-                    if (blockCenterX < midX) { leftBlocks.push(block); } else { rightBlocks.push(block); }
+                await worker.setParameters({ 
+                    preserve_interword_spaces: '1', 
+                    tessedit_pageseg_mode: '1' 
                 });
-                const sortTopDown = (a, b) => a.bbox.y0 - b.bbox.y0;
-                leftBlocks.sort(sortTopDown);
-                rightBlocks.sort(sortTopDown);
-                const orderedText = [...leftBlocks, ...rightBlocks].map(b => b.text.trim()).filter(t => t.length > 0).join('\n\n');
+                
+                const { data } = await worker.recognize(file);
+                
+                // 優化 2：導入專業級智慧版面排序算法，取代原本粗暴的硬性左右切割
+                let validBlocks = data.blocks.filter(b => b.text && b.text.trim().length > 0);
+                validBlocks.sort((a, b) => {
+                    const yTolerance = 40; // 允許同一行的垂直誤差範圍
+                    const aMidY = (a.bbox.y0 + a.bbox.y1) / 2;
+                    const bMidY = (b.bbox.y0 + b.bbox.y1) / 2;
+                    
+                    if (Math.abs(aMidY - bMidY) < yTolerance) {
+                        return a.bbox.x0 - b.bbox.x0; // 如果在同一水平線區域，由左至右排列
+                    } else {
+                        return a.bbox.y0 - b.bbox.y0; // 如果在不同行，由上至下排列
+                    }
+                });
+
+                let optimizedText = validBlocks.map(b => b.text.trim()).join('\n\n');
+
+                // 優化 3：文字校正與自動降噪 (解決多餘空白與錯亂問題)
+                optimizedText = optimizedText
+                    // 消除中文字之間因為 Tesseract 引擎缺陷產生的無意義空白 (連續執行兩次以防漏抓)
+                    .replace(/([\u4e00-\u9fa5])\s+([\u4e00-\u9fa5])/g, '$1$2')
+                    .replace(/([\u4e00-\u9fa5])\s+([\u4e00-\u9fa5])/g, '$1$2')
+                    // 修正常見標點符號前後多餘的空白
+                    .replace(/\s+([，。！？；：、,.\?!;:])/g, '$1')
+                    .replace(/([「【（《("])\s+/g, '$1')
+                    // 修復英文單字在行尾被換行截斷（連字號 Hyphen）的問題
+                    .replace(/([a-zA-Z])-\n([a-zA-Z])/g, '$1$2')
+                    // 清除掃描圖片邊緣常見的雜訊字符與單獨孤立符號
+                    .replace(/^[|~_—\-\s]+$/gm, '')
+                    // 清理過多不必要的連續換行，統一縮減為標準段落間距
+                    .replace(/\n{3,}/g, '\n\n')
+                    .trim();
+
                 await worker.terminate();
-                document.getElementById('ocrTextEditor').value = orderedText;
+                
+                document.getElementById('ocrTextEditor').value = optimizedText;
                 document.getElementById('editorSection').style.display = 'block';
                 loader.style.display = 'none';
             } catch (err) {
@@ -579,6 +605,7 @@
                 loader.style.display = 'none';
             }
         }
+        // ------------------------- 核心修改區域結束 -------------------------
 
         document.getElementById('dictInput').addEventListener('focus', (e) => {
             setTimeout(() => { e.target.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
