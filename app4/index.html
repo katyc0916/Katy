@@ -67,10 +67,11 @@
         .card h3 { font-size: 16px; margin: 5px 0; }
         .card p { font-size: 12px; margin: 0; }
 
+        /* 修改：讓 Textarea 預設溢出隱藏以便自動增高 */
         #ocrTextEditor, #scopeRawEditor {
-            width: 100%; height: 300px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
+            width: 100%; height: auto; min-height: 300px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 10px;
             font-family: 'Segoe UI', 'Microsoft JhengHei', monospace; font-size: 16px; line-height: 1.6;
-            margin-top: 10px; resize: vertical;
+            margin-top: 10px; resize: none; overflow-y: hidden;
         }
         .instruction-tip { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 13px; margin: 10px 0; border-left: 4px solid #fbc02d; width: 100%; }
 
@@ -204,6 +205,7 @@
         .category-chip input { transform: scale(1.2); }
 
         .dict-input-wrapper { position: relative; width: 100%; }
+        /* 修改：聽寫框設為自動增高 */
         #dictInput {
             width: 100%;
             padding: 18px;
@@ -214,7 +216,7 @@
             font-family: inherit;
             resize: none;
             min-height: 80px;
-            overflow-y: auto;
+            overflow-y: hidden;
         }
         .input-clear-btn {
             position: absolute;
@@ -234,12 +236,14 @@
             z-index: 5;
         }
 
-        /* Writing Page Adjustments */
+        /* Writing Page Adjustments - 修改為自動增高 */
         #writingContent {
-            height: 280px; 
-            max-height: 35vh; 
+            height: auto; 
+            min-height: 280px;
             margin-bottom: 5px;
             width: 100%;
+            resize: none;
+            overflow-y: hidden;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -268,10 +272,10 @@
 
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0; width: 100%;">
                 <h3 style="margin-top: 0; font-size: 15px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
-                <div style="display: flex; gap: 10px; width: 100%;">
-                    <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="exportAllData()">📤 Export Data</button>
+                <div style="display: flex; gap: 10px; width: 100%; justify-content: center;">
+                    <button class="btn-secondary" style="flex: 1; max-width: 160px; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="exportAllData()">📤 Export Data</button>
                     <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
-                    <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
+                    <button class="btn-secondary" style="flex: 1; max-width: 160px; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
                 </div>
                 <p style="font-size: 10px; color: #90a4ae; margin-top: 8px; text-align: center; margin-bottom: 0;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
             </div>
@@ -280,12 +284,12 @@
         <div id="dictionaryPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
             <h2>📖 Smart Lookup</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; width: 100%;">
-                <div style="position: relative; flex: 1;">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; width: 100%; align-items: center;">
+                <div style="position: relative; flex: 4;">
                     <input type="text" id="dictLookupInput" placeholder="Enter word or phrase..." style="width: 100%; padding: 12px; padding-right: 35px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px;" onkeypress="if(event.key === 'Enter') performLookup()">
                     <span onclick="document.getElementById('dictLookupInput').value=''; document.getElementById('dictLookupInput').focus();" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #b0bec5; font-size: 16px; font-weight: bold; padding: 5px;">✕</span>
                 </div>
-                <button class="btn-action" style="padding: 12px 24px; font-size: 16px;" onclick="performLookup()">Search</button>
+                <button class="btn-action" style="padding: 12px 15px; font-size: 16px; flex: 1;" onclick="performLookup()">Search</button>
             </div>
             <div id="lookupResult" style="display:none; background: #f8f9fa; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; width: 100%;">
                 </div>
@@ -441,7 +445,7 @@
 
                 <div class="dict-input-wrapper">
                     <textarea id="dictInput" placeholder="Type what you hear..." onkeydown="handleDictKeyDown(event)"></textarea>
-                    <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus();">🗑️</div>
+                    <div class="input-clear-btn" onclick="document.getElementById('dictInput').value = ''; document.getElementById('dictInput').focus(); resetAutoExpand(document.getElementById('dictInput'));">🗑️</div>
                 </div>
                 <br><br>
                 <button class="btn-action" onclick="checkDictation()" style="width:100%; padding: 15px; font-size: 18px;">Check Answer</button>
@@ -502,6 +506,21 @@
         
         let imageCropper = null;
 
+        // 新增：自動高度調整邏輯
+        function initAutoExpand() {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            });
+        }
+        function resetAutoExpand(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
         function stripMarkers(str) { return str.replace(/==/g, ''); }
         function formatDisplay(str) { return str.replace(/==(.+?)==/g, '<mark class="highlighter">$1</mark>'); }
         function hasChinese(text) { return /[\u4e00-\u9fa5]/.test(text); }
@@ -552,9 +571,11 @@
                     .replace(/^[|~_—\-\s]+$/gm, '')
                     .replace(/\n{3,}/g, '\n\n').trim();
                 await worker.terminate();
-                document.getElementById('ocrTextEditor').value = optimizedText;
+                const editor = document.getElementById('ocrTextEditor');
+                editor.value = optimizedText;
                 document.getElementById('editorSection').style.display = 'block';
                 loader.style.display = 'none';
+                resetAutoExpand(editor);
             } catch (err) { console.error(err); alert("OCR Error: " + err.message); loader.style.display = 'none'; }
         }
 
@@ -949,7 +970,7 @@
         function loadRawText() {
             const item = rawTextData.find(r => r.id == document.getElementById('rawTextSelect').value);
             const editor = document.getElementById('scopeRawEditor'); const actions = document.getElementById('rawActions');
-            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; } else { editor.style.display = 'none'; actions.style.display = 'none'; }
+            if (item) { editor.value = item.text; editor.style.display = 'block'; actions.style.display = 'flex'; resetAutoExpand(editor); } else { editor.style.display = 'none'; actions.style.display = 'none'; }
         }
 
         function startSession(id) { currentIndex = 0; if (id === 'dictation') { setupDictationConfig(); } else { activeSessionData = [...vocabData]; loadTask(id); } }
@@ -979,10 +1000,12 @@
             const item = activeSessionData[currentIndex];
             if (id === 'dictation') {
                 document.getElementById('dictProgress').innerText = `${currentIndex + 1} / ${activeSessionData.length}`;
-                document.getElementById('dictInput').value = ""; document.getElementById('dictResult').innerText = "";
+                const input = document.getElementById('dictInput');
+                input.value = ""; document.getElementById('dictResult').innerText = "";
                 const hintDisplay = document.getElementById('dictHintDisplay');
                 hintDisplay.innerText = /==(.+?)==/.test(item.word) ? item.word.replace(/==(.+?)==/g, '_____') : "";
-                document.getElementById('dictInput').focus();
+                input.focus();
+                resetAutoExpand(input);
             }
         }
 
@@ -1056,6 +1079,7 @@
             if (id) { const article = writingData.find(w => w.id === id); if (article) { titleInput.value = article.title; contentArea.value = article.content; } }
             else { titleInput.value = ""; contentArea.value = ""; currentWritingId = Date.now(); }
             updateWordCount();
+            resetAutoExpand(contentArea);
         }
 
         function closeWritingEditor() { saveWriting(); document.getElementById('writingListView').style.display = 'block'; document.getElementById('writingEditorView').style.display = 'none'; renderWritingList(); }
@@ -1128,7 +1152,11 @@
             reader.readAsText(file);
         }
 
-        window.onload = () => { renderTable(); renderRawDropdown(); renderFavoritesTable(); renderHistoryList(); renderWritingList(); };
+        window.onload = () => { 
+            renderTable(); renderRawDropdown(); renderFavoritesTable(); 
+            renderHistoryList(); renderWritingList(); 
+            initAutoExpand(); // 新增：啟動自動高度監聽
+        };
     </script>
 </body>
 </html>
