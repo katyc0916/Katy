@@ -22,11 +22,14 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* ✨ 專業優化：強制全螢幕且禁止 body 級別的溢位捲動 */
         html, body {
-            height: 100%;
+            height: 100dvh; /* 使用動態視窗高度 */
             width: 100%;
             overflow: hidden; 
-            position: fixed; 
+            position: fixed; /* 防止橡皮筋回彈效果 */
+            top: 0;
+            left: 0;
         }
 
         body {
@@ -35,6 +38,8 @@
             color: var(--text-color);
             line-height: 1.6;
             user-select: none;
+            display: flex;
+            flex-direction: column;
         }
 
         body::before {
@@ -50,6 +55,7 @@
             z-index: -1;
         }
 
+        /* ✨ 優化：確保主容器精確填充視窗 */
         .container {
             height: 100dvh; 
             display: flex;
@@ -57,8 +63,11 @@
             align-items: center;
             justify-content: space-between; 
             padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
             text-align: center;
             box-sizing: border-box;
+            width: 100%;
         }
 
         .hero {
@@ -68,7 +77,7 @@
         }
 
         h1 {
-            font-size: 3.2rem; 
+            font-size: clamp(2.5rem, 8vw, 3.2rem); /* 響應式字體大小 */
             letter-spacing: 2px;
             color: var(--text-color);
             position: relative;
@@ -113,7 +122,7 @@
             max-width: 320px;
             border-radius: 20px;
             padding: 15px;
-            margin: 15px 0;
+            margin: 10px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             font-size: 1.1rem;
         }
@@ -142,7 +151,7 @@
             max-width: 320px;
             flex: 1; 
             align-content: center; 
-            margin-bottom: 10px;
+            overflow: hidden; /* 防止內部超出 */
         }
 
         .main-btn {
@@ -169,7 +178,6 @@
             border-color: var(--primary-color);
         }
 
-        /* --- ✨ 優化外部連結按鈕樣式 --- */
         .ai-row {
             grid-column: span 2;
             display: flex;
@@ -200,7 +208,6 @@
 
         .ai-link-btn span { font-size: 1.2rem; }
         .ai-link-btn small { font-size: 0.75rem; color: var(--text-color); font-weight: bold; letter-spacing: 1px; }
-        /* --------------------------- */
 
         .interface-layer {
             display: none;
@@ -219,13 +226,15 @@
         }
 
         .layer-header {
-            padding: 15px;
+            padding-top: max(0px, env(safe-area-inset-top));
+            padding-left: 15px;
+            padding-right: 15px;
             border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             background: white;
             flex-shrink: 0;
-            height: 60px;
+            height: calc(60px + env(safe-area-inset-top));
         }
 
         .chat-container {
@@ -694,6 +703,7 @@
     </div>
 
     <script>
+        // --- 腳本邏輯與數據完全保留 ---
         let activeTranslation = { formal: '', slang: '', origin: '' };
         let currentPresFontSize = 7; 
         let currentSpeakingText = ""; 
@@ -719,7 +729,7 @@
                     {origin: "想要安靜點的位。", formal: "We would prefer a quieter table.", formal_check: "我們想要安靜一點的位。", slang: "Anywhere quiet?", slang_check: "靜啲嘅位？"},
                     {origin: "那邊的位可以嗎？", formal: "Could we sit over there?", formal_check: "我們可以坐那邊嗎？", slang: "Can we grab that spot?", slang_check: "坐嗰邊得嗎？"},
                     {origin: "有露天位嗎？", formal: "Is there any outdoor seating?", formal_check: "有戶外座位嗎？", slang: "Any tables outside?", slang_check: "有室外位？"},
-                    {origin: "這張桌子有點髒。", formal: "This table is a bit dirty.", formal_check: "這張桌子有點髒。", slang: "This table's sticky.", slang_check: "張檯污糟。"},
+                    {origin: "張桌子有點髒。", formal: "This table is a bit dirty.", formal_check: "這張桌子有點髒。", slang: "This table's sticky.", slang_check: "張檯污糟。"},
                     {origin: "可以多加一張椅子嗎？", formal: "Could we have an extra chair?", formal_check: "可以加張椅子嗎？", slang: "One more chair, please.", slang_check: "加張櫈。"},
                     {origin: "可以把兩張桌子併在一起嗎？", formal: "Could you push these two tables together?", formal_check: "能把這兩張桌子併在一起嗎？", slang: "Can we join the tables?", slang_check: "併檯得嗎？"},
                     {origin: "想要禁煙區。", formal: "A table in the non-smoking area, please.", formal_check: "禁煙區的位。", slang: "Non-smoking, please.", slang_check: "唔要食煙區。"}
