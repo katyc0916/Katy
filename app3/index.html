@@ -346,9 +346,20 @@
         #presentation-subtext { font-size: 3vh; color: #888; margin-top: 10px; }
         .pres-controls { margin-top: 30px; display: flex; gap: 15px; align-items: center; }
         .pres-btn { background: var(--primary-color); color: white; border: none; border-radius: 50%; width: 55px; height: 55px; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .pres-btn style="background: #555;" onclick="adjustPresFontSize(-1)">-</button>
-        <button class="pres-btn" style="background: #555;" onclick="adjustPresFontSize(1)">+</button>
-        <button class="pres-btn" style="background: #2b2b2b;" onclick="closeForcedLandscape()">✕</button>
+        .pres-close-hint { position: absolute; bottom: 20px; font-size: 0.7rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        .golden-tag { background: var(--accent-gold); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <div id="presentation-overlay">
+        <div id="presentation-text"></div>
+        <div id="presentation-subtext"></div>
+        <div class="pres-controls">
+            <button class="pres-btn" id="pres-speak-btn">🔊</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustPresFontSize(-1)">-</button>
+            <button class="pres-btn" style="background: #555;" onclick="adjustPresFontSize(1)">+</button>
+            <button class="pres-btn" style="background: #2b2b2b;" onclick="closeForcedLandscape()">✕</button>
         </div>
         <p class="pres-close-hint" id="close-hint-text">旋轉手機回到直向或點擊 X 關閉</p>
     </div>
@@ -608,7 +619,7 @@
                     {origin: "步行要多久？", formal: "How long does it take to walk there?", formal_check: "走路要多久？", slang: "How long on foot?", slang_check: "行過去幾耐？"},
                     {origin: "很遠嗎？", formal: "Is it very far?", formal_check: "很遠嗎？", slang: "Far from here?", slang_check: "遠唔遠？"},
                     {origin: "我可以走路去嗎？", formal: "Can I go there on foot?", formal_check: "能走路去嗎？", slang: "Walkable?", slang_check: "行唔行到去？"},
-                    {origin: "直走嗎？", formal: "Do I go straight?", formal_check: "直走嗎？", slang: "Straight ahead?", slang_check: "直行？"},
+                    {origin: "直走嗎？", formal: "Do I go straight?", formal_check: "Do I go straight?", slang: "Straight ahead?", slang_check: "直行？"},
                     {origin: "左轉還是右轉？", formal: "Should I turn left or right?", formal_check: "左轉還是右轉？", slang: "Left or right?", slang_check: "轉左定轉右？"},
                     {origin: "在下一個路口嗎？", formal: "Is it at the next intersection?", formal_check: "在下個路口嗎？", slang: "Next block?", slang_check: "下個路口？"},
                     {origin: "地標是什麼？", formal: "What is the landmark nearby?", formal_check: "附近地標是什麼？", slang: "Any landmarks?", slang_check: "有咩大建築物？"},
@@ -637,7 +648,7 @@
                     {origin: "可以提早入住嗎？", formal: "Is it possible to check in early?", formal_check: "能提早入住嗎？", slang: "Early check-in?", slang_check: "可唔可以早啲入房？"},
                     {origin: "包不包含早餐？", formal: "Is breakfast included?", formal_check: "包早餐嗎？", slang: "Breakfast included?", slang_check: "有無早餐？"},
                     {origin: "早餐幾點開始？", formal: "What time is breakfast served?", formal_check: "早餐幾點開始？", slang: "Breakfast time?", slang_check: "幾點有早餐？"},
-                    {origin: "WiFi密碼是什麼？", formal: "What is the Wi-Fi password?", formal_check: "WiFi密碼是什麼？", slang: "Wi-Fi password?", slang_check: "WiFi密碼？"},
+                    {origin: "WiFi密碼是什麼？", formal: "What is the Wi-Fi password?", formal_check: "WiFi密碼是什麼？", slang: "WiFi密碼？", slang_check: "WiFi密碼？"},
                     {origin: "退房時間是幾點？", formal: "What time is check-out?", formal_check: "退房是幾點？", slang: "Check-out time?", slang_check: "幾點退房？"},
                     {origin: "可以延遲退房嗎？", formal: "Is a late check-out available?", formal_check: "能延遲退房嗎？", slang: "Late check-out?", slang_check: "可唔可以晏啲退房？"},
                     {origin: "我的房間號碼是多少？", formal: "What is my room number?", formal_check: "我的房號多少？", slang: "My room number?", slang_check: "幾號房？"}
@@ -674,7 +685,7 @@
                     {origin: "房內有吹風機嗎？", formal: "Is there a hair dryer in the room?", formal_check: "房裡有吹風機嗎？", slang: "Hair dryer?", slang_check: "有無風筒？"},
                     {origin: "可以幫我叫的士嗎？", formal: "Could you call a taxi for me, please?", formal_check: "能幫我叫計程車嗎？", slang: "Call a cab for me.", slang_check: "幫我叫架的士。"},
                     {origin: "WiFi很慢。", formal: "The Wi-Fi is very slow.", formal_check: "WiFi很慢。", slang: "Wi-Fi's lagging.", slang_check: "WiFi好慢。"},
-                    {origin: "附近有什麼好吃的？", formal: "Are there any good restaurants nearby?", formal_check: "Are there any good restaurants nearby?", slang: "What's good to eat around here?", slang_check: "附近有咩好食？"},
+                    {origin: "附近有什麼好吃的？", formal: "Are there any good restaurants nearby?", formal_check: "附近有推薦餐廳嗎？", slang: "What's good to eat around here?", slang_check: "附近有咩好食？"},
                     {origin: "這附近安全嗎？", formal: "Is this neighborhood safe?", formal_check: "這附近安全嗎？", slang: "Safe area?", slang_check: "呢區安全嗎？"},
                     {origin: "我想換房間。", formal: "I would like to change my room.", formal_check: "我想換房。", slang: "Can I swap rooms?", slang_check: "想換房。"}
                 ],
@@ -735,33 +746,31 @@
             else { window.location.href = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;end`; }
         }
 
-        // --- 修改部分：專業優化 Gemini 和 Perplexity 跳轉邏輯 ---
+        // --- 修正後的 Gemini 跳轉邏輯 ---
         function launchGemini() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isiOS) {
-                // iOS: 優先嘗試 Google App 內的 Gemini 路徑，失敗則導向網頁
-                window.location.href = "googleapp://"; 
-                setTimeout(() => { window.open("https://gemini.google.com/", '_blank'); }, 1500);
-            } else {
-                // Android: 使用標準 Intent 呼叫 App
-                window.location.href = "intent://#Intent;scheme=google-gemini;package=com.google.android.apps.bard;end";
-                setTimeout(() => { window.open("https://gemini.google.com/", '_blank'); }, 1500);
+            if (isiOS) { 
+                window.location.href = "google-gemini://"; 
+                setTimeout(() => { window.open("https://gemini.google.com/", '_blank'); }, 2000); 
+            } else { 
+                // Android 優化跳轉
+                window.location.href = "intent://#Intent;scheme=google-gemini;package=com.google.android.apps.bard;end"; 
+                setTimeout(() => { window.open("https://gemini.google.com/", '_blank'); }, 2000);
             }
         }
 
+        // --- 修正後的 Perplexity 跳轉邏輯 ---
         function launchPerplexity() {
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isiOS) {
-                // iOS: 使用 Perplexity 官方 URL Scheme
+            if (isiOS) { 
                 window.location.href = "perplexity://"; 
-                setTimeout(() => { window.open("https://www.perplexity.ai/", '_blank'); }, 1500);
-            } else {
-                // Android: 使用標準 Intent 呼叫 App
-                window.location.href = "intent://#Intent;scheme=perplexity;package=ai.perplexity.perplexity;end";
-                setTimeout(() => { window.open("https://www.perplexity.ai/", '_blank'); }, 1500);
+                setTimeout(() => { window.open("https://www.perplexity.ai/", '_blank'); }, 2000); 
+            } else { 
+                // Android 優化跳轉
+                window.location.href = "intent://#Intent;scheme=perplexity;package=ai.perplexity.perplexity;end"; 
+                setTimeout(() => { window.open("https://www.perplexity.ai/", '_blank'); }, 2000);
             }
         }
-        // --- 修改結束 ---
 
         function copyToClipboard(text, btnElement) { navigator.clipboard.writeText(text).then(() => { const originalContent = btnElement.innerHTML; btnElement.innerHTML = '✅'; setTimeout(() => { btnElement.innerHTML = originalContent; }, 1000); }); }
 
