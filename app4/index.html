@@ -1193,43 +1193,30 @@
             reader.readAsText(file);
         }
         
-        // 新增的 AI 應用程式導向函數 (結合了網頁備案機制)
+        // 修改後的 AI 應用程式導向函數：直接跳轉至 App
         function openAILink(app) {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
-            let appUrl, webUrl;
+            let appUrl;
 
             if (app === 'gemini') {
-                webUrl = 'https://gemini.google.com/';
                 if (isAndroid) {
                     appUrl = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;end;';
                 } else if (isIOS) {
                     appUrl = 'googleapp://'; 
                 } else {
-                    appUrl = webUrl;
+                    appUrl = 'https://gemini.google.com/';
                 }
             } else if (app === 'perplexity') {
-                webUrl = 'https://www.perplexity.ai/';
                 if (isAndroid) {
                     appUrl = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
                 } else if (isIOS) {
                     appUrl = 'perplexity://';
                 } else {
-                    appUrl = webUrl;
+                    appUrl = 'https://www.perplexity.ai/';
                 }
             }
-
-            if (!isIOS && !isAndroid) {
-                window.open(webUrl, '_blank');
-                return;
-            }
-
-            const start = Date.now();
-            setTimeout(() => {
-                if (Date.now() - start < 1500) {
-                    window.open(webUrl, '_blank');
-                }
-            }, 800);
+            
             window.location.href = appUrl;
         }
 
