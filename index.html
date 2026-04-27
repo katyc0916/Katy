@@ -165,7 +165,6 @@
         .time-input { width: 60px; background: transparent; border: none; font-weight: bold; font-size: 0.95rem; color: #333; outline: none; }
         .loc-input { flex: 1; background: linear-gradient(to right, rgba(162, 210, 255, 0.7) 0%, rgba(162, 210, 255, 0.1) 100%); border: none; font-weight: bold; font-size: 1rem; outline: none; color: #1a1b26; font-family: inherit; line-height: 1.4; resize: none; overflow: hidden; min-height: 1.4em; padding: 2px 8px; border-radius: 4px; display: inline-block; box-sizing: border-box; }
         
-        /* 修改交通/口袋清單樣式 */
         .transport-box { display: flex; align-items: center; gap: 8px; width: 100%; box-sizing: border-box; padding-left: 43px; }
         .transport-input { flex: 1; background: #f0f7ff; border: none; border-radius: 6px; padding: 2px 8px; font-size: 0.9rem; line-height: 1.4; color: var(--transport-blue); font-weight: bold; outline: none; font-family: inherit; resize: none; overflow: hidden; min-height: 1.4em; display: inline-block; box-sizing: border-box; border-radius: 4px; }
         
@@ -297,6 +296,8 @@
         </div>
     </div>
 
+    <input type="file" id="file-import-input" style="display:none;" accept=".json">
+
     <div class="book-single">
         <div class="single-page p1" style="z-index: 30;"><div class="page-content hero-cover"><div class="hero-text-block"><div class="cta-container"><div class="cta-button" onclick="goNext()">GoGoGo</div></div></div></div></div>
         
@@ -306,7 +307,7 @@
         
         <div class="single-page p4" style="z-index: 27;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-flight" class="day-label-input js-save" value="16/7 (Thu) - 23/7 (Thu)"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🚀</span> Sky-High Fun <span class="emoji">🚀</span></h3><div class="info-box"><h4><input type="text" id="flight-airline-input" class="js-save input-dash" value="香港快運 HK Express" style="font-size:1rem; font-weight:bold; width:100%;"></h4><div class="flight-link-wrapper"><span class="official-tag">官方網站</span><a href="https://www.hkexpress.com/zh-HK" class="flight-link" target="_blank">🌐</a></div><div class="flight-ticket"><div class="flight-date-label">去程：<input type="text" id="flight-out-date" class="js-save input-dash input-dash-w" value="2026年7月16日" style="width:90px;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t1" class="flight-time js-save input-dash" value="07:05" style="width:45px;"><input type="text" id="flight-out-loc1" class="flight-city js-save input-dash" value="HKG 香港國際機場" style="flex:1;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-out-dur" class="js-save input-dash" value="3h 45m | Flight UO850 (T2)" style="width:200px;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-out-t2" class="flight-time js-save input-dash" value="11:50" style="width:45px;"><input type="text" id="flight-out-loc2" class="flight-city js-save input-dash" value="KIX 關西國際機場" style="flex:1;"></div></div><div class="flight-ticket" style="margin-top: 15px;"><div class="flight-date-label">回程：<input type="text" id="flight-in-date" class="js-save input-dash input-dash-w" value="2026年7月23日" style="width:90px;"></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t1" class="flight-time js-save input-dash" value="20:40" style="width:45px;"><input type="text" id="flight-in-loc1" class="flight-city js-save input-dash" value="KIX 關西國際機場" style="flex:1;"></div><div class="flight-line-container"><div class="flight-duration-info">✈️ <input type="text" id="flight-in-dur" class="js-save input-dash" value="4h 10m | Flight UO689 (T2)" style="width:200px;"></div></div><div class="flight-row"><span>✈️</span><input type="text" id="flight-in-t2" class="flight-time js-save input-dash" value="23:50" style="width:45px;"><input type="text" id="flight-in-loc2" class="flight-city js-save input-dash" value="HKG 香港國際機場" style="flex:1;"></div></div></div><div class="info-box"><h4>🧳 行理詳細配額與尺寸</h4><div class="luggage-display"><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><rect x="30" y="25" width="40" height="50" rx="5" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><path d="M40 25 V15 H60 V25" fill="none" stroke="var(--bag-cyan)" stroke-width="4"/><path d="M42 38 V65 M58 38 V65" fill="none" stroke="var(--flight-purple)" stroke-width="3" stroke-linecap="round"/><circle cx="35" cy="78" r="3" fill="var(--flight-purple)"/><circle cx="65" cy="78" r="3" fill="var(--flight-purple)"/></svg><div class="luggage-label">寄艙行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">158cm / 62吋</div></div><div class="luggage-item"><svg class="luggage-svg" viewBox="0 0 100 100"><path d="M30 70 V45 A20 20 0 0 1 70 45 V70" fill="none" stroke="var(--flight-purple)" stroke-width="4.5"/><rect x="30" y="70" width="40" height="4" fill="var(--flight-purple)"/><rect x="45" y="55" width="10" height="10" rx="2" fill="none" stroke="var(--bag-cyan)" stroke-width="3.5"/><path d="M25 70 H30 M70 70 H75" stroke="var(--flight-purple)" stroke-width="4.5"/></svg><div class="luggage-label">手提行李</div><div style="font-size:0.65rem; color:#666; margin-top:3px;">40x25x20cm</div></div></div><p style="font-size:0.85rem;"><strong>去程：</strong>隨身 7kg x6 + 寄艙 20kg x4</p><p style="font-size:0.85rem;"><strong>回程：</strong>隨身 7kg x6 + 寄艙 32kg x4</p></div><div class="info-box" style="border-bottom: 3px solid #f9ca24;"><a href="https://vjw-lp.digital.go.jp/zh-hant/" class="vjw-item" target="_blank">🔗 Visit Japan Web 官方申報入口</a><p style="font-size: 0.65rem; margin-top: 5px; color: #666; text-align:center;">(過關必備，請務必先完成申報並截圖 QR Code)</p></div></div></div>
         
-        <div class="single-page p5" style="z-index: 26;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-label" class="day-label-input js-save" value="16/7 (Thu) - 23/7 (Thu)"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem; display:flex; flex-direction:column; gap:4px;"><input type="text" id="stay-name" class="js-save input-dash" value="MA Masters Residence" style="font-weight:bold; width:100%;"><input type="text" id="stay-subname" class="js-save input-dash" value="道頓堀 · 島之內 · 心齋橋" style="font-weight:bold; width:100%;"></h4><p style="font-size: 0.85rem; color: #555; line-height: 1.4; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">📍 <textarea id="stay-addr" class="js-save input-dash" rows="2" style="flex:1; min-width:180px; resize:none; margin:0; overflow:hidden; word-break:break-word; line-height:1.4;">2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka</textarea><span onclick="openStaticMap($('stay-addr').value)" class="map-icon">🌐</span></p><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;"><div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;"><p style="margin:5px 0; display:flex; align-items:center;">🔑 Check-in: <input type="text" id="stay-checkin" class="js-save input-dash" value="16:00" style="width:50px; font-weight:bold; text-align:center;"></p><p style="margin:5px 0; display:flex; align-items:center;">🚪 Check-out: <input type="text" id="stay-checkout" class="js-save input-dash" value="11:00" style="width:50px; font-weight:bold; text-align:center;"></p></div></div><div class="japan-stay-card"><span class="japan-stay-label">🇯🇵 日本語名稱 (宿の名前)</span><strong class="japan-stay-name-jp">MA マスターズレジデンス</strong><strong class="japan-stay-name-jp">道頓堀 島之内 心斎橋</strong><span class="japan-stay-label">📍 日本語住所 (タクシー用)</span><strong class="japan-stay-addr-jp">〒542-0082 大阪府大阪市中央区島之内2丁目9-14</strong></div><div class="info-box" style="border-bottom-color: var(--theme-blue); padding-bottom: 20px;"><a href="https://www.trip.com/w/AOyeUfgZ9U2" class="trip-btn" target="_blank">🟦 Trip.com 訂單詳情</a></div><div class="info-box" style="border-bottom-color: #27ae60;"><div class="survival-section" style="margin-bottom: 0;"><p style="font-size: 0.95rem; font-weight: bold; color: #27ae60; margin: 0 0 10px 0;">🧳 行李寄存與預約</p><div class="survival-section"><p class="survival-title">🚇 日本橋站置物櫃 <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span></p></div><a href="https://cloak.ecbo.io/zh-TW/jpn/city/osaka" class="all-lockers-btn" target="_blank">🔍 ecbo cloak 大阪行李預約</a></div></div><div class="info-box" style="border-bottom-color: #e67e22;"><h4 style="margin-top:0; margin-bottom:12px; color:#e67e22; font-size: 0.95rem;">📍 附近商店與車站</h4><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🏪 便利商店</p><ul class="survival-list"><li>FamilyMart (島之內二丁目店) · 🚶 1 min <span onclick="openStaticMap('FamilyMart 島之内二丁目店')" class="map-icon">🌐</span></li><li>7-Eleven (大阪瓦屋町 3 丁目店) · 🚶 2 min <span onclick="openStaticMap('セブン-イレブン 大阪瓦屋町３丁目店')" class="map-icon">🌐</span></li><li>Lawson (島之內店) · 🚶 4 min <span onclick="openStaticMap('Lawson 島之内店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🛒 超市與購物</p><ul class="survival-list"><li>玉出超市 (周防町店) · 🚶 4 min <span onclick="openStaticMap('スーパー玉出 周防町店')" class="map-icon">🌐</span></li><li>Foodium (心齋橋店) · 🚶 6 min <span onclick="openStaticMap('foodium 心斎橋')" class="map-icon">🌐</span></li><li>唐吉訶德 (道頓堀店) · 🚶 7 min <span onclick="openStaticMap('ドン・キホーテ 道頓堀店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section" style="margin-bottom: 0;"><p class="survival-title" style="border-left-color: #e67e22;">🚇 鄰近地鐵站</p><ul class="survival-list"><li><strong>日本橋站</strong> · 🚶 6 min <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#e44d92;"></span>(千日前線) - <strong>6號出口有電梯</strong></div></li><li><strong>長堀橋站</strong> · 🚶 7 min <span onclick="openStaticMap('長堀橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li><li><strong>心齋橋站</strong> · 🚶 13 min <span onclick="openStaticMap('心斎橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#e5171f;"></span>(御堂筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li></ul></div></div></div></div>
+        <div class="single-page p5" style="z-index: 26;"><div class="page-content"><div class="day-header"><input type="text" id="stay-period-label" class="day-label-input js-save" value="16/7 (Thu) - 23/7 (Thu)"></div><div class="japan-time-box">🇯🇵 日本時間：<span class="local-clock">--:--:--</span></div><h3 class="page-title"><span class="emoji">🏠</span> Warm Stays <span class="emoji">🏠</span></h3><div class="info-box" style="border-bottom-color: var(--osaka-red);"><h4 style="color: var(--osaka-red); margin-top:0; font-size: 1.05rem; display:flex; flex-direction:column; gap:4px;"><input type="text" id="stay-name" class="js-save input-dash" value="MA Masters Residence" style="font-weight:bold; width:100%;"><input type="text" id="stay-subname" class="js-save input-dash" value="道頓堀 · 島之內 · 心齋橋" style="font-weight:bold; width:100%;"></h4><p style="font-size: 0.85rem; color: #555; line-height: 1.4; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">📍 <textarea id="stay-addr" class="js-save input-dash" rows="2" style="flex:1; min-width:180px; resize:none; margin:0; overflow:hidden; word-break:break-word; line-height:1.4;">2-chōme-9-14 Shimanouchi, Chuo Ward, Osaka</textarea><span onclick="openStaticMap($('stay-addr').value)" class="map-icon">🌐</span></p><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;"><div style="display: flex; justify-content: space-between; font-size:0.85rem; font-weight:bold;"><p style="margin:5px 0; display:flex; align-items:center;">🔑 Check-in: <input type="text" id="stay-checkin" class="js-save input-dash" value="16:00" style="width:50px; font-weight:bold; text-align:center;"></p><p style="margin:5px 0; display:flex; align-items:center;">🚪 Check-out: <input type="text" id="stay-checkout" class="js-save input-dash" value="11:00" style="width:50px; font-weight:bold; text-align:center;"></p></div></div><div class="japan-stay-card"><span class="japan-stay-label">🇯🇵 日本語名稱 (宿の名前)</span><strong class="japan-stay-name-jp">MA マスターズレジデンス</strong><strong class="japan-stay-name-jp">道頓堀 島之内 心斎橋</strong><span class="japan-stay-label">📍 日本語住所 (タクシー用)</span><strong class="japan-stay-addr-jp">〒542-0082 大阪府大阪市中央区島之内2丁目9-14</strong></div><div class="info-box" style="border-bottom-color: var(--theme-blue); padding-bottom: 20px;"><a href="https://www.trip.com/w/AOyeUfgZ9U2" class="trip-btn" target="_blank">🟦 Trip.com 訂單詳情</a></div><div class="info-box" style="border-bottom-color: #27ae60;"><div class="survival-section" style="margin-bottom: 0;"><p style="font-size: 0.95rem; font-weight: bold; color: #27ae60; margin: 0 0 10px 0;">🧳 行李寄存與預約</p><div class="survival-section"><p class="survival-title">🚇 日本橋站置物櫃 <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span></p></div><a href="https://cloak.ecbo.io/zh-TW/jpn/city/osaka" class="all-lockers-btn" target="_blank">🔍 ecbo cloak 大阪行李預約</a></div></div><div class="info-box" style="border-bottom-color: #e67e22;"><h4 style="margin-top:0; margin-bottom:12px; color:#e67e22; font-size: 0.95rem;">📍 附近商店與車站</h4><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🏪 便利商店</p><ul class="survival-list"><li>FamilyMart (島之內二丁目店) · 🚶 1 min <span onclick="openStaticMap('FamilyMart 島之内二丁目店')" class="map-icon">🌐</span></li><li>7-Eleven (大阪瓦屋町 3 丁目店) · 🚶 2 min <span onclick="openStaticMap('セブン-イレブン 大阪瓦屋町３丁目店')" class="map-icon">🌐</span></li><li>Lawson (島之內店) · 🚶 4 min <span onclick="openStaticMap('Lawson 島之内店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section"><p class="survival-title" style="border-left-color: #e67e22;">🛒 超市與購物</p><ul class="survival-list"><li>玉出超市 (周防町店) · 🚶 4 min <span onclick="openStaticMap('スーパー玉出 周防町店')" class="map-icon">🌐</span></li><li>Foodium (心齋橋店) · 🚶 6 min <span onclick="openStaticMap('foodium 心斎橋')" class="map-icon">🌐</span></li><li>唐吉訶德 (道頓堀店) · 🚶 7 min <span onclick="openStaticMap('ドン・キホーテ 道頓堀店')" class="map-icon">🌐</span></li></ul></div><div class="survival-section" style="margin-bottom: 0;"><p class="survival-title" style="border-left-color: #e67e22;">🚇 鄰近地鐵站</p><ul class="survival-list"><li><strong>日本橋站</strong> · 🚶 6 min <span onclick="openStaticMap('大阪府大阪市中央区 日本橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#e44d92;"></span>(千日前線) - <strong>6號出口有電梯</strong></div></li><li><strong>長堀橋站</strong> · 🚶 7 min <span onclick="openStaticMap('長堀橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#bb641e;"></span>(堺筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li><li><strong>心齋橋站</strong> · 🚶 13 min <span onclick="openStaticMap('心斎橋駅')" class="map-icon">🌐</span><div class="subway-desc"><span class="line-dot" style="background:#e5171f;"></span>(御堂筋線) / <span class="line-dot" style="background:#a9cc51;"></span>(長堀鶴見綠地線)</div></li></ul></div></div></div></div></div>
 
         <div class="single-page p14" style="z-index: 16;">
             <div class="page-content">
@@ -607,19 +608,37 @@
 
     const jumpToPage = idx => { $$('.single-page').forEach((p, i) => p.classList.toggle('flipped', i < idx)); $('page-nav-menu').style.display = 'none'; };
     
+    // --- 修復後的翻頁循環系統 ---
     const goNext = () => { 
-        const pages = $$('.single-page');
-        const unflipped = $$('.single-page:not(.flipped)'); 
-        if (unflipped.length > 1) { unflipped[0].classList.add('flipped'); } 
-        else { pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); } 
+        const pages = Array.from($$('.single-page'));
+        const unflipped = pages.filter(p => !p.classList.contains('flipped')); 
+        
+        if (unflipped.length > 1) { 
+            // 正常向後翻一頁
+            unflipped[0].classList.add('flipped'); 
+        } 
+        else { 
+            // 如果已在最後一頁，循環回封面（依序恢復，產生合上書本的視覺感）
+            pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); 
+        } 
     };
 
     const goPrev = () => { 
-        const pages = $$('.single-page');
-        const flipped = $$('.single-page.flipped'); 
-        if (flipped.length > 0) { flipped[flipped.length - 1].classList.remove('flipped'); } 
-        else { for (let i = 0; i < pages.length - 1; i++) { pages[i].classList.add('flipped'); } } 
+        const pages = Array.from($$('.single-page'));
+        const flipped = pages.filter(p => p.classList.contains('flipped')); 
+        
+        if (flipped.length > 0) { 
+            // 正常向前翻回一頁
+            flipped[flipped.length - 1].classList.remove('flipped'); 
+        } 
+        else { 
+            // 如果已在封面，撥左則直接循環至最後一頁 (翻開除了最後一頁以外的所有頁面)
+            for (let i = 0; i < pages.length - 1; i++) { 
+                pages[i].classList.add('flipped'); 
+            } 
+        } 
     };
+    // -------------------------
     
     function toggleMusic(aId, bId, defI, playI) {
         const audio = $(aId), btn = $(bId), span = btn.querySelector('span'), isPlaying = !audio.paused;
@@ -672,23 +691,81 @@
 
     function exportData() {
         saveAllRundowns(); saveInputs(); savePockets();
-        const all = { rundowns: {}, pockets: {}, stay: localStorage.getItem('osaka_stay_info'), ledger: localStorage.getItem('osaka_ledger_days'), packing: localStorage.getItem('osaka_packing_status'), settlement: localStorage.getItem('osaka_settlement') };
+        const all = { 
+            rundowns: {}, 
+            pockets: {}, 
+            stay: localStorage.getItem('osaka_stay_info'), 
+            ledger: localStorage.getItem('osaka_ledger_days'), 
+            packing: localStorage.getItem('osaka_packing_status'), 
+            settlement: localStorage.getItem('osaka_settlement') 
+        };
         for(let i=1; i<=8; i++) all.rundowns[i] = localStorage.getItem(`osaka_rundown_day${i}`);
         ['shop', 'eat', 'mall'].forEach(t => all.pockets[t] = localStorage.getItem(`osaka_pocket_${t}`));
-        const pass = prompt("密碼："); if(!pass) return;
-        navigator.clipboard.writeText(CryptoJS.AES.encrypt(JSON.stringify(all), pass).toString()); showToast("✅ 代碼已複製");
+        
+        const pass = prompt("🔐 請設定檔案加密密碼 (匯入時需輸入)：");
+        if(!pass) return;
+
+        try {
+            const encrypted = CryptoJS.AES.encrypt(JSON.stringify(all), pass).toString();
+            const blob = new Blob([encrypted], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
+            a.href = url;
+            a.download = `Osaka_Itinerary_${dateStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("✅ 備份檔案已匯出並下載");
+        } catch(e) {
+            alert("匯出發生錯誤: " + e.message);
+        }
     }
 
     function importData() {
-        const code = prompt("代碼："), pass = prompt("密碼："); if(!code || !pass) return;
-        try {
-            const dec = JSON.parse(CryptoJS.AES.decrypt(code, pass).toString(CryptoJS.Utf8));
-            Object.keys(dec.rundowns).forEach(k => localStorage.setItem(`osaka_rundown_day${k}`, dec.rundowns[k]));
-            if(dec.pockets) Object.keys(dec.pockets).forEach(k => localStorage.setItem(`osaka_pocket_${k}`, dec.pockets[k]));
-            localStorage.setItem('osaka_stay_info', dec.stay); localStorage.setItem('osaka_ledger_days', dec.ledger);
-            localStorage.setItem('osaka_packing_status', dec.packing); localStorage.setItem('osaka_settlement', dec.settlement);
-            location.reload();
-        } catch(e) { alert("解密失敗"); }
+        $('file-import-input').click();
+    }
+
+    function initFileImportListener() {
+        $('file-import-input').onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const pass = prompt("🔑 請輸入該檔案的原始加密密碼：");
+                if (!pass) return;
+
+                try {
+                    const decryptedBytes = CryptoJS.AES.decrypt(event.target.result.trim(), pass);
+                    const decryptedStr = decryptedBytes.toString(CryptoJS.enc.Utf8);
+                    if (!decryptedStr) throw new Error("密碼錯誤或檔案損壞");
+                    
+                    const dec = JSON.parse(decryptedStr);
+                    
+                    Object.keys(dec.rundowns).forEach(k => {
+                        if(dec.rundowns[k]) localStorage.setItem(`osaka_rundown_day${k}`, dec.rundowns[k]);
+                    });
+                    if(dec.pockets) {
+                        Object.keys(dec.pockets).forEach(k => {
+                            if(dec.pockets[k]) localStorage.setItem(`osaka_pocket_${k}`, dec.pockets[k]);
+                        });
+                    }
+                    if(dec.stay) localStorage.setItem('osaka_stay_info', dec.stay);
+                    if(dec.ledger) localStorage.setItem('osaka_ledger_days', dec.ledger);
+                    if(dec.packing) localStorage.setItem('osaka_packing_status', dec.packing);
+                    if(dec.settlement) localStorage.setItem('osaka_settlement', dec.settlement);
+                    
+                    showToast("🔄 資料同步成功，正在重啟...");
+                    setTimeout(() => location.reload(), 1500);
+                } catch(err) {
+                    alert("❌ 同步失敗：密碼錯誤或檔案格式不正確");
+                    e.target.value = ''; 
+                }
+            };
+            reader.readAsText(file);
+        };
     }
 
     window.addEventListener('load', () => {
@@ -705,8 +782,16 @@
         customRate = parseFloat(localStorage.getItem('osaka_custom_rate')) || 0.054;
         $('custom-rate-input').value = customRate;
         $('custom-rate-input').onchange = e => { customRate = parseFloat(e.target.value)||0.054; storage.save('osaka_custom_rate', customRate); updateRateDisplay(); };
+        
         $('jpy-input').oninput = convertCurrency;
-        $('hkd-input').oninput = e => { const v = parseFloat(e.target.value); $('jpy-input').value = isNaN(v)?"":Math.round(v/currentRate); convertCurrency(); };
+        $('hkd-input').oninput = e => { 
+            const v = parseFloat(e.target.value); 
+            const jpyVal = isNaN(v) ? "" : Math.round(v / currentRate);
+            $('jpy-input').value = jpyVal;
+            if(jpyVal) $('calc-history').innerText = jpyVal;
+        };
+
+        initFileImportListener();
         fetchLiveExchangeRate(); renderLedger(); renderSettlement();
         setInterval(() => {
             const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
