@@ -506,19 +506,28 @@
         
         let imageCropper = null;
 
-        // 新增：自動高度調整邏輯
+        // 新增與完善：專業的自動高度調整邏輯，完美結合 box-sizing 解決滾動條與跳動問題
         function initAutoExpand() {
             const textareas = document.querySelectorAll('textarea');
             textareas.forEach(textarea => {
-                textarea.addEventListener('input', function() {
+                const adjustHeight = function() {
                     this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
+                    // 精準計算邊框厚度，避免因 box-sizing: border-box 導致的高度跳躍
+                    const borderHeight = this.offsetHeight - this.clientHeight;
+                    this.style.height = (this.scrollHeight + borderHeight) + 'px';
+                };
+                
+                textarea.addEventListener('input', adjustHeight);
+                
+                // 於載入時自動初始化高度
+                setTimeout(() => adjustHeight.call(textarea), 0);
             });
         }
+        
         function resetAutoExpand(el) {
             el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
+            const borderHeight = el.offsetHeight - el.clientHeight;
+            el.style.height = (el.scrollHeight + borderHeight) + 'px';
         }
 
         function stripMarkers(str) { return str.replace(/==/g, ''); }
