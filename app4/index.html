@@ -246,7 +246,7 @@
         <h1>Lexicon Master</h1>
 
         <div id="homePage" class="page-content active">
-            <div class="portal-grid">
+            <div class="portal-grid" style="gap: 12px; margin-top: 10px;">
                 <div class="card" style="border-color: #1e88e5;" onclick="switchPage('dictionary')"><i>📖</i><h3>Dictionary</h3><p>Lookup & Learn</p></div>
                 <div class="card" style="border-color: #ffb300;" onclick="switchPage('favorites')"><i>⭐</i><h3>Favourites</h3><p>Save & Review</p></div>
                 <div class="card" style="border-color: #43a047;" onclick="switchPage('scan')"><i>📸</i><h3>Text Scanner</h3><p>Photo to Text</p></div>
@@ -255,14 +255,14 @@
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Draft & Edit</p></div>
             </div>
 
-            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
-                <h3 style="margin-top: 0; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
+            <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0;">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="exportAllData()">📤 Export Data</button>
                     <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
                     <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
                 </div>
-                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
+                <p style="font-size: 11px; color: #90a4ae; margin-top: 10px; margin-bottom: 0; text-align: center;">Export: Download data as a file to send via WhatsApp. <br> Import: Select the backup file to restore your data.</p>
             </div>
         </div>
 
@@ -456,7 +456,7 @@
                 
                 <input type="text" id="writingTitle" placeholder="Article Title..." style="width: 100%; padding: 15px; font-size: 18px; border: 2px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-weight: bold;">
                 
-                <textarea id="writingContent" placeholder="Start writing here..." oninput="handleWritingInput()" style="width: 100%; height: 350px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 8px; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.6; resize: vertical; box-sizing: border-box;"></textarea>
+                <textarea id="writingContent" placeholder="Start writing here..." oninput="handleWritingInput()" style="width: 100%; height: 260px; padding: 15px; border: 2px solid #cfd8dc; border-radius: 8px; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.6; resize: vertical; box-sizing: border-box;"></textarea>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 13px; color: #546e7a;">
                     <span id="writingWordCount" style="font-weight: bold; color: var(--primary-blue);">Words: 0</span>
