@@ -169,6 +169,39 @@
             border-color: var(--primary-color);
         }
 
+        /* --- ✨ 優化外部連結按鈕樣式 --- */
+        .ai-row {
+            grid-column: span 2;
+            display: flex;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .ai-link-btn {
+            flex: 1;
+            background: var(--glass);
+            border: 1px solid rgba(188, 0, 45, 0.1);
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .ai-link-btn:hover {
+            background: var(--user-bubble-bg);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .ai-link-btn span { font-size: 1.2rem; }
+        .ai-link-btn small { font-size: 0.75rem; color: var(--text-color); font-weight: bold; letter-spacing: 1px; }
+        /* --------------------------- */
+
         .interface-layer {
             display: none;
             position: fixed;
@@ -593,7 +626,16 @@
             <div class="main-btn" onclick="switchScene('shopping', '🛍️ SHOPPING')"><span>🛍️</span><small>SHOPPING</small></div>
             <div class="main-btn" onclick="switchScene('transport', '🚆 TRANSIT')"><span>🚆</span><small>TRANSIT</small></div>
             <div class="main-btn" onclick="switchScene('hotel', '🏨 HOTEL')"><span>🏨</span><small>HOTEL</small></div>
-        </main>
+            
+            <div class="ai-row">
+                <div class="ai-link-btn" onclick="launchGemini()">
+                    <span>✨</span><small>GEMINI</small>
+                </div>
+                <div class="ai-link-btn" onclick="launchPerplexity()">
+                    <span>🔍</span><small>PERPLEXITY</small>
+                </div>
+            </div>
+            </main>
 
         <footer id="main-footer">
             &copy; 2026 KATY GO. DESIGNED FOR HK TRAVELERS.
@@ -762,7 +804,7 @@
                     {origin: "可以分開付嗎？", formal: "Can we pay separately?", formal_check: "能分開付嗎？", slang: "Separate payments?", slang_check: "分開比錢？"},
                     {origin: "收現金嗎？", formal: "Do you accept cash?", formal_check: "收現金嗎？", slang: "Cash okay?", slang_check: "收錢得嗎？"},
                     {origin: "請給我一個購物袋。", formal: "Could I have a shopping bag, please?", formal_check: "請給我購物袋。", slang: "Bag, please.", slang_check: "要袋。"},
-                    {origin: "需要加錢買袋嗎？", formal: "Is there a charge for the bag?", formal_check: "袋子要收費嗎？", slang: "How much for the bag?", slang_check: "袋要幾錢？"},
+                    {origin: "需要加錢買袋嗎？", formal: "Is there a charge for the bag?", formal_check: "袋子要收費嗎？", slang: "袋子要收費嗎？", slang_check: "袋子要收費嗎？"},
                     {origin: "可以用Apple Pay嗎？", formal: "Do you accept Apple Pay?", formal_check: "可以用Apple Pay嗎？", slang: "Apple Pay okay?", slang_check: "用唔用到Apple Pay？"},
                     {origin: "可以幫我包裝成禮物嗎？", formal: "Could you gift-wrap this for me?", formal_check: "能幫我包成禮物嗎？", slang: "Gift wrap, please.", slang_check: "包禮物。"},
                     {origin: "收銀台在哪？", formal: "Where is the cashier?", formal_check: "收銀處在哪？", slang: "Where's the counter?", slang_check: "收銀係邊？"},
@@ -792,7 +834,7 @@
                     {origin: "JR站在哪？", formal: "Where is the JR station?", formal_check: "JR站在哪？", slang: "Where's the JR?", slang_check: "JR邊度搭？"},
                     {origin: "洗手間在哪？", formal: "Where are the restrooms?", formal_check: "洗手間在哪？", slang: "Toilet?", slang_check: "廁所？"},
                     {origin: "有電梯嗎？", formal: "Is there an elevator?", formal_check: "有電梯嗎？", slang: "Any lift?", slang_check: "有無lift？"},
-                    {origin: "這是正確的方向嗎？", formal: "Is this the correct direction?", formal_check: "這是正確方向嗎？", slang: "Wrong way?", slang_check: "呢邊啱唔啱？"}
+                    {origin: "這是正確的方向嗎？", formal: "Is this the correct direction?", formal_check: "這是正確方向嗎？", slang: "Wrong way?", slang_check: "呢邊邊啱唔啱？"}
                 ],
                 ticketing: [
                     {origin: "在哪裡買票？", formal: "Where can I buy tickets?", formal_check: "在哪買票？", slang: "Tickets where?", slang_check: "邊度買飛？"},
@@ -864,7 +906,7 @@
                     {origin: "這是我的行李牌。", formal: "Here is my luggage tag.", formal_check: "這是我的行李牌。", slang: "My luggage tag.", slang_check: "行李飛。"},
                     {origin: "行李可以送上房嗎？", formal: "Could you bring my bags to my room?", formal_check: "能把行李送到房間嗎？", slang: "Send bags to my room.", slang_check: "行李送上房。"},
                     {origin: "有多少件行李？", formal: "How many pieces of luggage?", formal_check: "有多少件行李？", slang: "How many bags?", slang_check: "幾多件行李？"},
-                    {origin: "這件很重。", formal: "This one is very heavy.", formal_check: "這件很重。", slang: "Super heavy.", slang_check: "好重。"},
+                    {origin: "這件很重。", formal: "This one is very heavy.", formal_check: "This one is very heavy.", slang: "Super heavy.", slang_check: "好重。"},
                     {origin: "這件易碎。", formal: "This is fragile.", formal_check: "這是易碎品。", slang: "Fragile, be careful.", slang_check: "易碎。"},
                     {origin: "在哪裡領取行李？", formal: "Where can I pick up my bags?", formal_check: "在哪領行李？", slang: "Luggage pickup?", slang_check: "邊度攞返行李？"}
                 ],
@@ -997,6 +1039,40 @@
             const iosUrl = `erudite://search?text=${encodedText}`;
             const androidIntent = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;end`;
             const webUrl = `https://erudite.hk/english-chinese-dictionary/${encodedText}`;
+
+            if (isiOS) {
+                window.location.href = iosUrl;
+                setTimeout(() => { window.open(webUrl, '_blank'); }, 2000);
+            } else if (isAndroid) {
+                window.location.href = androidIntent;
+            } else {
+                window.open(webUrl, '_blank');
+            }
+        }
+
+        function launchGemini() {
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const iosUrl = "google-gemini://";
+            const androidIntent = "intent://#Intent;scheme=google-gemini;package=com.google.android.apps.bard;end";
+            const webUrl = "https://gemini.google.com/";
+
+            if (isiOS) {
+                window.location.href = iosUrl;
+                setTimeout(() => { window.open(webUrl, '_blank'); }, 2000);
+            } else if (isAndroid) {
+                window.location.href = androidIntent;
+            } else {
+                window.open(webUrl, '_blank');
+            }
+        }
+
+        function launchPerplexity() {
+            const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const iosUrl = "perplexity://";
+            const androidIntent = "intent://#Intent;scheme=perplexity;package=ai.perplexity.perplexity;end";
+            const webUrl = "https://www.perplexity.ai/";
 
             if (isiOS) {
                 window.location.href = iosUrl;
@@ -1205,7 +1281,6 @@
             return wrapper;
         }
 
-        /* ✨ 專業修改：語言風格 NLP 轉換器 ✨ */
         function applyStyle(text, replacements) {
             let result = text;
             replacements.forEach(([regex, replacement]) => {
@@ -1298,7 +1373,6 @@
             field.value = ''; field.style.height = '40px'; field.blur();
             
             try {
-                // ✨ 專業修改：只呼叫一次標準翻譯，交由前端 Format 引擎風格化 ✨
                 const baseEnglishRaw = await translate(text, 'en');
                 const baseEnglish = cleanTranslation(baseEnglishRaw);
 
@@ -1355,7 +1429,6 @@
             try {
                 const key = chatID === 'voice-chat' ? 'voice' : 'text';
                 
-                // ✨ 專業修改：只呼叫一次標準翻譯，交由前端 Format 引擎風格化 ✨
                 const baseEnglishRaw = await translate(userInput, 'en');
                 const baseEnglish = cleanTranslation(baseEnglishRaw);
 
