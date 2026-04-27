@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
-        /* 統一盒模型，解決闊度微差的核心 */
+        /* 統一盒模型標準，確保闊度計算完全一致 */
         * {
             box-sizing: border-box;
         }
@@ -33,7 +33,6 @@
             display: flex;
             justify-content: center;
             padding: 15px 15px 100px 15px;
-            box-sizing: border-box;
             scroll-behavior: smooth;
             overflow-x: hidden;
         }
@@ -51,14 +50,12 @@
         }
 
         h1 { text-align: center; color: var(--primary-blue); font-size: 24px; margin-top: 0; margin-bottom: 15px; }
-        h2 { margin-top: 0; width: 100%; } /* 確保標題撐滿，維持對齊 */
 
         .page-content { 
             display: none; 
             animation: fadeIn 0.3s ease; 
             min-height: 70vh; 
-            width: 100%; /* 強制闊度 100% 保持一致 */
-            margin: 0;
+            width: 100%; /* 確保頁面內容撐滿 Container 內框 */
         }
         .page-content.active { display: block; }
         .back-btn { cursor: pointer; color: #546e7a; font-weight: bold; margin-bottom: 15px; display: inline-block; }
@@ -190,7 +187,7 @@
         .item-details { display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; width: 100%; }
         .item-details.show { display: block; }
         
-        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; }
+        .definition-en-line { font-size: 14px; color: #607d8b; line-height: 1.6; border-left: 3px solid var(--accent-green); padding-left: 10px; font-style: italic; width: 100%; }
 
         .toast-added { color: #2e7d32; font-size: 12px; font-weight: bold; margin-left: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
 
@@ -201,6 +198,7 @@
             border-radius: 3px;
         }
 
+        /* Dictation Specific */
         .category-chip { display: flex; align-items: center; gap: 8px; background: #f1f3f4; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; width: 100%; }
         .category-chip.selected { border-color: var(--primary-blue); background: var(--light-blue); }
         .category-chip input { transform: scale(1.2); }
@@ -236,6 +234,7 @@
             z-index: 5;
         }
 
+        /* Writing Page Adjustments */
         #writingContent {
             height: 280px; 
             max-height: 35vh; 
@@ -245,6 +244,7 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* Cropper Specific Styles */
         #cropSection { display: none; margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0; width: 100%; }
         .img-container { max-height: 50vh; width: 100%; margin-bottom: 15px; }
         .img-container img { max-width: 100%; display: block; }
@@ -268,7 +268,7 @@
 
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0; width: 100%;">
                 <h3 style="margin-top: 0; font-size: 15px; color: #546e7a; text-align: center;">📲 Data Sync & Backup</h3>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; width: 100%;">
                     <button class="btn-secondary" style="flex: 1; background: #607d8b; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="exportAllData()">📤 Export Data</button>
                     <input type="file" id="importDataFile" accept=".json" style="display: none;" onchange="importAllData(event)">
                     <button class="btn-secondary" style="flex: 1; background: #546e7a; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;" onclick="document.getElementById('importDataFile').click()">📥 Import Data</button>
@@ -295,12 +295,12 @@
             </div>
 
             <div id="searchHistoryContainer" style="margin-top: 30px; width: 100%;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px; width: 100%;">
                     <h3 style="font-size: 18px; color: #546e7a; margin: 0;">Recent Searches</h3>
                     <button class="btn-danger" style="margin: 0; padding: 4px 8px; font-size: 12px;" onclick="clearAllHistory()">🗑️ Delete All</button>
                 </div>
                 <div style="font-size: 12px; color: #90a4ae; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap to view.</div>
-                <div id="searchHistoryList"></div>
+                <div id="searchHistoryList" style="width: 100%;"></div>
             </div>
         </div>
 
@@ -312,7 +312,7 @@
                 <button class="btn-danger" style="margin-bottom: 0;" onclick="clearAllFavorites()">🗑️ Delete All</button>
             </div>
             <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
-            <div id="favoritesList"></div>
+            <div id="favoritesList" style="width: 100%;"></div>
         </div>
 
         <div id="scanPage" class="page-content">
@@ -400,13 +400,13 @@
                     💡 <b>Advanced Tip:</b> Use double equals (==word==) to define fill-in-the-blank targets.
                 </div>
                 <div style="font-size: 13px; color: #78909c; margin-bottom: 10px;">💡 Quick Action: Swipe left on any entry to remove it. Tap headers to expand/collapse.</div>
-                <div id="vocabList"></div>
+                <div id="vocabList" style="width: 100%;"></div>
             </div>
         </div>
 
         <div id="dictationPage" class="page-content">
             <div class="back-btn" onclick="goHome()">← Back to Home</div>
-            <div id="dictConfigUI">
+            <div id="dictConfigUI" style="width: 100%;">
                 <h2 style="text-align:center;">🎧 Dictation Setup</h2>
                 <div class="instruction-tip">Select categories for practice. No hints will be displayed during the session.</div>
                 <div style="font-weight: bold; margin-bottom: 10px; color: var(--primary-blue);">1. Choose Scope:</div>
@@ -420,10 +420,10 @@
             </div>
 
             <div id="dictPlayUI" style="display:none; text-align:center; width: 100%;">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
-                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a;">⏮️ Prev</button>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px; width: 100%;">
+                    <button class="btn-secondary" onclick="prevDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏮️ Prev</button>
                     <h3 id="dictProgress" style="margin: 0; min-width: 60px;">0 / 0</h3>
-                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a;">⏭️ Next</button>
+                    <button class="btn-secondary" onclick="skipDictation()" style="padding: 4px 10px; font-size: 14px; background: #cfd8dc; color: #546e7a; border: none; border-radius: 4px; cursor: pointer;">⏭️ Next</button>
                 </div>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
                     <button class="btn-action" onclick="speakTarget('en-GB')" style="flex: 1; background:#bbdefb; color: #0d47a1; padding: 15px; font-size: 18px;">🔊 UK Voice</button>
@@ -456,7 +456,7 @@
             
             <div id="writingListView" style="width: 100%;">
                 <button class="btn-action" style="width: 100%; padding: 15px; margin-bottom: 20px; font-size: 16px;" onclick="openWritingEditor()">➕ Create New Article</button>
-                <div id="writingListContainer"></div>
+                <div id="writingListContainer" style="width: 100%;"></div>
             </div>
 
             <div id="writingEditorView" style="display:none; width: 100%;">
@@ -467,15 +467,15 @@
                 
                 <input type="text" id="writingTitle" placeholder="Article Title..." style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #cfd8dc; border-radius: 8px; margin-bottom: 8px; font-weight: bold;">
                 
-                <textarea id="writingContent" placeholder="Start writing here..." oninput="handleWritingInput()"></textarea>
+                <textarea id="writingContent" placeholder="Start writing here..." oninput="handleWritingInput()" style="width: 100%; padding: 12px; border: 2px solid #cfd8dc; border-radius: 8px; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.6; resize: none;"></textarea>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 12px; color: #546e7a; width: 100%;">
                     <span id="writingWordCount" style="font-weight: bold; color: var(--primary-blue);">Words: 0</span>
                     <span id="writingSaveStatus" style="font-weight: bold;"></span>
                 </div>
 
-                <div class="action-row-container" style="margin-top: 10px;">
-                    <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; padding: 8px; margin: 5px 0; font-size: 12px;">
+                <div class="action-row-container" style="margin-top: 10px; width: 100%;">
+                    <div class="instruction-tip" style="background: #e1f5fe; border-left-color: #0288d1; padding: 8px; margin: 5px 0; font-size: 12px; width: 100%;">
                         💡 <b>Smart App Sync:</b> Auto copies text & opens target app.
                     </div>
                     <div class="action-row">
