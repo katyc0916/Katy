@@ -723,6 +723,7 @@
                     </div>
                     <div class="phonetic-item">
                         <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
+                        <span>${info.usPhonetic}</span>
                     </div>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
@@ -1192,34 +1193,39 @@
             reader.readAsText(file);
         }
         
-        // 專業跳轉函式：優化行動端 App 喚起邏輯
+        // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
         function openAILink(app) {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
-            
+
             if (app === 'gemini') {
-                const webUrl = 'https://gemini.google.com/';
                 if (isAndroid) {
-                    // Android：使用 Intent 喚起 Gemini App
-                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;end;';
+                    // Android：使用 Intent 協定並設定 browser_fallback_url，完美解決喚起失敗的備案問題，不需依賴不穩定的 setTimeout
+                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
                 } else if (isIOS) {
-                    // iOS：嘗試喚起 Google App 內的 Gemini 模組，失敗則跳轉網頁
-                    window.location.href = 'google-gemini://';
-                    setTimeout(() => { window.location.href = webUrl; }, 800);
+                    // iOS：移除會干擾系統彈窗的 setTimeout，改用動態建立隱藏 <a> 標籤來完美觸發 Apple 的 Universal Link
+                    const a = document.createElement('a');
+                    a.href = 'https://gemini.google.com/';
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
                 } else {
-                    window.open(webUrl, '_blank');
+                    // 桌面端：直接開新分頁
+                    window.open('https://gemini.google.com/', '_blank');
                 }
             } else if (app === 'perplexity') {
-                const webUrl = 'https://www.perplexity.ai/';
                 if (isAndroid) {
-                    // Android：使用 Intent 喚起 Perplexity App
-                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
                 } else if (isIOS) {
-                    // iOS：使用官方 URL Scheme
-                    window.location.href = 'perplexity://';
-                    setTimeout(() => { window.location.href = webUrl; }, 800);
+                    const a = document.createElement('a');
+                    a.href = 'https://www.perplexity.ai/';
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
                 } else {
-                    window.open(webUrl, '_blank');
+                    window.open('https://www.perplexity.ai/', '_blank');
                 }
             }
         }
