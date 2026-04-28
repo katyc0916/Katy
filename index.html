@@ -578,7 +578,8 @@
                 ledgerByDay[d].forEach((item, idx) => {
                     tj += item.jpy; th += item.hkd;
                     const div = document.createElement('div'); div.className = 'ledger-item';
-                    div.innerHTML = `<span>[D${d}] ${item.cat}</span><span>¥${item.jpy} ($${Math.round(item.hkd)})</span>`;
+                    const displayDay = item.dayName ? (isNaN(item.dayName) ? item.dayName : 'D' + item.dayName) : 'D' + d;
+                    div.innerHTML = `<span>[${displayDay}] ${item.cat}</span><span>¥${item.jpy} ($${Math.round(item.hkd)})</span>`;
                     addSwipeToDelete(div, () => { if(confirm("刪除？")) { ledgerByDay[d].splice(idx,1); storage.save('osaka_ledger_days', ledgerByDay); renderLedger(); } });
                     list.appendChild(div);
                 });
@@ -608,17 +609,13 @@
 
     const jumpToPage = idx => { $$('.single-page').forEach((p, i) => p.classList.toggle('flipped', i < idx)); $('page-nav-menu').style.display = 'none'; };
     
-    // --- 修復後的翻頁循環系統 ---
     const goNext = () => { 
         const pages = Array.from($$('.single-page'));
         const unflipped = pages.filter(p => !p.classList.contains('flipped')); 
-        
         if (unflipped.length > 1) { 
-            // 正常向後翻一頁
             unflipped[0].classList.add('flipped'); 
         } 
         else { 
-            // 如果已在最後一頁，循環回封面（依序恢復，產生合上書本的視覺感）
             pages.forEach((p, i) => setTimeout(() => p.classList.remove('flipped'), i * 40)); 
         } 
     };
@@ -626,19 +623,15 @@
     const goPrev = () => { 
         const pages = Array.from($$('.single-page'));
         const flipped = pages.filter(p => p.classList.contains('flipped')); 
-        
         if (flipped.length > 0) { 
-            // 正常向前翻回一頁
             flipped[flipped.length - 1].classList.remove('flipped'); 
         } 
         else { 
-            // 如果已在封面，撥左則直接循環至最後一頁 (翻開除了最後一頁以外的所有頁面)
             for (let i = 0; i < pages.length - 1; i++) { 
                 pages[i].classList.add('flipped'); 
             } 
         } 
     };
-    // -------------------------
     
     function toggleMusic(aId, bId, defI, playI) {
         const audio = $(aId), btn = $(bId), span = btn.querySelector('span'), isPlaying = !audio.paused;
@@ -669,12 +662,23 @@
     
     const quickMath = (op, label) => { const i = $('jpy-input'), val = safeEval(i.value + op); if(val) { i.value = Math.round(val); convertCurrency(); showToast(`✅ ${label}`); } };
     const customDiscountMath = () => { const p = prompt("折扣成數 (例: 85):"); if(p) quickMath(`*${parseFloat(p)/100}`, p+"折"); };
-    const changeLedgerDay = v => { currentLedgerDay = v; $('custom-day-name').style.display = v==='custom'?'block':'none'; renderLedger(); };
+    
+    const changeLedgerDay = v => { 
+        currentLedgerDay = v; 
+        $('custom-day-name').style.display = v==='custom'?'block':'none'; 
+        renderLedger(); 
+    };
     
     function addSpent(cat) { 
         const j = Math.round(safeEval($('jpy-input').value)); if(!j) return alert("請輸入有效金額");
-        const h = parseFloat((j * currentRate).toFixed(2)), d = currentLedgerDay==='all'?1:currentLedgerDay; 
-        ledgerByDay[d].push({cat, jpy:j, hkd:h}); storage.save('osaka_ledger_days', ledgerByDay); renderLedger(); closeCategory(); showToast("✅ 已記錄"); 
+        const h = parseFloat((j * currentRate).toFixed(2));
+        const d = currentLedgerDay==='all' ? 1 : currentLedgerDay;
+        const customName = (d === 'custom') ? ($('custom-day-name').value || '自訂') : d;
+        ledgerByDay[d].push({cat, jpy:j, hkd:h, dayName: customName}); 
+        storage.save('osaka_ledger_days', ledgerByDay); 
+        renderLedger(); 
+        closeCategory(); 
+        showToast("✅ 已記錄"); 
     }
     
     const addCustomSpent = () => { const c = prompt("輸入名稱："); if(c) addSpent(c); };
@@ -701,68 +705,42 @@
         };
         for(let i=1; i<=8; i++) all.rundowns[i] = localStorage.getItem(`osaka_rundown_day${i}`);
         ['shop', 'eat', 'mall'].forEach(t => all.pockets[t] = localStorage.getItem(`osaka_pocket_${t}`));
-        
         const pass = prompt("🔐 請設定檔案加密密碼 (匯入時需輸入)：");
         if(!pass) return;
-
         try {
             const encrypted = CryptoJS.AES.encrypt(JSON.stringify(all), pass).toString();
             const blob = new Blob([encrypted], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
-            a.href = url;
-            a.download = `Osaka_Itinerary_${dateStr}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = `Osaka_Itinerary_${dateStr}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
             showToast("✅ 備份檔案已匯出並下載");
-        } catch(e) {
-            alert("匯出發生錯誤: " + e.message);
-        }
+        } catch(e) { alert("匯出發生錯誤: " + e.message); }
     }
 
-    function importData() {
-        $('file-import-input').click();
-    }
+    function importData() { $('file-import-input').click(); }
 
     function initFileImportListener() {
         $('file-import-input').onchange = e => {
-            const file = e.target.files[0];
-            if (!file) return;
-
+            const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(event) {
-                const pass = prompt("🔑 請輸入該檔案的原始加密密碼：");
-                if (!pass) return;
-
+                const pass = prompt("🔑 請輸入該檔案的原始加密密碼："); if (!pass) return;
                 try {
                     const decryptedBytes = CryptoJS.AES.decrypt(event.target.result.trim(), pass);
                     const decryptedStr = decryptedBytes.toString(CryptoJS.enc.Utf8);
                     if (!decryptedStr) throw new Error("密碼錯誤或檔案損壞");
-                    
                     const dec = JSON.parse(decryptedStr);
-                    
-                    Object.keys(dec.rundowns).forEach(k => {
-                        if(dec.rundowns[k]) localStorage.setItem(`osaka_rundown_day${k}`, dec.rundowns[k]);
-                    });
-                    if(dec.pockets) {
-                        Object.keys(dec.pockets).forEach(k => {
-                            if(dec.pockets[k]) localStorage.setItem(`osaka_pocket_${k}`, dec.pockets[k]);
-                        });
-                    }
+                    Object.keys(dec.rundowns).forEach(k => { if(dec.rundowns[k]) localStorage.setItem(`osaka_rundown_day${k}`, dec.rundowns[k]); });
+                    if(dec.pockets) { Object.keys(dec.pockets).forEach(k => { if(dec.pockets[k]) localStorage.setItem(`osaka_pocket_${k}`, dec.pockets[k]); }); }
                     if(dec.stay) localStorage.setItem('osaka_stay_info', dec.stay);
                     if(dec.ledger) localStorage.setItem('osaka_ledger_days', dec.ledger);
                     if(dec.packing) localStorage.setItem('osaka_packing_status', dec.packing);
                     if(dec.settlement) localStorage.setItem('osaka_settlement', dec.settlement);
-                    
                     showToast("🔄 資料同步成功，正在重啟...");
                     setTimeout(() => location.reload(), 1500);
-                } catch(err) {
-                    alert("❌ 同步失敗：密碼錯誤或檔案格式不正確");
-                    e.target.value = ''; 
-                }
+                } catch(err) { alert("❌ 同步失敗：密碼錯誤或檔案格式不正確"); e.target.value = ''; }
             };
             reader.readAsText(file);
         };
@@ -782,7 +760,6 @@
         customRate = parseFloat(localStorage.getItem('osaka_custom_rate')) || 0.054;
         $('custom-rate-input').value = customRate;
         $('custom-rate-input').onchange = e => { customRate = parseFloat(e.target.value)||0.054; storage.save('osaka_custom_rate', customRate); updateRateDisplay(); };
-        
         $('jpy-input').oninput = convertCurrency;
         $('hkd-input').oninput = e => { 
             const v = parseFloat(e.target.value); 
@@ -790,7 +767,6 @@
             $('jpy-input').value = jpyVal;
             if(jpyVal) $('calc-history').innerText = jpyVal;
         };
-
         initFileImportListener();
         fetchLiveExchangeRate(); renderLedger(); renderSettlement();
         setInterval(() => {
