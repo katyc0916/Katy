@@ -136,12 +136,8 @@
             bottom: 0;
             width: 80px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            z-index: 1;
+            align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 14px; z-index: 1;
         }
 
         .swiped-left .item-main-content {
@@ -219,31 +215,17 @@
             overflow-y: hidden;
         }
         .input-clear-btn {
-            position: absolute;
-            right: 15px;
-            bottom: 15px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #e53935;
-            font-size: 16px;
-            z-index: 5;
+            position: absolute; right: 15px; bottom: 15px;
+            background: #f5f5f5; border: 1px solid #ddd; border-radius: 50%;
+            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #e53935; font-size: 16px; z-index: 5;
         }
 
         /* Writing Page Adjustments - 修改為自動增高 */
         #writingContent {
             height: auto; 
-            min-height: 280px;
-            margin-bottom: 5px;
-            width: 100%;
-            resize: none;
-            overflow-y: hidden;
+            min-height: 280px; margin-bottom: 5px; width: 100%;
+            resize: none; overflow-y: hidden;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -268,6 +250,23 @@
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Draft & Edit</p></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 12px; width: 100%;">
+                <div style="flex: 1; background: #fff; border: 2px solid #1a73e8; padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;" onclick="openAILink('gemini')" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+                    <i style="font-size: 22px; font-style: normal; margin: 0;">✨</i>
+                    <div style="text-align: left;">
+                        <h3 style="margin: 0; font-size: 15px; color: #1a73e8;">Gemini</h3>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #546e7a;">AI Assistant</p>
+                    </div>
+                </div>
+                <div style="flex: 1; background: #fff; border: 2px solid #26a69a; padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;" onclick="openAILink('perplexity')" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+                    <i style="font-size: 22px; font-style: normal; margin: 0;">🔎</i>
+                    <div style="text-align: left;">
+                        <h3 style="margin: 0; font-size: 15px; color: #26a69a;">Perplexity</h3>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #546e7a;">AI Search</p>
+                    </div>
+                </div>
             </div>
 
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0; width: 100%;">
@@ -988,7 +987,7 @@
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${i}`); let diff = touchStartX - e.touches[0].clientX;
+            let row = document.getElementById(`fav-row-${item.originalIndex}`); let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left'); else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
@@ -1192,6 +1191,43 @@
                 } catch (err) { alert("❌ 檔案解析失敗。"); }
             };
             reader.readAsText(file);
+        }
+        
+        // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
+        function openAILink(app) {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+
+            if (app === 'gemini') {
+                if (isAndroid) {
+                    // Android：使用 Intent 協定並設定 browser_fallback_url，完美解決喚起失敗的備案問題，不需依賴不穩定的 setTimeout
+                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
+                } else if (isIOS) {
+                    // iOS：移除會干擾系統彈窗的 setTimeout，改用動態建立隱藏 <a> 標籤來完美觸發 Apple 的 Universal Link
+                    const a = document.createElement('a');
+                    a.href = 'https://gemini.google.com/';
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    // 桌面端：直接開新分頁
+                    window.open('https://gemini.google.com/', '_blank');
+                }
+            } else if (app === 'perplexity') {
+                if (isAndroid) {
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
+                } else if (isIOS) {
+                    const a = document.createElement('a');
+                    a.href = 'https://www.perplexity.ai/';
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    window.open('https://www.perplexity.ai/', '_blank');
+                }
+            }
         }
 
         window.onload = () => { 
