@@ -1200,30 +1200,21 @@
 
             if (app === 'gemini') {
                 if (isAndroid) {
-                    // Android：使用 Intent 協定並設定 browser_fallback_url，完美解決喚起失敗的備案問題，不需依賴不穩定的 setTimeout
-                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
+                    // Android：使用標準 Intent 協議，package 名稱正確，確保在未安裝 App 時自動跳轉 Google Play 或網頁版
+                    window.location.href = 'intent://gemini.google.com/#Intent;scheme=https;package=com.google.android.apps.gemini;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
                 } else if (isIOS) {
-                    // iOS：移除會干擾系統彈窗的 setTimeout，改用動態建立隱藏 <a> 標籤來完美觸發 Apple 的 Universal Link
-                    const a = document.createElement('a');
-                    a.href = 'https://gemini.google.com/';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    // iOS：直接使用 HTTPS 網址。如果系統裝有 App 並支持 Universal Links，會自動彈出跳轉提示，這是最穩定的專業做法。
+                    window.location.href = 'https://gemini.google.com/';
                 } else {
-                    // 桌面端：直接開新分頁
                     window.open('https://gemini.google.com/', '_blank');
                 }
             } else if (app === 'perplexity') {
                 if (isAndroid) {
-                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
+                    // Android：使用 Perplexity 官方指定的 Intent 協議與 package
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;scheme=https;package=ai.perplexity.app.android;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
                 } else if (isIOS) {
-                    const a = document.createElement('a');
-                    a.href = 'https://www.perplexity.ai/';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    // iOS：使用官方網址觸發 Universal Links 跳轉
+                    window.location.href = 'https://www.perplexity.ai/';
                 } else {
                     window.open('https://www.perplexity.ai/', '_blank');
                 }
