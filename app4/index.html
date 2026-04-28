@@ -1193,32 +1193,30 @@
             reader.readAsText(file);
         }
         
-        // 專業跳轉函式：優化深層鏈接 (Deep Linking) 以強迫啟動行動應用程式
+        // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
         function openAILink(app) {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
 
             if (app === 'gemini') {
                 if (isAndroid) {
-                    // Android：使用 Intent 協議強制開啟對應包名，移除 fallback url 避免被瀏覽器截獲
-                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.bard;scheme=https;end;';
+                    // Android：使用正確的 package name (Gemini 實際包名為 com.google.android.apps.bard)
+                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.bard;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
                 } else if (isIOS) {
-                    // iOS：雖然官方沒公開協定，但 Universal Link 在 window.location 直接賦值時最有效
+                    // iOS：在 onclick 的觸發回圈內，直接設定 href 能夠順利觸發系統的 Universal Link (開啟 APP)；
+                    // 若使用建立隱藏 <a> 並加上 target="_blank" 反而會被 Safari 視為新分頁而阻擋 APP 跳轉。
                     window.location.href = 'https://gemini.google.com/';
                 } else {
+                    // 桌面端：直接開新分頁
                     window.open('https://gemini.google.com/', '_blank');
                 }
             } else if (app === 'perplexity') {
                 if (isAndroid) {
-                    // Android：直接使用自定義協定 scheme 配合 Intent
-                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
+                    // Android：Perplexity
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
                 } else if (isIOS) {
-                    // iOS：Perplexity 支援自定義協定 perplexity://，這比 https 更容易喚醒 App
-                    window.location.href = 'perplexity://';
-                    // 若無回應，則在 500ms 後嘗試 Universal Link
-                    setTimeout(() => {
-                        window.location.href = 'https://www.perplexity.ai/';
-                    }, 500);
+                    // iOS：直接跳轉以觸發 Universal Link
+                    window.location.href = 'https://www.perplexity.ai/';
                 } else {
                     window.open('https://www.perplexity.ai/', '_blank');
                 }
