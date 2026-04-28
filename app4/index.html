@@ -657,7 +657,7 @@
                 const isPhraseOrSentence = lookupStr.includes(' ') && lookupStr.split(' ').length > 1;
                 let zhLines = [];
                 if (data[1]) {
-                    const posMap = { "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "pron.", "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int." };
+                    const posMap = { "noun": "n.", "verb": "v.", "adjective": "adj.", "adverb": "adv.", "pronoun": "pron.", "preposition": "prep.", "conjunction": "conj.", "interjection": "int." };
                     data[1].forEach(posSection => {
                         const posRaw = posSection[0].toLowerCase();
                         const posLabel = posMap[posRaw] || posSection[0]; 
@@ -1193,29 +1193,44 @@
             reader.readAsText(file);
         }
         
-        // 新增的 AI 應用程式導向函數 (僅限跳轉應用程式)
+        // 新增的 AI 應用程式導向函數 (結合了網頁備案機制)
         function openAILink(app) {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
-            let appUrl;
+            let appUrl, webUrl;
 
             if (app === 'gemini') {
+                webUrl = 'https://gemini.google.com/';
                 if (isAndroid) {
                     appUrl = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;end;';
                 } else if (isIOS) {
                     appUrl = 'googleapp://'; 
+                } else {
+                    appUrl = webUrl;
                 }
             } else if (app === 'perplexity') {
+                webUrl = 'https://www.perplexity.ai/';
                 if (isAndroid) {
                     appUrl = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
                 } else if (isIOS) {
                     appUrl = 'perplexity://';
+                } else {
+                    appUrl = webUrl;
                 }
             }
 
-            if (appUrl) {
-                window.location.href = appUrl;
+            if (!isIOS && !isAndroid) {
+                window.open(webUrl, '_blank');
+                return;
             }
+
+            const start = Date.now();
+            setTimeout(() => {
+                if (Date.now() - start < 1500) {
+                    window.open(webUrl, '_blank');
+                }
+            }, 800);
+            window.location.href = appUrl;
         }
 
         window.onload = () => { 
