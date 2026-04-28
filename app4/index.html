@@ -723,7 +723,6 @@
                     </div>
                     <div class="phonetic-item">
                         <button class="pron-icon" onclick="speakFromList('${cleanSpeech.replace(/'/g, "\\'")}', 'en-US')">US</button>
-                        <span>${info.usPhonetic}</span>
                     </div>
                 </div>
                 <div class="phonetic-line" style="margin-bottom: 15px;">
@@ -1193,52 +1192,36 @@
             reader.readAsText(file);
         }
         
-        // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
+        // 專業跳轉函式：優化行動端 App 喚起邏輯
         function openAILink(app) {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
-            let appUrl, webUrl;
-
+            
             if (app === 'gemini') {
-                webUrl = 'https://gemini.google.com/';
+                const webUrl = 'https://gemini.google.com/';
                 if (isAndroid) {
-                    // Android Intent：直接嘗試喚起 Gemini App
-                    appUrl = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;end;';
+                    // Android：使用 Intent 喚起 Gemini App
+                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;end;';
                 } else if (isIOS) {
-                    // iOS URL Scheme：嘗試喚起 Google App 或 Gemini 快捷方式
-                    appUrl = 'google-gemini://'; 
+                    // iOS：嘗試喚起 Google App 內的 Gemini 模組，失敗則跳轉網頁
+                    window.location.href = 'google-gemini://';
+                    setTimeout(() => { window.location.href = webUrl; }, 800);
                 } else {
-                    appUrl = webUrl;
-                }
-            } else if (app === 'perplexity') {
-                webUrl = 'https://www.perplexity.ai/';
-                if (isAndroid) {
-                    // Android Intent：直接嘗試喚起 Perplexity App
-                    appUrl = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
-                } else if (isIOS) {
-                    // iOS URL Scheme：Perplexity 官方跳轉協定
-                    appUrl = 'perplexity://';
-                } else {
-                    appUrl = webUrl;
-                }
-            }
-
-            // 非行動端環境直接開啟網頁
-            if (!isIOS && !isAndroid) {
-                window.open(webUrl, '_blank');
-                return;
-            }
-
-            // 執行跳轉與網頁備案邏輯
-            const start = Date.now();
-            window.location.href = appUrl;
-
-            // 如果 800ms 後仍留在原網頁，則判定 App 未安裝，改開網頁版
-            setTimeout(() => {
-                if (Date.now() - start < 1500) {
                     window.open(webUrl, '_blank');
                 }
-            }, 800);
+            } else if (app === 'perplexity') {
+                const webUrl = 'https://www.perplexity.ai/';
+                if (isAndroid) {
+                    // Android：使用 Intent 喚起 Perplexity App
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;end;';
+                } else if (isIOS) {
+                    // iOS：使用官方 URL Scheme
+                    window.location.href = 'perplexity://';
+                    setTimeout(() => { window.location.href = webUrl; }, 800);
+                } else {
+                    window.open(webUrl, '_blank');
+                }
+            }
         }
 
         window.onload = () => { 
