@@ -1195,39 +1195,31 @@
         
         // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
         function openAILink(app) {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isAndroid = /Android/.test(navigator.userAgent);
+            let scheme = '';
+            let fallbackUrl = '';
 
             if (app === 'gemini') {
-                if (isAndroid) {
-                    // Android：使用 Intent 協定並設定 browser_fallback_url，完美解決喚起失敗的備案問題，不需依賴不穩定的 setTimeout
-                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.gemini;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
-                } else if (isIOS) {
-                    // iOS：移除會干擾系統彈窗的 setTimeout，改用動態建立隱藏 <a> 標籤來完美觸發 Apple 的 Universal Link
-                    const a = document.createElement('a');
-                    a.href = 'https://gemini.google.com/';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } else {
-                    // 桌面端：直接開新分頁
-                    window.open('https://gemini.google.com/', '_blank');
-                }
+                // 定義 Gemini 的 Custom URL Scheme 與備用網頁版連結
+                scheme = 'gemini://';
+                fallbackUrl = 'https://gemini.google.com/';
             } else if (app === 'perplexity') {
-                if (isAndroid) {
-                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
-                } else if (isIOS) {
-                    const a = document.createElement('a');
-                    a.href = 'https://www.perplexity.ai/';
-                    a.target = '_blank';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } else {
-                    window.open('https://www.perplexity.ai/', '_blank');
-                }
+                // 定義 Perplexity 的 Custom URL Scheme 與備用網頁版連結
+                scheme = 'perplexity://';
+                fallbackUrl = 'https://www.perplexity.ai/';
             }
+
+            // 模擬 DeepL / Erudite 原生跳轉：直接賦值 location.href
+            // 這將會強制系統（特別是 iOS）彈出「是否開啟應用程式」的原生詢問視窗
+            window.location.href = scheme;
+
+            // 備案機制：透過監測時間差，判斷 App 是否成功被喚起
+            // 若未成功喚起 (如未安裝該 App)，則於短暫延遲後以新分頁開啟網頁版
+            const startTimestamp = Date.now();
+            setTimeout(function() {
+                if (Date.now() - startTimestamp < 1500) {
+                    window.open(fallbackUrl, '_blank');
+                }
+            }, 1000);
         }
 
         window.onload = () => { 
