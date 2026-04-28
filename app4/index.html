@@ -1200,20 +1200,22 @@
 
             if (app === 'gemini') {
                 if (isAndroid) {
-                    // Android：使用標準 Intent 協議，package 名稱正確，確保在未安裝 App 時自動跳轉 Google Play 或網頁版
-                    window.location.href = 'intent://gemini.google.com/#Intent;scheme=https;package=com.google.android.apps.gemini;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
+                    // Android：使用正確的 package name (Gemini 實際包名為 com.google.android.apps.bard)
+                    window.location.href = 'intent://gemini.google.com/#Intent;package=com.google.android.apps.bard;scheme=https;S.browser_fallback_url=https%3A%2F%2Fgemini.google.com%2F;end;';
                 } else if (isIOS) {
-                    // iOS：直接使用 HTTPS 網址。如果系統裝有 App 並支持 Universal Links，會自動彈出跳轉提示，這是最穩定的專業做法。
+                    // iOS：在 onclick 的觸發回圈內，直接設定 href 能夠順利觸發系統的 Universal Link (開啟 APP)；
+                    // 若使用建立隱藏 <a> 並加上 target="_blank" 反而會被 Safari 視為新分頁而阻擋 APP 跳轉。
                     window.location.href = 'https://gemini.google.com/';
                 } else {
+                    // 桌面端：直接開新分頁
                     window.open('https://gemini.google.com/', '_blank');
                 }
             } else if (app === 'perplexity') {
                 if (isAndroid) {
-                    // Android：使用 Perplexity 官方指定的 Intent 協議與 package
-                    window.location.href = 'intent://www.perplexity.ai/#Intent;scheme=https;package=ai.perplexity.app.android;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
+                    // Android：Perplexity
+                    window.location.href = 'intent://www.perplexity.ai/#Intent;package=ai.perplexity.app.android;scheme=https;S.browser_fallback_url=https%3A%2F%2Fwww.perplexity.ai%2F;end;';
                 } else if (isIOS) {
-                    // iOS：使用官方網址觸發 Universal Links 跳轉
+                    // iOS：直接跳轉以觸發 Universal Link
                     window.location.href = 'https://www.perplexity.ai/';
                 } else {
                     window.open('https://www.perplexity.ai/', '_blank');
