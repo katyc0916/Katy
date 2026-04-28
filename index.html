@@ -746,7 +746,7 @@
         };
     }
 
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const savedStay = storage.load('osaka_stay_info', {});
         renderDayPages(savedStay);
         const savedPacking = storage.load('osaka_packing_status', {});
