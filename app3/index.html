@@ -448,7 +448,6 @@
     </div>
 
     <script>
-        // --- 所有的 JS 邏輯、資料庫、翻譯函數、事件監聽完全保留且未作修改 ---
         let activeTranslation = { formal: '', slang: '', origin: '' };
         let currentPresFontSize = 7; 
         let currentSpeakingText = ""; 
@@ -465,7 +464,17 @@
                     {origin: "要等幾耐？", formal: "How long is the wait?", formal_check: "要等多久？", slang: "How long for a table?", slang_check: "要等幾耐？"},
                     {origin: "我可以坐在櫃檯位嗎？", formal: "Could I sit at the counter?", formal_check: "我可以坐在吧檯嗎？", slang: "Counter seating okay?", slang_check: "坐吧檯得嗎？"},
                     {origin: "現在有位嗎？", formal: "Do you have any tables available now?", formal_check: "現在有空位嗎？", slang: "Got any space?", slang_check: "而家有位？"},
-                    {origin: "我們分開坐也可以。", formal: "We don't mind sitting separately.", formal_check: "我們不介意分開坐。", slang: "Separate tables are fine.", slang_check: "分開坐都得。"}
+                    {origin: "我們分開坐也可以。", formal: "We don't mind sitting separately.", formal_check: "我們不介意分開坐。", slang: "Separate tables are fine.", slang_check: "分開坐都得。"},
+                    {origin: "我們想坐卡位。", formal: "We would like a booth seat, please.", formal_check: "我們想要一個卡座。", slang: "Booth seat, please.", slang_check: "要卡位。"},
+                    {origin: "最低消費是多少？", formal: "What is the minimum charge?", formal_check: "最低消費多少？", slang: "Minimum spend?", slang_check: "最低消費？"},
+                    {origin: "小童需要收費嗎？", formal: "Is there a charge for children?", formal_check: "小孩收費嗎？", slang: "Do kids pay?", slang_check: "細路要比錢？"},
+                    {origin: "可以加多一個人嗎？", formal: "Could we add one more person to our party?", formal_check: "能加一個人嗎？", slang: "One more person.", slang_check: "加多個人。"},
+                    {origin: "我們有輪椅。有方便的位嗎？", formal: "We have a wheelchair. Do you have an accessible table?", formal_check: "我們有輪椅，有方便的位嗎？", slang: "Wheelchair accessible seat?", slang_check: "有輪椅位？"},
+                    {origin: "需要自己找位置嗎？", formal: "Should we seat ourselves?", formal_check: "我們自己找位嗎？", slang: "Seat ourselves?", slang_check: "自己搵位？"},
+                    {origin: "我朋友轉頭就到。", formal: "My friend will be arriving shortly.", formal_check: "我朋友很快到。", slang: "Friend's coming soon.", slang_check: "朋友轉頭到。"},
+                    {origin: "這裡可以帶寵物嗎？", formal: "Are pets allowed here?", formal_check: "這裡允許寵物嗎？", slang: "Pet friendly?", slang_check: "可以帶狗？"},
+                    {origin: "有BB車可以放邊？", formal: "Where can we park our stroller?", formal_check: "嬰兒車可以放哪？", slang: "Where to put the stroller?", slang_check: "BB車放邊？"},
+                    {origin: "我們想坐近門口。", formal: "We prefer a table near the entrance.", formal_check: "我們想坐門口附近。", slang: "Near the door, please.", slang_check: "近門口。"}
                 ],
                 seating: [
                     {origin: "想要靠窗的位。", formal: "We would like a window seat, please.", formal_check: "我們想要靠窗的座位。", slang: "Window seat, please.", slang_check: "窗口位。"},
@@ -477,7 +486,17 @@
                     {origin: "張桌子有點髒。", formal: "This table is a bit dirty.", formal_check: "這張桌子有點髒。", slang: "This table's sticky.", slang_check: "張檯污糟。"},
                     {origin: "可以多加一張椅子嗎？", formal: "Could we have an extra chair?", formal_check: "可以加張椅子嗎？", slang: "One more chair, please.", slang_check: "加張櫈。"},
                     {origin: "可以把兩張桌子併在一起嗎？", formal: "Could you push these two tables together?", formal_check: "能把這兩張桌子併在一起嗎？", slang: "Can we join the tables?", slang_check: "併檯得嗎？"},
-                    {origin: "想要禁煙區。", formal: "A table in the non-smoking area, please.", formal_check: "禁煙區的位。", slang: "Non-smoking, please.", slang_check: "唔要食煙區。"}
+                    {origin: "想要禁煙區。", formal: "A table in the non-smoking area, please.", formal_check: "禁煙區的位。", slang: "Non-smoking, please.", slang_check: "唔要食煙區。"},
+                    {origin: "這裡太熱了。", formal: "It is a bit too warm here.", formal_check: "這裡太熱了。", slang: "Too hot here.", slang_check: "呢度太熱。"},
+                    {origin: "冷氣可以調細一點嗎？", formal: "Could you turn down the air conditioning?", formal_check: "可以把冷氣調小嗎？", slang: "AC lower, please?", slang_check: "冷氣細啲得嗎？"},
+                    {origin: "這個位有點暗。", formal: "This table is a bit too dark.", formal_check: "這位置有點暗。", slang: "Too dark here.", slang_check: "呢度太黑。"},
+                    {origin: "有無風景好啲嘅位？", formal: "Do you have a table with a better view?", formal_check: "有風景更好的座位嗎？", slang: "Better view table?", slang_check: "靚啲風景嘅位？"},
+                    {origin: "梳化好像有點污糟。", formal: "The booth seems a bit dirty.", formal_check: "沙發似乎有點髒。", slang: "Sticky booth.", slang_check: "卡位污糟。"},
+                    {origin: "隔籬枱好嘈。", formal: "The next table is very loud.", formal_check: "隔壁桌很吵。", slang: "Too noisy next to us.", slang_check: "隔籬好嘈。"},
+                    {origin: "請問有網籃裝袋嗎？", formal: "Do you have a basket for my bag?", formal_check: "有放包包的籃子嗎？", slang: "Bag basket?", slang_check: "有裝袋嘅籃嗎？"},
+                    {origin: "可以俾幾張紙巾墊枱嗎？", formal: "Could I have some napkins for the table?", formal_check: "能給些紙巾墊桌子嗎？", slang: "Extra napkins?", slang_check: "要多啲紙巾。"},
+                    {origin: "我們可以坐長枱嗎？", formal: "Could we have a long table?", formal_check: "我們可以坐長桌嗎？", slang: "Long table?", slang_check: "長檯得嗎？"},
+                    {origin: "請問洗手間喺邊個方向？", formal: "Which direction is the restroom from here?", formal_check: "洗手間往哪個方向？", slang: "Where's the bathroom?", slang_check: "廁所邊度？"}
                 ],
                 time: [
                     {origin: "我預約了七點。", formal: "I have a reservation at seven.", formal_check: "我約了七點。", slang: "Reserved for seven.", slang_check: "約咗七點。"},
@@ -489,7 +508,17 @@
                     {origin: "我們想取消預約。", formal: "We would like to cancel our reservation.", formal_check: "我想取消預訂。", slang: "Cancelling the booking.", slang_check: "取消預約。"},
                     {origin: "菜還沒到，還要等多久？", formal: "The food hasn't arrived; how much longer?", formal_check: "食物還沒到，還要多久？", slang: "Where's our food?", slang_check: "嘢食呢？"},
                     {origin: "你們什麼時候關門？", formal: "What time do you close?", formal_check: "你們幾點關門？", slang: "Closing time?", slang_check: "幾點收舖？"},
-                    {origin: "午餐供應到幾點？", formal: "Until what time is lunch served?", formal_check: "午餐供應到幾點？", slang: "When does lunch end?", slang_check: "午餐幾點完？"}
+                    {origin: "午餐供應到幾點？", formal: "Until what time is lunch served?", formal_check: "午餐供應到幾點？", slang: "When does lunch end?", slang_check: "午餐幾點完？"},
+                    {origin: "仲有幾耐先有得食？", formal: "How long until the food is ready?", formal_check: "食物還有多久準備好？", slang: "Food ready soon?", slang_check: "就快有得食？"},
+                    {origin: "我們坐低咗好耐都未有人落單。", formal: "We have been seated for a while, could we order?", formal_check: "我們坐了很久，可以點餐嗎？", slang: "Can we order now?", slang_check: "可以落單未？"},
+                    {origin: "可以快少少嗎？", formal: "Could you expedite our order?", formal_check: "可以加快我們的餐點嗎？", slang: "Make it quick, please.", slang_check: "快少少唔該。"},
+                    {origin: "叫咗嘅嘢飲幾時到？", formal: "When will our drinks arrive?", formal_check: "我們的飲料何時到？", slang: "Where are our drinks?", slang_check: "嘢飲去咗邊？"},
+                    {origin: "幾點有下午茶？", formal: "What time is afternoon tea served?", formal_check: "下午茶幾點開始？", slang: "Afternoon tea time?", slang_check: "下午茶幾時有？"},
+                    {origin: "歡樂時光去到幾點？", formal: "When does happy hour end?", formal_check: "歡樂時光到幾點結束？", slang: "Happy hour till when?", slang_check: "Happy hour去到幾點？"},
+                    {origin: "可以預約今晚八點嗎？", formal: "Can I book for 8 PM tonight?", formal_check: "可以預訂今晚八點嗎？", slang: "Book for 8 tonight?", slang_check: "今晚八點得嗎？"},
+                    {origin: "我哋想食耐少少，得唔得？", formal: "Can we stay a little longer?", formal_check: "我們可以多待一會兒嗎？", slang: "Can we chill here?", slang_check: "坐耐啲得嗎？"},
+                    {origin: "下午有落場休息嗎？", formal: "Do you close in the afternoon?", formal_check: "你們下午休息嗎？", slang: "Closed in the afternoon?", slang_check: "晏晝有落場？"},
+                    {origin: "甜品可以遲啲上嗎？", formal: "Can you serve the dessert later?", formal_check: "甜點可以晚點上嗎？", slang: "Dessert later.", slang_check: "甜品遲啲上。"}
                 ],
                 food: [
                     {origin: "有推薦嗎？", formal: "What would you recommend?", formal_check: "有什麼推薦？", slang: "What's good here?", slang_check: "咩好食？"},
@@ -501,7 +530,17 @@
                     {origin: "跟這張圖片一樣的。", formal: "The same as this picture, please.", formal_check: "和這圖片一樣。", slang: "This one in the photo.", slang_check: "跟呢個圖。"},
                     {origin: "這個是什麼肉？", formal: "What kind of meat is this?", formal_check: "這是什麼肉？", slang: "What meat is this?", slang_check: "呢份係咩肉？"},
                     {origin: "可以給我熱水嗎？", formal: "Could I have some hot water, please?", formal_check: "可以給我熱水嗎？", slang: "Hot water, please.", slang_check: "熱水，唔該。"},
-                    {origin: "再來一份。", formal: "One more, please.", formal_check: "再多一個。", slang: "Another round.", slang_check: "再嚟一份。"}
+                    {origin: "再來一份。", formal: "One more, please.", formal_check: "再多一個。", slang: "Another round.", slang_check: "再嚟一份。"},
+                    {origin: "這個辣嗎？", formal: "Is this spicy?", formal_check: "這個辣嗎？", slang: "Is it hot?", slang_check: "辣唔辣？"},
+                    {origin: "我食素。", formal: "I am a vegetarian.", formal_check: "我是素食者。", slang: "I'm veggie.", slang_check: "我食齋。"},
+                    {origin: "有無無麩質嘅選擇？", formal: "Do you have gluten-free options?", formal_check: "有無麩質選擇嗎？", slang: "Gluten-free stuff?", slang_check: "有無麩質？"},
+                    {origin: "份量大嗎？", formal: "Is the portion size large?", formal_check: "份量大嗎？", slang: "Big portion?", slang_check: "大份嗎？"},
+                    {origin: "可唔可以分開上醬汁？", formal: "Could you put the sauce on the side?", formal_check: "醬汁可以分開上嗎？", slang: "Sauce on the side.", slang_check: "醬分開上。"},
+                    {origin: "啲嘢食唔夠熱。", formal: "The food is not hot enough.", formal_check: "食物不夠熱。", slang: "Food's kinda cold.", slang_check: "嘢食唔熱。"},
+                    {origin: "呢個好鹹。", formal: "This is very salty.", formal_check: "這個很鹹。", slang: "Super salty.", slang_check: "好鹹。"},
+                    {origin: "有無跟餐飲？", formal: "Does this come with a drink?", formal_check: "這個附飲料嗎？", slang: "Comes with a drink?", slang_check: "包飲品？"},
+                    {origin: "想要多啲冰。", formal: "Extra ice, please.", formal_check: "請多加冰塊。", slang: "Extra ice.", slang_check: "多冰。"},
+                    {origin: "牛排要五成熟。", formal: "Medium for the steak, please.", formal_check: "牛排五分熟。", slang: "Medium steak.", slang_check: "五成熟。"}
                 ],
                 checkout: [
                     {origin: "埋單。", formal: "Could I have the bill, please?", formal_check: "請給我賬單。", slang: "Check, please.", slang_check: "埋單。"},
@@ -513,7 +552,17 @@
                     {origin: "可以在這裡付嗎？", formal: "Can I pay here?", formal_check: "可以在這裡付嗎？", slang: "Pay at the table?", slang_check: "呢度比錢？"},
                     {origin: "包不包含服務費？", formal: "Is the service charge included?", formal_check: "包含服務費嗎？", slang: "Is tip included?", slang_check: "包唔包加一？"},
                     {origin: "我可以打包嗎？", formal: "Could I have this to go, please?", formal_check: "我可以帶走嗎？", slang: "Can I get a doggy bag?", slang_check: "想拎走。"},
-                    {origin: "找錯錢了。", formal: "I think the change is incorrect.", formal_check: "找錯錢了。", slang: "Wrong change.", slang_check: "找錯錢。"}
+                    {origin: "找錯錢了。", formal: "I think the change is incorrect.", formal_check: "找錯錢了。", slang: "Wrong change.", slang_check: "找錯錢。"},
+                    {origin: "可以用支付寶/微信嗎？", formal: "Do you accept Alipay or WeChat Pay?", formal_check: "接受支付寶或微信嗎？", slang: "Alipay or WeChat okay?", slang_check: "用到支付寶微信嗎？"},
+                    {origin: "散紙唔使找。", formal: "Please keep the change.", formal_check: "不用找零了。", slang: "Keep the change.", slang_check: "唔使找。"},
+                    {origin: "我們想AA制。", formal: "We want to split the bill evenly.", formal_check: "我們想平分賬單。", slang: "Split it down the middle.", slang_check: "除開兩份。"},
+                    {origin: "呢餐我請。", formal: "It is my treat.", formal_check: "這頓我請。", slang: "It's on me.", slang_check: "我請客。"},
+                    {origin: "有無得打折？", formal: "Is there any discount available?", formal_check: "有任何折扣嗎？", slang: "Got a discount?", slang_check: "有無折？"},
+                    {origin: "加一服務費計錯咗。", formal: "The service charge is calculated incorrectly.", formal_check: "服務費算錯了。", slang: "Service fee is wrong.", slang_check: "加一錯咗。"},
+                    {origin: "請問可以印兩張收據嗎？", formal: "Could you print two receipts, please?", formal_check: "可以印兩張收據嗎？", slang: "Two receipts, please.", slang_check: "兩張單。"},
+                    {origin: "我哋無叫呢樣嘢。", formal: "We did not order this item.", formal_check: "我們沒點這個。", slang: "Didn't order this.", slang_check: "無叫呢個。"},
+                    {origin: "可以用外幣找數嗎？", formal: "Can I pay with foreign currency?", formal_check: "能用外幣付嗎？", slang: "Foreign cash okay?", slang_check: "用外幣得嗎？"},
+                    {origin: "個外賣盒要加錢嗎？", formal: "Is there an extra charge for the takeaway box?", formal_check: "外帶盒要額外收費嗎？", slang: "Charge for the box?", slang_check: "飯盒要加錢？"}
                 ]
             },
             shopping: {
@@ -527,7 +576,17 @@
                     {origin: "有我的尺碼嗎？", formal: "Do you have this in my size?", formal_check: "有我的尺碼嗎？", slang: "Got my size?", slang_check: "有無我碼？"},
                     {origin: "這件是均碼嗎？", formal: "Is this one-size-only?", formal_check: "這是均碼嗎？", slang: "Free size?", slang_check: "係咪Free size？"},
                     {origin: "我想量一下尺寸。", formal: "I would like to get measured.", formal_check: "我想量尺寸。", slang: "Can you measure me?", slang_check: "幫我度下。"},
-                    {origin: "袖子太長了。", formal: "The sleeves are too long.", formal_check: "袖子太長。", slang: "Sleeves too long.", slang_check: "袖太長。"}
+                    {origin: "袖子太長了。", formal: "The sleeves are too long.", formal_check: "袖子太長。", slang: "Sleeves too long.", slang_check: "袖太長。"},
+                    {origin: "褲頭太窄。", formal: "The waist is too tight.", formal_check: "腰部太緊。", slang: "Waist is tight.", slang_check: "褲頭緊。"},
+                    {origin: "褲腳太長，可以改嗎？", formal: "The pants are too long, can you alter them?", formal_check: "褲子太長，可以修改嗎？", slang: "Can you hem these?", slang_check: "改短得嗎？"},
+                    {origin: "有無半碼？", formal: "Do you have half sizes?", formal_check: "有半號的嗎？", slang: "Half sizes?", slang_check: "有半碼嗎？"},
+                    {origin: "呢個碼對我嚟講有啲細。", formal: "This size runs a bit small for me.", formal_check: "這尺碼對我有點小。", slang: "Runs small.", slang_check: "碼數偏細。"},
+                    {origin: "膊頭位好窄。", formal: "It is tight across the shoulders.", formal_check: "肩膀處很緊。", slang: "Tight on the shoulders.", slang_check: "膊頭緊。"},
+                    {origin: "有特大碼嗎？", formal: "Do you carry plus sizes?", formal_check: "有加大碼嗎？", slang: "Got plus sizes?", slang_check: "有大碼嗎？"},
+                    {origin: "童裝最大去到幾多歲？", formal: "What is the largest size for kids?", formal_check: "童裝最大尺寸是多少？", slang: "Biggest kid size?", slang_check: "最大童裝幾大？"},
+                    {origin: "男裝喺邊一層？", formal: "Which floor is the men's section on?", formal_check: "男裝在哪一層？", slang: "Where's menswear?", slang_check: "男裝喺邊？"},
+                    {origin: "我可以試另外一個碼嗎？", formal: "Can I try a different size?", formal_check: "我可以試另一個尺寸嗎？", slang: "Another size?", slang_check: "試另一個碼？"},
+                    {origin: "試身室有限帶幾多件嗎？", formal: "Is there an item limit for the fitting room?", formal_check: "試衣間有件數限制嗎？", slang: "Item limit for fitting?", slang_check: "限帶幾件？"}
                 ],
                 color: [
                     {origin: "有其他顏色嗎？", formal: "Does this come in other colors?", formal_check: "有別的顏色嗎？", slang: "Any other colors?", slang_check: "有無其他色？"},
@@ -539,7 +598,17 @@
                     {origin: "白色容易髒嗎？", formal: "Does the white get dirty easily?", formal_check: "白色易髒嗎？", slang: "Does it stain easily?", slang_check: "白易唔易污糟？"},
                     {origin: "我可以看看那個藍色的嗎？", formal: "Could I see the blue one?", formal_check: "能看藍色那個嗎？", slang: "Show me the blue one.", slang_check: "睇下藍色嗰件。"},
                     {origin: "這顏色配我嗎？", formal: "Does this color suit me?", formal_check: "這色襯我嗎？", slang: "Does this look good on me?", slang_check: "襯唔襯我？"},
-                    {origin: "要這張照片上的顏色。", formal: "I want the color in this photo.", formal_check: "要照片上的顏色。", slang: "This color from the pic.", slang_check: "要圖入面隻色。"}
+                    {origin: "要這張照片上的顏色。", formal: "I want the color in this photo.", formal_check: "要照片上的顏色。", slang: "This color from the pic.", slang_check: "要圖入面隻色。"},
+                    {origin: "有無粉紅色？", formal: "Do you have this in pink?", formal_check: "有粉紅色的嗎？", slang: "Got it in pink?", slang_check: "有粉紅色嗎？"},
+                    {origin: "呢個圖案有其他色嗎？", formal: "Does this pattern come in other colors?", formal_check: "這圖案有別的顏色嗎？", slang: "Other colors for this pattern?", slang_check: "呢個花有其他色？"},
+                    {origin: "兩隻色我都想要。", formal: "I will take both colors.", formal_check: "我兩個顏色都要。", slang: "I'll take both.", slang_check: "兩隻色都要。"},
+                    {origin: "邊隻色最受歡迎？", formal: "Which color is the most popular?", formal_check: "哪個顏色最受歡迎？", slang: "Most popular color?", slang_check: "邊隻色最賣得？"},
+                    {origin: "呢個色有啲顯老。", formal: "This color makes me look older.", formal_check: "這顏色顯老。", slang: "Makes me look old.", slang_check: "著到好老。"},
+                    {origin: "有無素色/淨色？", formal: "Do you have any plain colors?", formal_check: "有素色的嗎？", slang: "Any plain ones?", slang_check: "有淨色嗎？"},
+                    {origin: "呢隻色會甩色嗎？", formal: "Will this color fade?", formal_check: "這顏色會掉色嗎？", slang: "Will it fade?", slang_check: "會甩色嗎？"},
+                    {origin: "我想要透明嘅。", formal: "I would like a transparent one.", formal_check: "我想要透明的。", slang: "Clear one, please.", slang_check: "要透明嘅。"},
+                    {origin: "呢隻係啞面定光面？", formal: "Is this matte or glossy?", formal_check: "這是啞光還是亮面的？", slang: "Matte or glossy?", slang_check: "啞面定反光？"},
+                    {origin: "我唔太鍾意呢隻色。", formal: "I do not really like this color.", formal_check: "我不太喜歡這顏色。", slang: "Not feeling this color.", slang_check: "唔太鍾意呢隻色。"}
                 ],
                 price: [
                     {origin: "多少錢？", formal: "How much is this?", formal_check: "這個多少錢？", slang: "How much?", slang_check: "幾錢？"},
@@ -551,7 +620,17 @@
                     {origin: "有沒有退稅？", formal: "Is this eligible for tax refund?", formal_check: "可以退稅嗎？", slang: "Tax-free?", slang_check: "免稅？"},
                     {origin: "最低消費多少可以退稅？", formal: "What's the minimum for a tax refund?", formal_check: "退稅最低消費多少？", slang: "How much for tax-free?", slang_check: "幾錢可以免稅？"},
                     {origin: "我不要了，謝謝。", formal: "I'll pass, thank you.", formal_check: "我不要了，謝謝。", slang: "No thanks.", slang_check: "唔要喇。"},
-                    {origin: "這是含稅價嗎？", formal: "Is tax included in this price?", formal_check: "價格含稅嗎？", slang: "Tax included?", slang_check: "含稅價？"}
+                    {origin: "這是含稅價嗎？", formal: "Is tax included in this price?", formal_check: "價格含稅嗎？", slang: "Tax included?", slang_check: "含稅價？"},
+                    {origin: "標價係美金定港紙？", formal: "Is the price in USD or local currency?", formal_check: "標價是美金還是當地貨幣？", slang: "USD or local cash?", slang_check: "美金定港紙？"},
+                    {origin: "有無做緊咩信用卡優惠？", formal: "Are there any credit card promotions?", formal_check: "有信用卡優惠嗎？", slang: "Card promos?", slang_check: "信用卡有折？"},
+                    {origin: "全場都有折嗎？", formal: "Is the discount storewide?", formal_check: "全店都有折扣嗎？", slang: "Storewide sale?", slang_check: "全部都有折？"},
+                    {origin: "呢件衫折實幾錢？", formal: "What is the final price after the discount?", formal_check: "這衣服折後多少錢？", slang: "Final price?", slang_check: "折實幾錢？"},
+                    {origin: "買滿幾多有送禮物？", formal: "What is the minimum spend for a free gift?", formal_check: "滿多少送禮物？", slang: "Min spend for a gift?", slang_check: "買幾多送嘢？"},
+                    {origin: "呢個價錢包埋配件嗎？", formal: "Does the price include accessories?", formal_check: "價格包含配件嗎？", slang: "Accessories included?", slang_check: "包埋配件？"},
+                    {origin: "算平啲啦，我買好多。", formal: "Give me a better price, I am buying a lot.", formal_check: "算便宜點吧，我買很多。", slang: "Better deal? I'm buying a bunch.", slang_check: "平啲啦，買好多。"},
+                    {origin: "會唔會再減價？", formal: "Will it go on further markdown?", formal_check: "還會再降價嗎？", slang: "Will it go lower?", slang_check: "遲啲會平啲？"},
+                    {origin: "原價係幾多？", formal: "What was the original price?", formal_check: "原價是多少？", slang: "Original price?", slang_check: "原價幾錢？"},
+                    {origin: "呢個係最低價？", formal: "Is this your bottom price?", formal_check: "這是最低價嗎？", slang: "Lowest you can go?", slang_check: "最平係呢個價？"}
                 ],
                 pay: [
                     {origin: "我要買這個。", formal: "I would like to buy this.", formal_check: "我想買這個。", slang: "I'll take this.", slang_check: "要呢個。"},
@@ -559,11 +638,21 @@
                     {origin: "可以分開付嗎？", formal: "Can we pay separately?", formal_check: "能分開付嗎？", slang: "Separate payments?", slang_check: "分開比錢？"},
                     {origin: "收現金嗎？", formal: "Do you accept cash?", formal_check: "收現金嗎？", slang: "Cash okay?", slang_check: "收錢得嗎？"},
                     {origin: "請給我一個購物袋。", formal: "Could I have a shopping bag, please?", formal_check: "請給我購物袋。", slang: "Bag, please.", slang_check: "要袋。"},
-                    {origin: "需要加錢買袋嗎？", formal: "Is there a charge for the bag?", formal_check: "袋子要收費嗎？", slang: "袋子要收費嗎？", slang_check: "袋子要收費嗎？"},
+                    {origin: "需要加錢買袋嗎？", formal: "Is there a charge for the bag?", formal_check: "袋子要收費嗎？", slang: "Charge for bag?", slang_check: "袋子要收費嗎？"},
                     {origin: "可以用Apple Pay嗎？", formal: "Do you accept Apple Pay?", formal_check: "可以用Apple Pay嗎？", slang: "Apple Pay okay?", slang_check: "用唔用到Apple Pay？"},
                     {origin: "可以幫我包裝成禮物嗎？", formal: "Could you gift-wrap this for me?", formal_check: "能幫我包成禮物嗎？", slang: "Gift wrap, please.", slang_check: "包禮物。"},
                     {origin: "收銀台在哪？", formal: "Where is the cashier?", formal_check: "收銀處在哪？", slang: "Where's the counter?", slang_check: "收銀係邊？"},
-                    {origin: "我想要一張正式發票。", formal: "I need a formal invoice, please.", formal_check: "我需要正式發票。", slang: "Invoice, please.", slang_check: "要發票。"}
+                    {origin: "我想要一張正式發票。", formal: "I need a formal invoice, please.", formal_check: "我需要正式發票。", slang: "Invoice, please.", slang_check: "要發票。"},
+                    {origin: "我想用兩張卡找數。", formal: "I want to split it between two cards.", formal_check: "我想用兩張卡分開付。", slang: "Split on two cards.", slang_check: "用兩張卡比。"},
+                    {origin: "收唔收銀聯卡？", formal: "Do you accept UnionPay?", formal_check: "接受銀聯卡嗎？", slang: "UnionPay okay?", slang_check: "收銀聯？"},
+                    {origin: "我可以之後返嚟俾錢嗎？", formal: "Can I pay for it later?", formal_check: "我可以稍後回來付款嗎？", slang: "Pay later?", slang_check: "遲啲返嚟比錢得嗎？"},
+                    {origin: "麻煩幫我剪走個價錢牌。", formal: "Please cut off the price tag.", formal_check: "請幫我剪掉吊牌。", slang: "Cut the tag off, please.", slang_check: "剪牌。"},
+                    {origin: "呢樣嘢分開包裝。", formal: "Wrap this one separately, please.", formal_check: "這個請分開包裝。", slang: "Wrap this separately.", slang_check: "分開包裝。"},
+                    {origin: "收據可以發去我email嗎？", formal: "Can you email the receipt to me?", formal_check: "收據可以發電郵給我嗎？", slang: "Email the receipt?", slang_check: "收據email俾我。"},
+                    {origin: "有無會員卡積分？", formal: "Can I collect member points?", formal_check: "可以儲會員積分嗎？", slang: "Can I get points?", slang_check: "儲積分？"},
+                    {origin: "我要退稅單。", formal: "I need the tax refund form.", formal_check: "我需要退稅單。", slang: "Tax refund form, please.", slang_check: "要退稅單。"},
+                    {origin: "找多咗錢俾我。", formal: "You gave me too much change.", formal_check: "你多找錢給我了。", slang: "Too much change.", slang_check: "找多咗錢。"},
+                    {origin: "找少咗錢。", formal: "You shortchanged me.", formal_check: "你少找錢了。", slang: "Shortchanged.", slang_check: "找少咗。"}
                 ],
                 others: [
                     {origin: "有新的嗎？", formal: "Do you have a new one in the box?", formal_check: "有全新的嗎？", slang: "A fresh one, please.", slang_check: "要新嘅。"},
@@ -575,7 +664,17 @@
                     {origin: "可以幫我拿個籃嗎？", formal: "Could I have a basket, please?", formal_check: "請給我個籃子。", slang: "Got a basket?", slang_check: "有無籃？"},
                     {origin: "這件衣服是什麼質料？", formal: "What material is this made of?", formal_check: "這是什麼料子？", slang: "What's the fabric?", slang_check: "咩料嚟？"},
                     {origin: "有其他分店嗎？", formal: "Are there any other branches nearby?", formal_check: "附近有分店嗎？", slang: "Other stores nearby?", slang_check: "有無分店？"},
-                    {origin: "可以送貨到酒店嗎？", formal: "Could you deliver this to my hotel?", formal_check: "能送貨到酒店嗎？", slang: "Deliver to my hotel?", slang_check: "送去酒店得嗎？"}
+                    {origin: "可以送貨到酒店嗎？", formal: "Could you deliver this to my hotel?", formal_check: "能送貨到酒店嗎？", slang: "Deliver to my hotel?", slang_check: "送去酒店得嗎？"},
+                    {origin: "幾點閂門？", formal: "What time do you close?", formal_check: "你們幾點打烊？", slang: "Closing time?", slang_check: "幾點收工？"},
+                    {origin: "可以幫我留起佢嗎？", formal: "Can you put this on hold for me?", formal_check: "可以幫我保留這個嗎？", slang: "Put this on hold?", slang_check: "留起佢得嗎？"},
+                    {origin: "呢度有手推車嗎？", formal: "Do you have shopping carts here?", formal_check: "這裡有購物車嗎？", slang: "Got shopping carts?", slang_check: "有無手推車？"},
+                    {origin: "呢個係本地造定進口？", formal: "Is this locally made or imported?", formal_check: "這是本地製造還是進口的？", slang: "Local or imported?", slang_check: "本地定進口？"},
+                    {origin: "有無目錄可以睇？", formal: "Do you have a catalog I can look at?", formal_check: "有產品目錄嗎？", slang: "Got a catalog?", slang_check: "有無catalog睇？"},
+                    {origin: "呢隻牌子有專櫃嗎？", formal: "Is there a dedicated counter for this brand?", formal_check: "這品牌有專櫃嗎？", slang: "Counter for this brand?", slang_check: "有專櫃嗎？"},
+                    {origin: "請問電梯喺邊？", formal: "Where are the escalators?", formal_check: "請問手扶梯在哪？", slang: "Where are the escalators?", slang_check: "電梯喺邊？"},
+                    {origin: "我可唔可以拆開個盒睇？", formal: "Can I open the box to check?", formal_check: "可以打開盒子看看嗎？", slang: "Can I open the box?", slang_check: "拆開睇得嗎？"},
+                    {origin: "呢個係限量版嗎？", formal: "Is this a limited edition?", formal_check: "這是限量版嗎？", slang: "Limited edition?", slang_check: "限量版？"},
+                    {origin: "網上買會唔會平啲？", formal: "Is it cheaper to buy online?", formal_check: "網購會比較便宜嗎？", slang: "Cheaper online?", slang_check: "上網買平啲？"}
                 ]
             },
             transport: {
@@ -589,7 +688,17 @@
                     {origin: "JR站在哪？", formal: "Where is the JR station?", formal_check: "JR站在哪？", slang: "Where's the JR?", slang_check: "JR邊度搭？"},
                     {origin: "洗手間在哪？", formal: "Where are the restrooms?", formal_check: "洗手間在哪？", slang: "Toilet?", slang_check: "廁所？"},
                     {origin: "有電梯嗎？", formal: "Is there an elevator?", formal_check: "有電梯嗎？", slang: "Any lift?", slang_check: "有無lift？"},
-                    {origin: "這是正確的方向嗎？", formal: "Is this the correct direction?", formal_check: "這是正確方向嗎？", slang: "Wrong way?", slang_check: "呢邊邊啱唔啱？"}
+                    {origin: "這是正確的方向嗎？", formal: "Is this the correct direction?", formal_check: "這是正確方向嗎？", slang: "Wrong way?", slang_check: "呢邊邊啱唔啱？"},
+                    {origin: "邊個月台去機場？", formal: "Which platform is for the airport?", formal_check: "去機場在哪個月台？", slang: "Platform for the airport?", slang_check: "邊個月台去機場？"},
+                    {origin: "呢個站有幾多個出口？", formal: "How many exits are there in this station?", formal_check: "這車站有幾個出口？", slang: "How many exits?", slang_check: "有幾多個出口？"},
+                    {origin: "去市中心搭咩線？", formal: "Which line goes to the city center?", formal_check: "去市中心搭哪條線？", slang: "Line to the city?", slang_check: "搭咩線出市區？"},
+                    {origin: "請問有詢問處嗎？", formal: "Is there an information desk?", formal_check: "有詢問處嗎？", slang: "Info desk?", slang_check: "有無詢問處？"},
+                    {origin: "有無無障礙通道？", formal: "Is there a wheelchair accessible route?", formal_check: "有無障礙通道嗎？", slang: "Wheelchair route?", slang_check: "有無障礙通道？"},
+                    {origin: "可以帶單車上車嗎？", formal: "Can I bring a bicycle on the train?", formal_check: "能帶腳踏車上車嗎？", slang: "Bikes allowed on train?", slang_check: "單車上得車嗎？"},
+                    {origin: "邊度可以搭的士？", formal: "Where is the taxi stand?", formal_check: "在哪裡搭計程車？", slang: "Where's the taxi stand?", slang_check: "邊度搭的士？"},
+                    {origin: "轉車洗唔洗出閘？", formal: "Do I need to exit the gates to transfer?", formal_check: "轉車需要出站嗎？", slang: "Need to exit to transfer?", slang_check: "轉車要出閘？"},
+                    {origin: "車站入面有便利店嗎？", formal: "Is there a convenience store inside the station?", formal_check: "站內有便利店嗎？", slang: "Convenience store inside?", slang_check: "站內有便利店？"},
+                    {origin: "我上錯車喇。", formal: "I got on the wrong train.", formal_check: "我上錯車了。", slang: "Got on the wrong train.", slang_check: "搭錯車。"}
                 ],
                 ticketing: [
                     {origin: "在哪裡買票？", formal: "Where can I buy tickets?", formal_check: "在哪買票？", slang: "Tickets where?", slang_check: "邊度買飛？"},
@@ -601,7 +710,17 @@
                     {origin: "有周遊券嗎？", formal: "Do you sell day passes?", formal_check: "有日票嗎？", slang: "Any day pass?", slang_check: "有無一日卷？"},
                     {origin: "哪裡可以增值？", formal: "Where can I top up my card?", formal_check: "哪裡可以充值？", slang: "Top up here?", slang_check: "邊度入錢？"},
                     {origin: "售票機在哪？", formal: "Where are the ticket machines?", formal_check: "售票機在哪？", slang: "Ticket machines?", slang_check: "買飛機係邊？"},
-                    {origin: "小孩有折扣嗎？", formal: "Is there a child's discount?", formal_check: "小孩有優惠嗎？", slang: "Kid's price?", slang_check: "細路有無折？"}
+                    {origin: "小孩有折扣嗎？", formal: "Is there a child's discount?", formal_check: "小孩有優惠嗎？", slang: "Kid's price?", slang_check: "細路有無折？"},
+                    {origin: "可以買來回飛嗎？", formal: "Can I buy a round-trip ticket?", formal_check: "可以買來回票嗎？", slang: "Round-trip ticket?", slang_check: "買來回飛？"},
+                    {origin: "呢張飛幾時到期？", formal: "When does this ticket expire?", formal_check: "這票何時過期？", slang: "When does it expire?", slang_check: "張飛幾時到期？"},
+                    {origin: "有無長者優惠？", formal: "Is there a senior discount?", formal_check: "有長者優惠嗎？", slang: "Senior discount?", slang_check: "有長者優惠嗎？"},
+                    {origin: "部機食咗我啲錢。", formal: "The machine swallowed my money.", formal_check: "機器吞了我的錢。", slang: "Machine ate my money.", slang_check: "部機食咗錢。"},
+                    {origin: "點樣轉英文介面？", formal: "How do I switch to English on the screen?", formal_check: "如何切換成英文界面？", slang: "How to change to English?", slang_check: "點轉英文？"},
+                    {origin: "我買錯飛，可以退嗎？", formal: "I bought the wrong ticket, can I get a refund?", formal_check: "我買錯票了，能退嗎？", slang: "Wrong ticket, can I refund?", slang_check: "買錯飛有得退嗎？"},
+                    {origin: "特急列車要加錢嗎？", formal: "Is there an extra charge for the express train?", formal_check: "特快列車要加錢嗎？", slang: "Extra for express?", slang_check: "快車要加錢嗎？"},
+                    {origin: "可以用信用卡買飛嗎？", formal: "Can I pay for the ticket with a credit card?", formal_check: "能用信用卡買票嗎？", slang: "Credit card for tickets?", slang_check: "碌卡買飛？"},
+                    {origin: "有無家庭套票？", formal: "Do you have a family pass?", formal_check: "有家庭套票嗎？", slang: "Family pass?", slang_check: "有家庭套票？"},
+                    {origin: "點樣買劃位飛？", formal: "How do I reserve a seat?", formal_check: "如何預訂座位？", slang: "How to book a seat?", slang_check: "點樣劃位？"}
                 ],
                 time: [
                     {origin: "下一班車幾點？", formal: "What time is the next train?", formal_check: "下班車幾點？", slang: "Next train?", slang_check: "下班車？"},
@@ -613,7 +732,17 @@
                     {origin: "每幾分鐘一班車？", formal: "How often do the trains run?", formal_check: "每隔幾分鐘一班？", slang: "How frequent?", slang_check: "幾耐一班？"},
                     {origin: "下一班公車什麼時候來？", formal: "When is the next bus coming?", formal_check: "下班公車幾點？", slang: "Next bus?", slang_check: "下班巴士？"},
                     {origin: "還要等多久？", formal: "How much longer is the wait?", formal_check: "還要等多久？", slang: "How much longer?", slang_check: "仲要等幾耐？"},
-                    {origin: "現在是繁忙時間嗎？", formal: "Is it peak hour now?", formal_check: "現在是高峰期嗎？", slang: "Rush hour?", slang_check: "繁忙時間？"}
+                    {origin: "現在是繁忙時間嗎？", formal: "Is it peak hour now?", formal_check: "現在是高峰期嗎？", slang: "Rush hour?", slang_check: "繁忙時間？"},
+                    {origin: "車程大約幾耐？", formal: "How long is the journey roughly?", formal_check: "車程大概多久？", slang: "How long is the ride?", slang_check: "車程幾耐？"},
+                    {origin: "仲有幾多個站？", formal: "How many stops left?", formal_check: "還有幾個站？", slang: "How many stops left?", slang_check: "仲有幾多個站？"},
+                    {origin: "下一站係咩？", formal: "What is the next stop?", formal_check: "下一站是什麼？", slang: "Next stop?", slang_check: "下個站係咩？"},
+                    {origin: "去到XX要轉車嗎？", formal: "Do I need to transfer for XX?", formal_check: "去XX需要轉車嗎？", slang: "Transfer for XX?", slang_check: "去XX要轉車？"},
+                    {origin: "呢班車係直通車嗎？", formal: "Is this a direct train?", formal_check: "這是直達車嗎？", slang: "Direct train?", slang_check: "係咪直通車？"},
+                    {origin: "因為大雨停駛嗎？", formal: "Is the service suspended due to heavy rain?", formal_check: "因為大雨停駛了嗎？", slang: "Suspended because of rain?", slang_check: "落雨停駛？"},
+                    {origin: "夜班巴士幾點開？", formal: "What time does the night bus leave?", formal_check: "夜間巴士幾點發車？", slang: "Night bus time?", slang_check: "通宵巴士幾點開？"},
+                    {origin: "有無時間表可以拎？", formal: "Do you have a printed timetable?", formal_check: "有紙本時刻表嗎？", slang: "Got a timetable?", slang_check: "有無時間表？"},
+                    {origin: "我趕時間，有無快車？", formal: "I am in a hurry, is there an express?", formal_check: "我趕時間，有快車嗎？", slang: "In a rush, any express?", slang_check: "好趕，有無快車？"},
+                    {origin: "點解架車停咗？", formal: "Why has the train stopped?", formal_check: "為什麼車停了？", slang: "Why did the train stop?", slang_check: "點解停車？"}
                 ],
                 walk: [
                     {origin: "步行要多久？", formal: "How long does it take to walk there?", formal_check: "走路要多久？", slang: "How long on foot?", slang_check: "行過去幾耐？"},
@@ -625,7 +754,17 @@
                     {origin: "地標是什麼？", formal: "What is the landmark nearby?", formal_check: "附近地標是什麼？", slang: "Any landmarks?", slang_check: "有咩大建築物？"},
                     {origin: "過馬路嗎？", formal: "Do I need to cross the street?", formal_check: "要過馬路嗎？", slang: "Cross over?", slang_check: "過馬路？"},
                     {origin: "在地下嗎？", formal: "Is it underground?", formal_check: "在地下嗎？", slang: "Below ground?", slang_check: "係地底？"},
-                    {origin: "在商場裡面嗎？", formal: "Is it inside the mall?", formal_check: "在商場裡嗎？", slang: "In the mall?", slang_check: "係商場入面？"}
+                    {origin: "在商場裡面嗎？", formal: "Is it inside the mall?", formal_check: "在商場裡嗎？", slang: "In the mall?", slang_check: "係商場入面？"},
+                    {origin: "附近有無天橋？", formal: "Is there a footbridge nearby?", formal_check: "附近有天橋嗎？", slang: "Footbridge nearby?", slang_check: "有無天橋？"},
+                    {origin: "係咪要行樓梯？", formal: "Do I have to take the stairs?", formal_check: "需要走樓梯嗎？", slang: "Take the stairs?", slang_check: "要行樓梯嗎？"},
+                    {origin: "條路難行嗎？", formal: "Is the path difficult to walk?", formal_check: "這條路難走嗎？", slang: "Hard to walk there?", slang_check: "難行嗎？"},
+                    {origin: "係上斜定落斜？", formal: "Is it uphill or downhill?", formal_check: "是上坡還是下坡？", slang: "Uphill or downhill?", slang_check: "上斜定落斜？"},
+                    {origin: "地圖顯示喺附近。", formal: "The map shows it is nearby.", formal_check: "地圖顯示在附近。", slang: "Map says it's close.", slang_check: "地圖話喺附近。"},
+                    {origin: "行錯路喇。", formal: "We went the wrong way.", formal_check: "我們走錯路了。", slang: "Wrong way.", slang_check: "行錯路。"},
+                    {origin: "過咗馬路再轉左？", formal: "Cross the road and then turn left?", formal_check: "過馬路然後左轉嗎？", slang: "Cross and turn left?", slang_check: "過馬路轉左？"},
+                    {origin: "睇唔到有路牌。", formal: "I do not see any street signs.", formal_check: "我看不到路標。", slang: "Don't see any signs.", slang_check: "無路牌。"},
+                    {origin: "呢個方向係去北面嗎？", formal: "Is this heading North?", formal_check: "這是往北的方向嗎？", slang: "Heading North?", slang_check: "去北面嗎？"},
+                    {origin: "可以帶我行一小段嗎？", formal: "Could you walk me part of the way?", formal_check: "可以帶我走一小段嗎？", slang: "Walk with me a bit?", slang_check: "帶我行一陣？"}
                 ],
                 others: [
                     {origin: "有行李寄存箱嗎？", formal: "Are there any coin lockers available?", formal_check: "有投幣寄存櫃嗎？", slang: "Coin lockers?", slang_check: "有無locker？"},
@@ -637,7 +776,17 @@
                     {origin: "附近有機場巴士嗎？", formal: "Is there an airport shuttle nearby?", formal_check: "附近有機場接駁車嗎？", slang: "Airport bus?", slang_check: "有無機場巴士？"},
                     {origin: "我可以充電嗎？", formal: "Is there a charging station?", formal_check: "有充電站嗎？", slang: "Power outlet?", slang_check: "邊度有得叉電？"},
                     {origin: "有免費WiFi嗎？", formal: "Is there free Wi-Fi?", formal_check: "有免費WiFi嗎？", slang: "Free Wi-Fi?", slang_check: "有無Free WiFi？"},
-                    {origin: "這台機器壞了。", formal: "This machine is out of order.", formal_check: "這機器壞了。", slang: "It's broken.", slang_check: "壞咗。"}
+                    {origin: "這台機器壞了。", formal: "This machine is out of order.", formal_check: "這機器壞了。", slang: "It's broken.", slang_check: "壞咗。"},
+                    {origin: "的士可以放幾多件行李？", formal: "How much luggage can the taxi fit?", formal_check: "計程車能裝多少行李？", slang: "How much luggage fits?", slang_check: "的士放到幾多行李？"},
+                    {origin: "司機，我想去呢個地址。", formal: "Driver, I want to go to this address.", formal_check: "司機，我想去這個地址。", slang: "Take me here, driver.", slang_check: "司機，去呢度。"},
+                    {origin: "麻煩喺度停。", formal: "Please pull over here.", formal_check: "請在這裡停車。", slang: "Stop here, please.", slang_check: "喺度停。"},
+                    {origin: "可以俾張單我嗎？", formal: "Can I have a receipt, please?", formal_check: "能給我收據嗎？", slang: "Receipt, please.", slang_check: "要張單。"},
+                    {origin: "請問要綁安全帶嗎？", formal: "Do I need to wear a seatbelt?", formal_check: "需要繫安全帶嗎？", slang: "Seatbelt needed?", slang_check: "要帶安全帶嗎？"},
+                    {origin: "巴士有無冷氣？", formal: "Does the bus have air conditioning?", formal_check: "公車有冷氣嗎？", slang: "AC on the bus?", slang_check: "巴士有冷氣嗎？"},
+                    {origin: "渡輪碼頭喺邊？", formal: "Where is the ferry pier?", formal_check: "渡輪碼頭在哪裡？", slang: "Ferry pier?", slang_check: "碼頭喺邊？"},
+                    {origin: "買船飛要出示護照嗎？", formal: "Do I need my passport for ferry tickets?", formal_check: "買船票需要護照嗎？", slang: "Passport for ferry?", slang_check: "買船飛要護照？"},
+                    {origin: "暈車浪，有無膠袋？", formal: "I am motion sick, do you have a plastic bag?", formal_check: "我暈車，有塑膠袋嗎？", slang: "Carsick, got a bag?", slang_check: "暈車浪，有無袋？"},
+                    {origin: "單車可以租幾耐？", formal: "How long can I rent the bicycle for?", formal_check: "腳踏車可以租多久？", slang: "How long to rent the bike?", slang_check: "單車租幾耐？"}
                 ]
             },
             hotel: {
@@ -651,7 +800,17 @@
                     {origin: "WiFi密碼是什麼？", formal: "What is the Wi-Fi password?", formal_check: "WiFi密碼是什麼？", slang: "WiFi密碼？", slang_check: "WiFi密碼？"},
                     {origin: "退房時間是幾點？", formal: "What time is check-out?", formal_check: "退房是幾點？", slang: "Check-out time?", slang_check: "幾點退房？"},
                     {origin: "可以延遲退房嗎？", formal: "Is a late check-out available?", formal_check: "能延遲退房嗎？", slang: "Late check-out?", slang_check: "可唔可以晏啲退房？"},
-                    {origin: "我的房間號碼是多少？", formal: "What is my room number?", formal_check: "我的房號多少？", slang: "My room number?", slang_check: "幾號房？"}
+                    {origin: "我的房間號碼是多少？", formal: "What is my room number?", formal_check: "我的房號多少？", slang: "My room number?", slang_check: "幾號房？"},
+                    {origin: "我想升級房間。", formal: "I would like to upgrade my room.", formal_check: "我想升級房間。", slang: "Room upgrade?", slang_check: "升級房間。"},
+                    {origin: "請問雙人床係一張定兩張？", formal: "Is the double bed one bed or two?", formal_check: "雙人床是一張還是兩張？", slang: "One bed or two?", slang_check: "一張床定兩張床？"},
+                    {origin: "有無海景房？", formal: "Do you have a sea view room?", formal_check: "有海景房嗎？", slang: "Sea view room?", slang_check: "有無海景房？"},
+                    {origin: "我們想安排相連房。", formal: "We would like connecting rooms.", formal_check: "我們想要連通房。", slang: "Connecting rooms, please.", slang_check: "想要相連房。"},
+                    {origin: "請問健身室喺幾樓？", formal: "Which floor is the gym on?", formal_check: "健身房在幾樓？", slang: "Where's the gym?", slang_check: "健身室喺幾樓？"},
+                    {origin: "泳池幾點開放？", formal: "What time does the pool open?", formal_check: "游泳池幾點開放？", slang: "Pool opening time?", slang_check: "泳池幾點開？"},
+                    {origin: "房卡得一張嗎？", formal: "Is there only one room key?", formal_check: "房卡只有一張嗎？", slang: "Only one key?", slang_check: "得一張房卡？"},
+                    {origin: "可以幫我影印護照嗎？", formal: "Can you photocopy my passport?", formal_check: "可以幫我影印護照嗎？", slang: "Copy my passport?", slang_check: "幫我印護照。"},
+                    {origin: "大堂有無迎賓飲品？", formal: "Are there welcome drinks in the lobby?", formal_check: "大堂有迎賓飲料嗎？", slang: "Welcome drinks?", slang_check: "有無welcome drink？"},
+                    {origin: "我想延遲多一晚。", formal: "I would like to extend my stay for one more night.", formal_check: "我想多延遲一晚。", slang: "Extend for one night.", slang_check: "想住多一晚。"}
                 ],
                 luggage: [
                     {origin: "可以寄存行李嗎？", formal: "Could you store my luggage, please?", formal_check: "可以寄存行李嗎？", slang: "Keep my bags?", slang_check: "幫我睇喼？"},
@@ -663,7 +822,17 @@
                     {origin: "有多少件行李？", formal: "How many pieces of luggage?", formal_check: "有多少件行李？", slang: "How many bags?", slang_check: "幾多件行李？"},
                     {origin: "這件很重。", formal: "This one is very heavy.", formal_check: "This one is very heavy.", slang: "Super heavy.", slang_check: "好重。"},
                     {origin: "這件易碎。", formal: "This is fragile.", formal_check: "這是易碎品。", slang: "Fragile, be careful.", slang_check: "易碎。"},
-                    {origin: "在哪裡領取行李？", formal: "Where can I pick up my bags?", formal_check: "在哪領行李？", slang: "Luggage pickup?", slang_check: "邊度攞返行李？"}
+                    {origin: "在哪裡領取行李？", formal: "Where can I pick up my bags?", formal_check: "在哪領行李？", slang: "Luggage pickup?", slang_check: "邊度攞返行李？"},
+                    {origin: "行李可以過夜嗎？", formal: "Can I store my luggage overnight?", formal_check: "行李可以寄存過夜嗎？", slang: "Store bags overnight?", slang_check: "行李可以過夜？"},
+                    {origin: "幫我小心處理呢個袋。", formal: "Please handle this bag carefully.", formal_check: "請小心處理這個包。", slang: "Be careful with this bag.", slang_check: "小心啲呢個袋。"},
+                    {origin: "房入面有無保險箱？", formal: "Is there a safe in the room?", formal_check: "房間裡有保險箱嗎？", slang: "Safe in the room?", slang_check: "有無保險箱？"},
+                    {origin: "行李車喺邊？", formal: "Where is the luggage cart?", formal_check: "行李推車在哪裡？", slang: "Where's the luggage cart?", slang_check: "行李車喺邊？"},
+                    {origin: "可以幫我搬上車嗎？", formal: "Could you help me load this into the car?", formal_check: "可以幫我搬上車嗎？", slang: "Help load this?", slang_check: "幫手搬上車。"},
+                    {origin: "我漏咗件行李喺大堂。", formal: "I left a piece of luggage in the lobby.", formal_check: "我把一件行李落在這了。", slang: "Left a bag in the lobby.", slang_check: "漏咗行李喺大堂。"},
+                    {origin: "呢度有行李鎖買嗎？", formal: "Do you sell luggage locks here?", formal_check: "這裡賣行李鎖嗎？", slang: "Sell luggage locks?", slang_check: "有行李鎖賣？"},
+                    {origin: "有無人幫手拎行李？", formal: "Is there a bellboy to help with luggage?", formal_check: "有人幫忙拿行李嗎？", slang: "Anyone to help with bags?", slang_check: "有人幫手拎行李？"},
+                    {origin: "呢個手提袋我自己拎。", formal: "I will carry this handbag myself.", formal_check: "這手提袋我自己拿。", slang: "I'll take this bag.", slang_check: "自己拎。"},
+                    {origin: "寄存行李有限體積嗎？", formal: "Is there a size limit for stored luggage?", formal_check: "寄存行李有尺寸限制嗎？", slang: "Size limit for bags?", slang_check: "行李有限幾大？"}
                 ],
                 fee: [
                     {origin: "要付按金嗎？", formal: "Is there a deposit required?", formal_check: "要付押金嗎？", slang: "Need a deposit?", slang_check: "要唔要按金？"},
@@ -675,7 +844,17 @@
                     {origin: "可以用信用卡嗎？", formal: "Do you accept credit cards?", formal_check: "收信用卡嗎？", slang: "Cards okay?", slang_check: "碌卡得嗎？"},
                     {origin: "有學生優惠嗎？", formal: "Is there a student discount?", formal_check: "有學生優惠嗎？", slang: "Student price?", slang_check: "學生有無折？"},
                     {origin: "幾點前要退房才不收費？", formal: "What time is check-out to avoid charges?", formal_check: "幾點退房不收費？", slang: "Late check-out fee?", slang_check: "遲退房要加錢？"},
-                    {origin: "價錢不對。", formal: "The price is incorrect.", formal_check: "價格不正確。", slang: "Wrong price.", slang_check: "價錢唔啱。"}
+                    {origin: "價錢不對。", formal: "The price is incorrect.", formal_check: "價格不正確。", slang: "Wrong price.", slang_check: "價錢唔啱。"},
+                    {origin: "房租已經俾咗。", formal: "The room is already paid for.", formal_check: "房費已經付了。", slang: "Room's paid for.", slang_check: "房租俾咗。"},
+                    {origin: "按金幾時會退返？", formal: "When will the deposit be refunded?", formal_check: "押金何時退還？", slang: "When do I get the deposit back?", slang_check: "幾時退按金？"},
+                    {origin: "可以用現金俾按金嗎？", formal: "Can I pay the deposit in cash?", formal_check: "能用現金付押金嗎？", slang: "Cash deposit?", slang_check: "現金俾按金？"},
+                    {origin: "叫room service要加錢嗎？", formal: "Is there an extra fee for room service?", formal_check: "客房服務要加錢嗎？", slang: "Room service cost extra?", slang_check: "room service要加錢？"},
+                    {origin: "迷你吧嘅嘢飲要錢嗎？", formal: "Are the drinks in the minibar free?", formal_check: "迷你吧飲料免費嗎？", slang: "Minibar drinks free?", slang_check: "迷你吧免費？"},
+                    {origin: "打本地電話收費幾多？", formal: "How much is a local phone call?", formal_check: "撥打本地電話多少錢？", slang: "Cost for a local call?", slang_check: "打本地電話幾錢？"},
+                    {origin: "洗衫費點計？", formal: "How much is the laundry service?", formal_check: "洗衣服務多少錢？", slang: "Laundry cost?", slang_check: "洗衫幾錢？"},
+                    {origin: "停車場要收費嗎？", formal: "Is there a fee for parking?", formal_check: "停車要收費嗎？", slang: "Do I pay for parking?", slang_check: "泊車要錢嗎？"},
+                    {origin: "有無隱藏收費？", formal: "Are there any hidden fees?", formal_check: "有任何隱藏費用嗎？", slang: "Any hidden fees?", slang_check: "有無隱藏收費？"},
+                    {origin: "我想即刻結帳。", formal: "I would like to settle my bill now.", formal_check: "我想現在結算。", slang: "Settle the bill now.", slang_check: "想依家結帳。"}
                 ],
                 inquiry: [
                     {origin: "附近有便利店嗎？", formal: "Is there a convenience store nearby?", formal_check: "附近有便利店嗎？", slang: "Convenience store nearby?", slang_check: "附近有無便利店？"},
@@ -687,7 +866,17 @@
                     {origin: "WiFi很慢。", formal: "The Wi-Fi is very slow.", formal_check: "WiFi很慢。", slang: "Wi-Fi's lagging.", slang_check: "WiFi好慢。"},
                     {origin: "附近有什麼好吃的？", formal: "Are there any good restaurants nearby?", formal_check: "附近有推薦餐廳嗎？", slang: "What's good to eat around here?", slang_check: "附近有咩好食？"},
                     {origin: "這附近安全嗎？", formal: "Is this neighborhood safe?", formal_check: "這附近安全嗎？", slang: "Safe area?", slang_check: "呢區安全嗎？"},
-                    {origin: "我想換房間。", formal: "I would like to change my room.", formal_check: "我想換房。", slang: "Can I swap rooms?", slang_check: "想換房。"}
+                    {origin: "我想換房間。", formal: "I would like to change my room.", formal_check: "我想換房。", slang: "Can I swap rooms?", slang_check: "想換房。"},
+                    {origin: "廁所塞咗。", formal: "The toilet is clogged.", formal_check: "馬桶堵住了。", slang: "Toilet's clogged.", slang_check: "廁所塞咗。"},
+                    {origin: "花灑無水出。", formal: "The shower has no water.", formal_check: "淋浴沒水。", slang: "No water in the shower.", slang_check: "花灑無水。"},
+                    {origin: "房好大陣煙味。", formal: "The room smells like smoke.", formal_check: "房間煙味很重。", slang: "Room smells like smoke.", slang_check: "房有煙味。"},
+                    {origin: "鄰居太嘈喇。", formal: "The neighbors are too noisy.", formal_check: "鄰居太吵了。", slang: "Neighbors are too loud.", slang_check: "隔籬好嘈。"},
+                    {origin: "唔該聽朝七點叫醒我。", formal: "Wake-up call at 7 AM, please.", formal_check: "請明早7點叫醒我。", slang: "Wake me at 7 AM.", slang_check: "七點叫醒我。"},
+                    {origin: "可唔可以加張床？", formal: "Could you add a rollaway bed?", formal_check: "可以加張床嗎？", slang: "Add a bed?", slang_check: "加床得嗎？"},
+                    {origin: "房無廁紙喇。", formal: "The room is out of toilet paper.", formal_check: "房間沒衛生紙了。", slang: "Out of toilet paper.", slang_check: "無廁紙。"},
+                    {origin: "洗頭水唔夠用。", formal: "Not enough shampoo.", formal_check: "洗髮水不夠用。", slang: "Need more shampoo.", slang_check: "洗頭水唔夠。"},
+                    {origin: "可以借個萬能插頭嗎？", formal: "Can I borrow a universal adapter?", formal_check: "能借萬能轉換插頭嗎？", slang: "Borrow an adapter?", slang_check: "借萬能插頭？"},
+                    {origin: "有無熨斗同燙衫板？", formal: "Do you have an iron and ironing board?", formal_check: "有熨斗和燙衣板嗎？", slang: "Got an iron?", slang_check: "有無熨斗？"}
                 ],
                 emergency: [
                     {origin: "我感到不舒服。", formal: "I'm not feeling well.", formal_check: "我不舒服。", slang: "I feel sick.", slang_check: "我病病地。"},
@@ -699,7 +888,17 @@
                     {origin: "發生火警了！", formal: "There is a fire!", formal_check: "著火了！", slang: "Fire!", slang_check: "火燭呀！"},
                     {origin: "這裡有人受傷。", formal: "Someone is injured here.", formal_check: "有人受傷。", slang: "Someone's hurt.", slang_check: "有人受傷。"},
                     {origin: "我的房門反鎖了。", formal: "I'm locked out of my room.", formal_check: "我被反鎖在房外。", slang: "Locked out.", slang_check: "開唔到門。"},
-                    {origin: "這是一個緊急情況。", formal: "This is an emergency.", formal_check: "這是緊急情況。", slang: "It's an emergency.", slang_check: "好緊急。"}
+                    {origin: "這是一個緊急情況。", formal: "This is an emergency.", formal_check: "這是緊急情況。", slang: "It's an emergency.", slang_check: "好緊急。"},
+                    {origin: "救命！", formal: "Help!", formal_check: "救命！", slang: "Help!", slang_check: "救命！"},
+                    {origin: "這裡有小偷。", formal: "There is a thief here.", formal_check: "這裡有小偷。", slang: "Thief here.", slang_check: "有賊。"},
+                    {origin: "我俾人搶劫。", formal: "I have been robbed.", formal_check: "我被搶劫了。", slang: "I got robbed.", slang_check: "被人打劫。"},
+                    {origin: "警署喺邊？", formal: "Where is the police station?", formal_check: "警察局在哪裡？", slang: "Where's the police station?", slang_check: "警署喺邊？"},
+                    {origin: "領事館電話幾多號？", formal: "What is the consulate's phone number?", formal_check: "領事館電話是多少？", slang: "Consulate phone number?", slang_check: "領事館電話？"},
+                    {origin: "停電喇。", formal: "There is a power outage.", formal_check: "停電了。", slang: "Power's out.", slang_check: "停電。"},
+                    {origin: "𨋢壞咗困住咗人。", formal: "People are stuck in the broken elevator.", formal_check: "電梯壞了，有人被困。", slang: "Stuck in the elevator.", slang_check: "困𨋢。"},
+                    {origin: "佢暈咗。", formal: "He has fainted.", formal_check: "他暈倒了。", slang: "He fainted.", slang_check: "佢暈低咗。"},
+                    {origin: "我需要白車。", formal: "I need an ambulance.", formal_check: "我需要救護車。", slang: "Need an ambulance.", slang_check: "要叫白車。"},
+                    {origin: "請盡快過來！", formal: "Please come quickly!", formal_check: "請盡快過來！", slang: "Come quick!", slang_check: "快啲過嚟！"}
                 ],
                 others: [
                     {origin: "有雨傘可以借嗎？", formal: "Do you have any umbrellas I could borrow?", formal_check: "可以借雨傘嗎？", slang: "Can I borrow an umbrella?", slang_check: "有無遮借？"},
@@ -711,7 +910,17 @@
                     {origin: "這裡有微波爐嗎？", formal: "Is there a microwave available?", formal_check: "有微波爐嗎？", slang: "Any microwave?", slang_check: "有無叮叮？"},
                     {origin: "可以多要一個枕頭嗎？", formal: "Could I have an extra pillow, please?", formal_check: "能多要個枕頭嗎？", slang: "Another pillow, please.", slang_check: "加個枕頭。"},
                     {origin: "插座在哪裡？", formal: "Where are the power outlets?", formal_check: "插座在哪？", slang: "Where can I plug this in?", slang_check: "邊度有插頭？"},
-                    {origin: "我想投訴。", formal: "I would like to make a complaint.", formal_check: "我想投訴。", slang: "I've got a complaint.", slang_check: "我想投訴。"}
+                    {origin: "我想投訴。", formal: "I would like to make a complaint.", formal_check: "我想投訴。", slang: "I've got a complaint.", slang_check: "我想投訴。"},
+                    {origin: "酒店有無紀念品賣？", formal: "Do you sell souvenirs in the hotel?", formal_check: "酒店賣紀念品嗎？", slang: "Sell souvenirs here?", slang_check: "有紀念品賣？"},
+                    {origin: "可唔可以幫我訂位食飯？", formal: "Can you help me make a restaurant reservation?", formal_check: "能幫我預訂餐廳嗎？", slang: "Book a table for me?", slang_check: "幫手訂位食飯？"},
+                    {origin: "邊度有水機？", formal: "Where is the water dispenser?", formal_check: "飲水機在哪？", slang: "Water dispenser?", slang_check: "水機喺邊？"},
+                    {origin: "有無嬰兒房/育嬰室？", formal: "Is there a nursing room?", formal_check: "有哺乳室嗎？", slang: "Nursing room?", slang_check: "有無育嬰室？"},
+                    {origin: "會議室喺邊？", formal: "Where is the meeting room?", formal_check: "會議室在哪裡？", slang: "Meeting room?", slang_check: "會議室喺邊？"},
+                    {origin: "電影係免費嘅嗎？", formal: "Are the movies free?", formal_check: "電影是免費的嗎？", slang: "Free movies?", slang_check: "電影免費？"},
+                    {origin: "唔該幫我清理房間。", formal: "Please make up my room.", formal_check: "請打掃我的房間。", slang: "Clean my room, please.", slang_check: "執房唔該。"},
+                    {origin: "今日唔需要執房。", formal: "No housekeeping needed today.", formal_check: "今天不需要打掃。", slang: "Do not disturb today.", slang_check: "今日唔洗執房。"},
+                    {origin: "早餐券唔見咗。", formal: "I lost my breakfast voucher.", formal_check: "我弄丟了早餐券。", slang: "Lost my breakfast ticket.", slang_check: "早餐券唔見咗。"},
+                    {origin: "你哋服務好好。", formal: "Your service is excellent.", formal_check: "你們的服務很好。", slang: "Great service.", slang_check: "服務好好。"}
                 ]
             }
         };
@@ -746,27 +955,25 @@
             else { window.location.href = `intent://search?text=${encodedText}#Intent;scheme=erudite;package=com.erudite.dictionary;end`; }
         }
 
-        // --- 修正後的 Gemini 跳轉邏輯 ---
         function launchGemini() {
+            const webUrl = "https://gemini.google.com/";
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isiOS) { 
-                window.location.href = "google-gemini://"; 
-                setTimeout(() => { window.open("https://gemini.google.com/", '_blank'); }, 2000); 
-            } else { 
-                // Android 優化跳轉
-                window.location.href = "intent://gemini.google.com/#Intent;scheme=https;package=com.google.android.apps.bard;end"; 
+            if (isiOS) {
+                window.location.href = "googleapp://";
+                setTimeout(() => { window.location.href = webUrl; }, 800);
+            } else {
+                window.location.href = `intent://${webUrl.replace('https://', '')}#Intent;scheme=https;package=com.google.android.apps.bard;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
             }
         }
 
-        // --- 修正後的 Perplexity 跳轉邏輯 ---
         function launchPerplexity() {
+            const webUrl = "https://www.perplexity.ai/";
             const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (isiOS) { 
-                window.location.href = "perplexity://"; 
-                setTimeout(() => { window.open("https://www.perplexity.ai/", '_blank'); }, 2000); 
-            } else { 
-                // Android 優化跳轉
-                window.location.href = "intent://www.perplexity.ai/#Intent;scheme=https;package=ai.perplexity.app.android;end"; 
+            if (isiOS) {
+                window.location.href = "perplexity://";
+                setTimeout(() => { window.location.href = webUrl; }, 800);
+            } else {
+                window.location.href = `intent://${webUrl.replace('https://', '')}#Intent;scheme=https;package=ai.perplexity.app;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
             }
         }
 
