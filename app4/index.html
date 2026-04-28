@@ -136,8 +136,12 @@
             bottom: 0;
             width: 80px;
             display: flex;
-            align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 14px; z-index: 1;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 1;
         }
 
         .swiped-left .item-main-content {
@@ -215,17 +219,31 @@
             overflow-y: hidden;
         }
         .input-clear-btn {
-            position: absolute; right: 15px; bottom: 15px;
-            background: #f5f5f5; border: 1px solid #ddd; border-radius: 50%;
-            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #e53935; font-size: 16px; z-index: 5;
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #e53935;
+            font-size: 16px;
+            z-index: 5;
         }
 
         /* Writing Page Adjustments - 修改為自動增高 */
         #writingContent {
             height: auto; 
-            min-height: 280px; margin-bottom: 5px; width: 100%;
-            resize: none; overflow-y: hidden;
+            min-height: 280px;
+            margin-bottom: 5px;
+            width: 100%;
+            resize: none;
+            overflow-y: hidden;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -250,23 +268,6 @@
                 <div class="card" style="border-color: #8e24aa;" onclick="switchPage('scope')"><i>📋</i><h3>Study Scope</h3><p>Manage List</p></div>
                 <div class="card" style="border-color: #e53935;" onclick="switchPage('dictation')"><i>🎧</i><h3>Dictation</h3><p>Listen & Spell</p></div>
                 <div class="card" style="border-color: #00acc1;" onclick="switchPage('writing')"><i>✍️</i><h3>Writing</h3><p>Draft & Edit</p></div>
-            </div>
-
-            <div style="display: flex; gap: 12px; margin-top: 12px; width: 100%;">
-                <div style="flex: 1; background: #fff; border: 2px solid #1a73e8; padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;" onclick="openAILink('gemini')" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
-                    <i style="font-size: 22px; font-style: normal; margin: 0;">✨</i>
-                    <div style="text-align: left;">
-                        <h3 style="margin: 0; font-size: 15px; color: #1a73e8;">Gemini</h3>
-                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #546e7a;">AI Assistant</p>
-                    </div>
-                </div>
-                <div style="flex: 1; background: #fff; border: 2px solid #26a69a; padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;" onclick="openAILink('perplexity')" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
-                    <i style="font-size: 22px; font-style: normal; margin: 0;">🔎</i>
-                    <div style="text-align: left;">
-                        <h3 style="margin: 0; font-size: 15px; color: #26a69a;">Perplexity</h3>
-                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #546e7a;">AI Search</p>
-                    </div>
-                </div>
             </div>
 
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 15px; border: 1px solid #e0e0e0; width: 100%;">
@@ -987,7 +988,7 @@
 
         function handleFavTouchStart(e) { touchStartX = e.touches[0].clientX; }
         function handleFavTouchMove(e, i) {
-            let row = document.getElementById(`fav-row-${item.originalIndex}`); let diff = touchStartX - e.touches[0].clientX;
+            let row = document.getElementById(`fav-row-${i}`); let diff = touchStartX - e.touches[0].clientX;
             if (diff > 20) row.classList.add('swiped-left'); else if (diff < -20) row.classList.remove('swiped-left');
         }
         function handleFavTouchEnd(e, i) { if (touchStartX - e.changedTouches[0].clientX < 40) document.getElementById(`fav-row-${i}`).classList.remove('swiped-left'); }
@@ -1191,35 +1192,6 @@
                 } catch (err) { alert("❌ 檔案解析失敗。"); }
             };
             reader.readAsText(file);
-        }
-        
-        // 專業跳轉函式：優化 Gemini 與 Perplexity 的應用程式啟動邏輯
-        function openAILink(app) {
-            let scheme = '';
-            let fallbackUrl = '';
-
-            if (app === 'gemini') {
-                // 定義 Gemini 的 Custom URL Scheme 與備用網頁版連結
-                scheme = 'gemini://';
-                fallbackUrl = 'https://gemini.google.com/';
-            } else if (app === 'perplexity') {
-                // 定義 Perplexity 的 Custom URL Scheme 與備用網頁版連結
-                scheme = 'perplexity://';
-                fallbackUrl = 'https://www.perplexity.ai/';
-            }
-
-            // 模擬 DeepL / Erudite 原生跳轉：直接賦值 location.href
-            // 這將會強制系統（特別是 iOS）彈出「是否開啟應用程式」的原生詢問視窗
-            window.location.href = scheme;
-
-            // 備案機制：透過監測時間差，判斷 App 是否成功被喚起
-            // 若未成功喚起 (如未安裝該 App)，則於短暫延遲後以新分頁開啟網頁版
-            const startTimestamp = Date.now();
-            setTimeout(function() {
-                if (Date.now() - startTimestamp < 1500) {
-                    window.open(fallbackUrl, '_blank');
-                }
-            }, 1000);
         }
 
         window.onload = () => { 
